@@ -1,0 +1,918 @@
+:root {
+  --guild-1: #ff9999;
+  --guild-2: #9999ff;
+  --guild-3: #99ff99;
+  --guild-4: #ffff99;
+  --empty-point: rgba(255, 255, 255, 0.86);
+  --border: #b8b8b8;
+  --surface: #ffffff;
+  --page: #f7f7f4;
+  --text: #222222;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: center;
+  background: var(--page);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #888888;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #eeeeee;
+}
+
+button:disabled {
+  color: #777777;
+  cursor: not-allowed;
+}
+
+h2,
+h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+footer {
+  margin: 40px 0 16px;
+  color: #777777;
+  font-size: 0.8rem;
+}
+
+.app-shell {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.panel {
+  margin: 0 auto 16px;
+}
+
+.source-panel {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(136px, 1fr));
+  gap: 10px;
+  width: min(100%, 760px);
+}
+
+.source-grid label {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.source-grid input,
+.source-grid select {
+  width: 100%;
+  min-height: 34px;
+}
+
+.combo-box {
+  position: relative;
+  display: block;
+}
+
+.combo-box input {
+  border: 1px solid #999999;
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.combo-box input::placeholder {
+  color: #b8b8b8;
+  opacity: 1;
+}
+
+.combo-options {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #999999;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.combo-options button,
+.combo-empty {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  background: #ffffff;
+}
+
+.combo-options button:hover {
+  background: #eeeeee;
+}
+
+.combo-group-button {
+  font-weight: 700;
+}
+
+.combo-options .combo-world-button {
+  padding-left: 20px;
+  font-weight: 400;
+}
+
+.combo-empty {
+  color: #777777;
+}
+
+.guild-display {
+  width: min(100%, 380px);
+}
+
+.guild-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  justify-content: center;
+  gap: 8px 16px;
+}
+
+.guild-cell {
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid #999999;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+
+.guild-cell1 {
+  background-color: var(--guild-1);
+}
+
+.guild-cell2 {
+  background-color: var(--guild-2);
+}
+
+.guild-cell3 {
+  background-color: var(--guild-3);
+}
+
+.guild-cell4 {
+  background-color: var(--guild-4);
+}
+
+.apply-data-button {
+  width: 100%;
+  margin-top: 10px;
+  border-color: #315f8f;
+  background: #346fa8;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.apply-data-button:hover {
+  background: #285c91;
+}
+
+.apply-data-button.has-pending {
+  border-color: #1f6f3d;
+  background: #23824a;
+}
+
+.apply-data-button.has-pending:hover {
+  background: #1d713f;
+}
+
+.apply-data-button:disabled {
+  border-color: #9aa8b5;
+  background: #d7dde3;
+  color: #6f7a84;
+}
+
+.pending-message {
+  margin: 6px 0 0;
+  color: #1f6f3d;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status-message {
+  min-height: 1.4em;
+  margin: 0;
+  color: #555555;
+  font-size: 0.9rem;
+}
+
+.status-message[data-type="success"] {
+  color: #23642f;
+}
+
+.status-message[data-type="error"] {
+  color: #9b1c1c;
+}
+
+.section-divider {
+  width: 100%;
+  margin: 4px 0 16px;
+  border: 0;
+  border-top: 1px solid #cfcfcf;
+}
+
+.table-scroll {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.cumulative-scope {
+  min-height: 1.3em;
+  margin: -4px 0 8px;
+  color: #666666;
+  font-size: 0.85rem;
+}
+
+.score-table {
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+.score-table th,
+.score-table td {
+  min-width: 64px;
+  border: 1px solid #aaaaaa;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.score-table th:first-child,
+.score-table td:first-child {
+  min-width: 36px;
+}
+
+.score-table th:nth-child(2),
+.score-table td:nth-child(2) {
+  min-width: 144px;
+}
+
+.score-table thead {
+  background-color: #eeeeee;
+}
+
+.score-total,
+.score-cumulative {
+  font-weight: 700;
+  background: #f5f5f5;
+}
+
+.score-cumulative {
+  background: #edf4fb;
+}
+
+.score-icon-cell {
+  padding: 4px;
+}
+
+.score-guild-marker {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  color: #222222;
+}
+
+.score-guild-marker svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 100%;
+  margin: 0 0 12px;
+}
+
+.occupation-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+}
+
+.tab-button {
+  flex: 0 0 auto;
+  min-width: 42px;
+  min-height: 34px;
+  padding: 5px 12px;
+  border-color: #999999;
+  background: #ffffff;
+}
+
+.tab-button.is-active {
+  border-color: #333333;
+  background: #333333;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.tab-add-button {
+  font-weight: 700;
+}
+
+.tab-name-input {
+  flex: 0 0 auto;
+  width: 88px;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid #333333;
+  border-radius: 6px;
+  font: inherit;
+  text-align: center;
+  background: #ffffff;
+}
+
+.tab-context-menu {
+  position: fixed;
+  z-index: 1000;
+  padding: 4px;
+  border: 1px solid #999999;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.tab-context-menu button {
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.tab-context-menu button:hover {
+  background: #eeeeee;
+}
+
+.delete-tab-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.reset-data-button {
+  flex: 0 0 auto;
+  border-color: #a77b7b;
+  color: #7f2828;
+  white-space: nowrap;
+}
+
+.reset-data-button:hover {
+  background: #f7eaea;
+}
+
+.map-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.point {
+  position: absolute;
+  --point-aura-color: transparent;
+  z-index: 5;
+  width: 150px;
+  min-height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background-color: transparent;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.point-aura {
+  position: absolute;
+  z-index: 1;
+  --point-aura-wash: color-mix(in srgb, var(--point-aura-color) 82%, transparent);
+  --point-aura-deep: color-mix(in srgb, var(--point-aura-color) 96%, #d8d0ad 4%);
+  width: 72px;
+  height: 52px;
+  border-radius: 54% 46% 58% 42% / 48% 56% 44% 52%;
+  transform: translate(-50%, -50%) rotate(-6deg);
+  background:
+    radial-gradient(ellipse at 42% 48%,
+      var(--point-aura-deep) 0%,
+      var(--point-aura-wash) 28%,
+      transparent 68%),
+    radial-gradient(ellipse at 62% 38%,
+      var(--point-aura-wash) 0%,
+      transparent 52%),
+    radial-gradient(ellipse at 30% 65%,
+      var(--point-aura-wash) 0%,
+      transparent 48%);
+  opacity: 0.76;
+  filter: blur(6px) saturate(1.08);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.point-aura::before,
+.point-aura::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 48% 52% 44% 56% / 55% 45% 55% 45%;
+  background:
+    radial-gradient(ellipse at 55% 45%,
+      var(--point-aura-color) 0%,
+      transparent 56%);
+  opacity: 0.44;
+  filter: blur(7px);
+}
+
+.point-aura::after {
+  inset: 18%;
+  border-radius: 58% 42% 51% 49% / 40% 58% 42% 60%;
+  transform: rotate(18deg);
+  opacity: 0.34;
+}
+
+.point-structure {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.point-banner {
+  position: absolute;
+  z-index: 3;
+  display: block;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.point-name-label {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  min-width: 96px;
+  height: 18px;
+  color: #e8d3a8;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 1px 1px rgba(31, 15, 5, 0.92),
+    0 0 3px rgba(47, 21, 6, 0.82),
+    0 0 5px rgba(88, 50, 18, 0.45);
+  pointer-events: none;
+  transform: translate(-50%, calc(-50% - 2px));
+}
+
+.point-aura-temple {
+  width: 288px;
+  height: 216px;
+}
+
+.point-aura-castle {
+  width: 246px;
+  height: 180px;
+}
+
+.point-aura-church {
+  width: 195px;
+  height: 150px;
+}
+
+.point-frame {
+  position: absolute;
+  z-index: 0;
+  left: calc(50% + 66px);
+  top: calc(50% + 10px);
+  width: 100px;
+  height: 100px;
+  background: url("shield-marker.png") center / contain no-repeat;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.point::after {
+  content: none;
+}
+
+.point-sword-frame {
+  position: absolute;
+  z-index: 0;
+  left: calc(50% - 66px);
+  top: calc(50% - 10px);
+  width: 18px;
+  height: 18px;
+  color: var(--sword-guild-color, #d86a72);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.sword-marker-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("sword-marker.png") center / contain no-repeat;
+}
+
+.point-labels {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  grid-template-rows: repeat(2, 18px);
+  gap: 2px;
+  width: 128px;
+  transform: translate(-50%, -50%);
+}
+
+.point-labels::before,
+.point-labels::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 136px;
+  height: 18px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg,
+      rgba(22, 41, 47, 0) 0%,
+      rgba(22, 41, 47, 0.78) 16%,
+      rgba(18, 37, 43, 0.9) 50%,
+      rgba(22, 41, 47, 0.78) 84%,
+      rgba(22, 41, 47, 0) 100%);
+  pointer-events: none;
+}
+
+.point-labels::before {
+  top: 0;
+  left: 9px;
+  background:
+    linear-gradient(90deg,
+      rgba(93, 38, 42, 0.9) 0%,
+      rgba(70, 29, 33, 0.92) 62%,
+      rgba(93, 38, 42, 0.58) 84%,
+      rgba(93, 38, 42, 0) 100%);
+}
+
+.point-labels::after {
+  bottom: 0;
+  right: 9px;
+  background:
+    linear-gradient(90deg,
+      rgba(22, 41, 47, 0) 0%,
+      rgba(22, 41, 47, 0.58) 16%,
+      rgba(18, 37, 43, 0.9) 38%,
+      rgba(22, 41, 47, 0.9) 100%);
+}
+
+.point select {
+  position: relative;
+  z-index: 2;
+  width: 130px;
+  min-height: 18px;
+  min-width: 0;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  border: 0;
+  border-radius: 0;
+  color: #eef4f8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  background-color: transparent;
+}
+
+.point-attacker-select {
+  justify-self: start;
+  margin-left: 9px;
+}
+
+.point-owner-select {
+  justify-self: start;
+  margin-left: -11px;
+}
+
+.point select option {
+  min-width: 220px;
+  color: #f3f7f8;
+  background-color: #1f3238;
+}
+
+.point-mobile-icons,
+.point-chip {
+  display: none;
+}
+
+.point-chip-mark svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: center;
+}
+
+.point-chip-mark .marker-diamond {
+  transform: translateY(0.25px);
+}
+
+.point-chip-mark .marker-teardrop {
+  transform: translateY(0.5px);
+}
+
+.point-chip-mark .marker-crystal {
+  transform: translateY(0.25px);
+}
+
+.point-chip-mark .marker-star-gem {
+  transform: translateY(0.25px);
+}
+
+.point-chip-empty {
+  line-height: 1;
+}
+
+.point:focus-within {
+  z-index: 10;
+}
+
+.point select:focus {
+  width: 130px;
+  min-width: 0;
+  max-width: 130px;
+}
+
+.mobile-point-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.mobile-point-picker[hidden] {
+  display: none;
+}
+
+.mobile-point-picker-panel {
+  width: min(100%, 480px);
+  padding: 12px;
+  border-radius: 12px 12px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.mobile-point-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mobile-picker-close {
+  min-width: 36px;
+  padding: 4px 10px;
+}
+
+.mobile-point-picker-options {
+  display: grid;
+  gap: 12px;
+}
+
+.mobile-picker-group h4 {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+}
+
+.mobile-picker-group-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mobile-picker-option {
+  min-height: 42px;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.mobile-picker-option[aria-pressed="true"] {
+  outline: 2px solid #222222;
+  outline-offset: 1px;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 10px;
+  }
+
+  .source-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .tab-row {
+    flex-direction: column;
+    gap: 6px;
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .occupation-tabs {
+    justify-content: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .delete-tab-button {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+  }
+
+  .reset-data-button {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+  }
+
+  .tab-button {
+    min-width: 40px;
+    padding: 5px 10px;
+  }
+
+  .point {
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+  }
+
+  .point::after {
+    display: none;
+  }
+
+  .point-aura {
+    display: none;
+  }
+
+  .point-frame {
+    display: none;
+  }
+
+  .point-sword-frame,
+  .point-labels,
+  .point select {
+    display: none;
+  }
+
+  .point-mobile-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transform: translateY(-24px);
+  }
+
+  .point-chip {
+    display: grid;
+    place-items: center;
+    position: relative;
+    z-index: 1;
+    width: 18px;
+    height: 18px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    color: var(--chip-guild-color, #222222);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    overflow: visible;
+    background: transparent !important;
+    box-shadow: none;
+  }
+
+  .point-owner-chip::before {
+    content: "";
+    position: absolute;
+    inset: -34px;
+    z-index: -1;
+    background: url("shield-marker.png") center center / contain no-repeat;
+    pointer-events: none;
+  }
+
+  .point-attacker-chip .sword-marker-icon {
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    width: calc(100%);
+    height: calc(100%);
+    transform: none;
+    filter:
+      drop-shadow(0 1px 1px rgba(255, 255, 255, 0.35))
+      drop-shadow(0 0 2px rgba(0, 0, 0, 0.45));
+  }
+
+  .point-chip-mark {
+    display: grid;
+    place-items: center;
+    position: relative;
+    z-index: 1;
+    width: 8px;
+    height: 8px;
+    transform: none;
+  }
+
+  .point-attacker-chip .point-chip-mark {
+    transform: none;
+  }
+
+  .point-chip-mark svg {
+    position: relative;
+    z-index: 1;
+    width: 8px;
+    height: 8px;
+    stroke-width: 1.65;
+    transform: none;
+    filter:
+      drop-shadow(0 1px 1px rgba(255, 255, 255, 0.55))
+      drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+  }
+
+  .point-chip-mark svg path:first-child {
+    fill: rgba(255, 255, 255, 0.82);
+  }
+
+  .point-chip-mark .marker-diamond,
+  .point-chip-mark .marker-teardrop,
+  .point-chip-mark .marker-crystal,
+  .point-chip-mark .marker-star-gem {
+    transform: none;
+  }
+}

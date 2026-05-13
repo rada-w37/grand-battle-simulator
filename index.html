@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Battle Simulator</title>
+  <link rel="stylesheet" href="style.css?v=20260512-mobile-map-assets">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel source-panel">
+      <div class="source-grid">
+        <label>
+          <span>サーバー</span>
+          <select id="server-select">
+            <option value="1">Japan</option>
+            <option value="2">Korea</option>
+            <option value="3">Asia</option>
+            <option value="4">North America</option>
+            <option value="5">Europe</option>
+            <option value="6">Global</option>
+          </select>
+        </label>
+
+        <label>
+          <span>ワールド</span>
+          <div class="combo-box">
+            <input type="text" id="world-input" name="grand-battle-world" placeholder="W1" autocomplete="new-password" inputmode="numeric" aria-controls="world-suggestions">
+            <datalist id="world-options"></datalist>
+            <div id="world-suggestions" class="combo-options" role="listbox" hidden></div>
+          </div>
+        </label>
+
+        <label>
+          <span>クラス</span>
+          <select id="class-select">
+            <option value="3">グランドマスター</option>
+            <option value="2">エキスパート</option>
+            <option value="1">エリート</option>
+          </select>
+        </label>
+
+        <label>
+          <span>ブロック</span>
+          <select id="block-select">
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+            <option value="3">D</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="guild-display" aria-labelledby="guild-heading">
+        <h3 id="guild-heading">ギルド名</h3>
+        <div id="guild-grid" class="guild-grid" aria-live="polite"></div>
+        <button type="button" id="apply-data-button" class="apply-data-button" disabled>データを反映</button>
+        <p id="pending-message" class="pending-message" hidden>未反映データがあります</p>
+      </div>
+
+      <p id="status-message" class="status-message" aria-live="polite"></p>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="panel score-panel" aria-labelledby="score-heading">
+      <h2 id="score-heading">獲得ポイント</h2>
+      <p id="cumulative-scope" class="cumulative-scope"></p>
+      <div class="table-scroll">
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th class="score-icon-header"></th>
+              <th>ギルド名</th>
+              <th>神殿</th>
+              <th>城</th>
+              <th>教会</th>
+              <th>合計</th>
+              <th>累計</th>
+            </tr>
+          </thead>
+          <tbody id="score-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="tab-row">
+      <nav id="occupation-tabs" class="occupation-tabs" aria-label="拠点状況タブ"></nav>
+      <button type="button" id="delete-tab-button" class="delete-tab-button">選択中のタブを削除</button>
+      <button type="button" id="reset-data-button" class="reset-data-button">全データ初期化</button>
+    </div>
+
+    <section class="map-container" aria-label="拠点マップ">
+      <img src="map.png" alt="グランドバトル拠点マップ" class="map-image">
+      <div id="battle-points"></div>
+    </section>
+
+    <div id="mobile-point-picker" class="mobile-point-picker" hidden>
+      <div class="mobile-point-picker-panel">
+        <div class="mobile-point-picker-header">
+          <strong id="mobile-point-picker-title">拠点選択</strong>
+          <button type="button" id="mobile-point-picker-close" class="mobile-picker-close" aria-label="閉じる">×</button>
+        </div>
+        <div id="mobile-point-picker-options" class="mobile-point-picker-options"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    (c)BANK OF INNOVATION 該当画像の転載・配布等は禁止しております。
+  </footer>
+
+  <script src="script.js?v=20260512-muted-aura"></script>
+</body>
+</html>
