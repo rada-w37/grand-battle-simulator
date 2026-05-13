@@ -542,7 +542,7 @@ footer {
   top: calc(50% + 10px);
   width: 100px;
   height: 100px;
-  background: url("shield-marker.png") center / contain no-repeat;
+  background: url("resource/shield-marker.png") center / contain no-repeat;
   pointer-events: none;
   transform: translate(-50%, -50%);
 }
@@ -567,7 +567,7 @@ footer {
   display: block;
   width: 100%;
   height: 100%;
-  background: url("sword-marker.png") center / contain no-repeat;
+  background: url("resource/sword-marker.png") center / contain no-repeat;
 }
 
 .point-labels {
@@ -863,7 +863,7 @@ footer {
     position: absolute;
     inset: -34px;
     z-index: -1;
-    background: url("shield-marker.png") center center / contain no-repeat;
+    background: url("resource/shield-marker.png") center center / contain no-repeat;
     pointer-events: none;
   }
 
