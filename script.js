@@ -209,7 +209,7 @@ function createOption(value, text) {
 }
 
 function getPointSelects() {
-  return Array.from(document.querySelectorAll(".point-owner-select"));
+  return Array.from(document.querySelectorAll(".point-defender-select"));
 }
 
 function getAllPointSelects() {
@@ -218,15 +218,15 @@ function getAllPointSelects() {
 
 function normalizePointState(state) {
   if (typeof state === "string") {
-    return { owner: state, attacker: "" };
+    return { defender: state, attacker: "" };
   }
 
   if (!state || typeof state !== "object") {
-    return { owner: "", attacker: "" };
+    return { defender: "", attacker: "" };
   }
 
   return {
-    owner: state.owner || state.guildName || state.defender || "",
+    defender: state.defender || state.guildName || state.defender || "",
     attacker: state.attacker || state.attackerGuildName || ""
   };
 }
@@ -239,8 +239,8 @@ function getGuildIndex(guildName) {
   return getGuildEntries().findIndex(guild => guild.name === guildName) + 1;
 }
 
-function updatePointChip(point, guildName, role = "owner") {
-  const chip = point.querySelector(role === "attacker" ? ".point-attacker-chip" : ".point-owner-chip");
+function updatePointChip(point, guildName, role = "defender") {
+  const chip = point.querySelector(role === "attacker" ? ".point-attacker-chip" : ".point-defender-chip");
   if (!chip) return;
 
   const guildIndex = getGuildIndex(guildName);
@@ -269,14 +269,14 @@ function updatePointDeclaration(point, guildName) {
 
 function updateAllPointChips() {
   document.querySelectorAll(".point").forEach(point => {
-    const select = point.querySelector(".point-owner-select");
+    const select = point.querySelector(".point-defender-select");
     updatePointChip(point, select.value);
     updatePointDeclaration(point, point.querySelector(".point-attacker-select")?.value || "");
   });
 }
 
 function createEmptyOccupationStates() {
-  return BATTLE_POINTS.map(() => ({ owner: "", attacker: "" }));
+  return BATTLE_POINTS.map(() => ({ defender: "", attacker: "" }));
 }
 
 function createOccupationTab(index, selectStates = createEmptyOccupationStates()) {
@@ -336,7 +336,7 @@ function loadOccupationTabs() {
 
 function getCurrentSelectStates() {
   return Array.from(document.querySelectorAll(".point")).map(point => ({
-    owner: point.querySelector(".point-owner-select")?.value || "",
+    defender: point.querySelector(".point-defender-select")?.value || "",
     attacker: point.querySelector(".point-attacker-select")?.value || ""
   }));
 }
@@ -487,13 +487,13 @@ function applySelectStates(selectStates = createEmptyOccupationStates()) {
   pendingSelectStates = cloneOccupationStates(selectStates);
   document.querySelectorAll(".point").forEach((point, index) => {
     const state = normalizePointState(pendingSelectStates[index]);
-    const ownerSelect = point.querySelector(".point-owner-select");
+    const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
 
-    ownerSelect.value = state.owner;
+    defenderSelect.value = state.defender;
     attackerSelect.value = state.attacker;
-    setPointAura(point, state.owner);
-    updatePointChip(point, state.owner);
+    setPointAura(point, state.defender);
+    updatePointChip(point, state.defender);
     updatePointDeclaration(point, state.attacker);
   });
   updateScores();
@@ -678,10 +678,10 @@ function renderBattlePoints() {
     attackerSelect.setAttribute("aria-label", `${point.id} attacking guild`);
     labels.appendChild(attackerSelect);
 
-    const ownerSelect = document.createElement("select");
-    ownerSelect.className = "point-owner-select";
-    ownerSelect.setAttribute("aria-label", `${point.id} occupying guild`);
-    labels.appendChild(ownerSelect);
+    const defenderSelect = document.createElement("select");
+    defenderSelect.className = "point-defender-select";
+    defenderSelect.setAttribute("aria-label", `${point.id} occupying guild`);
+    labels.appendChild(defenderSelect);
     wrapper.appendChild(labels);
 
     const mobileIcons = document.createElement("div");
@@ -694,12 +694,12 @@ function renderBattlePoints() {
     attackerChip.addEventListener("click", () => openMobilePointPicker(wrapper));
     mobileIcons.appendChild(attackerChip);
 
-    const ownerChip = document.createElement("button");
-    ownerChip.type = "button";
-    ownerChip.className = "point-chip point-owner-chip";
-    ownerChip.setAttribute("aria-label", `${point.id}の占拠ギルドを選択`);
-    ownerChip.addEventListener("click", () => openMobilePointPicker(wrapper));
-    mobileIcons.appendChild(ownerChip);
+    const defenderChip = document.createElement("button");
+    defenderChip.type = "button";
+    defenderChip.className = "point-chip point-defender-chip";
+    defenderChip.setAttribute("aria-label", `${point.id}の占拠ギルドを選択`);
+    defenderChip.addEventListener("click", () => openMobilePointPicker(wrapper));
+    mobileIcons.appendChild(defenderChip);
 
     wrapper.appendChild(mobileIcons);
 
@@ -714,22 +714,22 @@ function updateGuildOptions() {
 
   document.querySelectorAll(".point").forEach((point, index) => {
     const state = normalizePointState(pendingSelectStates[index]);
-    const ownerSelect = point.querySelector(".point-owner-select");
+    const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
-    const currentOwner = ownerSelect.value || state.owner;
+    const currentdefender = defenderSelect.value || state.defender;
     const currentAttacker = attackerSelect.value || state.attacker;
 
-    [ownerSelect, attackerSelect].forEach(select => {
+    [defenderSelect, attackerSelect].forEach(select => {
       select.replaceChildren(createOption("", select === attackerSelect ? "" : "選択"));
       guilds.forEach(guild => {
         select.appendChild(createOption(guild.name, guild.name));
       });
     });
 
-    ownerSelect.value = guilds.some(guild => guild.name === currentOwner) ? currentOwner : "";
+    defenderSelect.value = guilds.some(guild => guild.name === currentdefender) ? currentdefender : "";
     attackerSelect.value = guilds.some(guild => guild.name === currentAttacker) ? currentAttacker : "";
-    setPointAura(point, ownerSelect.value);
-    updatePointChip(point, ownerSelect.value);
+    setPointAura(point, defenderSelect.value);
+    updatePointChip(point, defenderSelect.value);
     updatePointDeclaration(point, attackerSelect.value);
   });
 }
@@ -770,7 +770,7 @@ function calculateScoresFromStates(selectStates, guildNames) {
   const scores = createEmptyScores(guildNames);
 
   BATTLE_POINTS.forEach((point, index) => {
-    addPointScore(scores, normalizePointState(selectStates[index]).owner, point.type || "church");
+    addPointScore(scores, normalizePointState(selectStates[index]).defender, point.type || "church");
   });
 
   return scores;
@@ -812,7 +812,7 @@ function updateScores() {
   const cumulativeScores = getCumulativeScores(guildNames);
 
   document.querySelectorAll(".point").forEach(point => {
-    const selectedGuild = point.querySelector(".point-owner-select").value;
+    const selectedGuild = point.querySelector(".point-defender-select").value;
     const type = point.dataset.type || "church";
     addPointScore(activeScores, selectedGuild, type);
     setPointAura(point, selectedGuild);
@@ -1149,7 +1149,7 @@ function closeMobilePointPicker() {
 }
 
 function setPointGuild(point, role, guildName) {
-  const select = point.querySelector(role === "attacker" ? ".point-attacker-select" : ".point-owner-select");
+  const select = point.querySelector(role === "attacker" ? ".point-attacker-select" : ".point-defender-select");
   select.value = guildName;
 
   if (role === "attacker") {
@@ -1165,7 +1165,7 @@ function setPointGuild(point, role, guildName) {
 
 function openMobilePointPicker(point) {
   activeMobilePoint = point;
-  const ownerSelect = point.querySelector(".point-owner-select");
+  const defenderSelect = point.querySelector(".point-defender-select");
   const attackerSelect = point.querySelector(".point-attacker-select");
   const pointLabel = point.dataset.id || "拠点";
   elements.mobilePointPickerTitle.textContent = pointLabel;
@@ -1207,7 +1207,7 @@ function openMobilePointPicker(point) {
   };
 
   elements.mobilePointPickerOptions.replaceChildren(
-    createGroup("防衛側", "owner", ownerSelect, "未選択"),
+    createGroup("防衛側", "defender", defenderSelect, "未選択"),
     createGroup("布告側", "attacker", attackerSelect, "布告なし")
   );
   elements.mobilePointPicker.hidden = false;
@@ -1237,13 +1237,13 @@ function applyBattleData() {
 
   document.querySelectorAll(".point").forEach(point => {
     const castleId = Number(point.dataset.castleId);
-    const ownerSelect = point.querySelector(".point-owner-select");
+    const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
     const castleData = castlesById.get(castleId);
     const guildName = castleData ? getOccupyingGuild(castleData, guilds) : "";
     const attackerGuildName = castleData ? getAttackingGuild(castleData, guilds) : "";
 
-    ownerSelect.value = guildName;
+    defenderSelect.value = guildName;
     attackerSelect.value = attackerGuildName;
     setPointAura(point, guildName);
     updatePointChip(point, guildName);

@@ -649,7 +649,7 @@ footer {
   margin-left: 9px;
 }
 
-.point-owner-select {
+.point-defender-select {
   justify-self: start;
   margin-left: -11px;
 }
@@ -858,7 +858,7 @@ footer {
     box-shadow: none;
   }
 
-  .point-owner-chip::before {
+  .point-defender-chip::before {
     content: "";
     position: absolute;
     inset: -34px;
