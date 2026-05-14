@@ -422,7 +422,7 @@ footer {
   position: absolute;
   --point-aura-color: transparent;
   z-index: 5;
-  width: 150px;
+  width: 130px;
   min-height: 42px;
   padding: 0;
   border: 0;
@@ -435,7 +435,7 @@ footer {
 .point-aura {
   position: absolute;
   z-index: 1;
-  --point-aura-wash: color-mix(in srgb, var(--point-aura-color) 82%, transparent);
+  --point-aura-wash: color-mix(in srgb, var(--point-aura-color) 62%, transparent);
   --point-aura-deep: color-mix(in srgb, var(--point-aura-color) 96%, #d8d0ad 4%);
   width: 72px;
   height: 52px;
@@ -504,11 +504,10 @@ footer {
   z-index: 4;
   display: grid;
   place-items: center;
-  min-width: 96px;
-  height: 18px;
+  min-width: 0;
   color: #e8d3a8;
   font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-  font-size: 0.62rem;
+  font-size: clamp(1.8rem, 0.75vw, 0.7rem);
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -518,8 +517,10 @@ footer {
     0 0 5px rgba(88, 50, 18, 0.45);
   pointer-events: none;
   transform: translate(-50%, calc(-50% - 2px));
+  transform-origin: center;
+  white-space: nowrap;
 }
-
+  
 .point-aura-temple {
   width: 288px;
   height: 216px;
@@ -538,10 +539,10 @@ footer {
 .point-frame {
   position: absolute;
   z-index: 0;
-  left: calc(50% + 66px);
-  top: calc(50% + 10px);
-  width: 100px;
-  height: 100px;
+  left: calc(82%);
+  top: calc(50% + 16px);
+  width: 90px;
+  height: 90px;
   background: url("resource/shield-marker.png") center / contain no-repeat;
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -554,7 +555,7 @@ footer {
 .point-sword-frame {
   position: absolute;
   z-index: 0;
-  left: calc(50% - 66px);
+  left: calc(18%);
   top: calc(50% - 10px);
   width: 18px;
   height: 18px;
@@ -576,10 +577,11 @@ footer {
   left: 50%;
   top: 50%;
   display: grid;
-  grid-template-rows: repeat(2, 18px);
+  /* grid-template-rows: repeat(2, 18px); */
   gap: 2px;
-  width: 128px;
+  width: 49%;
   transform: translate(-50%, -50%);
+  align-items: start;
 }
 
 .point-labels::before,
@@ -587,7 +589,7 @@ footer {
   content: "";
   position: absolute;
   z-index: -1;
-  width: 136px;
+  width:125%;
   height: 18px;
   border-radius: 3px;
   background:
@@ -602,7 +604,7 @@ footer {
 
 .point-labels::before {
   top: 0;
-  left: 9px;
+  left: 0px;
   background:
     linear-gradient(90deg,
       rgba(93, 38, 42, 0.9) 0%,
@@ -613,7 +615,7 @@ footer {
 
 .point-labels::after {
   bottom: 0;
-  right: 9px;
+  right: 0;
   background:
     linear-gradient(90deg,
       rgba(22, 41, 47, 0) 0%,
@@ -625,15 +627,14 @@ footer {
 .point select {
   position: relative;
   z-index: 2;
-  width: 130px;
+  width: 90%;
   min-height: 18px;
-  min-width: 0;
-  padding: 0 10px;
-  text-overflow: ellipsis;
+  /* min-width: 50; */
+  /* text-overflow: ellipsis; */
   border: 0;
   border-radius: 0;
   color: #eef4f8;
-  font-size: 0.68rem;
+  font-size: 0.55rem;
   font-weight: 700;
   text-align: center;
   text-align-last: center;
@@ -645,18 +646,20 @@ footer {
 }
 
 .point-attacker-select {
-  justify-self: start;
-  margin-left: 9px;
+  justify-self: center;
+  /* margin-right: 9px; */
+  align-self: center;
 }
 
 .point-defender-select {
-  justify-self: start;
-  margin-left: -11px;
+  justify-self: center;
+  /* margin-left: -11px; */
+  align-self: center;
 }
 
 .point select option {
-  min-width: 220px;
-  color: #f3f7f8;
+  /* min-width: 220px; */
+  /* color: #f3f7f8; */
   background-color: #1f3238;
 }
 
@@ -701,9 +704,9 @@ footer {
 }
 
 .point select:focus {
-  width: 130px;
+  width: 200%;
   min-width: 0;
-  max-width: 130px;
+  /* max-width: 130px; */
 }
 
 .mobile-point-picker {

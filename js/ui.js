@@ -189,7 +189,8 @@ function renderBannerPlacements(fragment) {
     label.className = "point-name-label";
     label.textContent = placement.name;
     label.dataset.pointId = placement.pointId;
-    label.style.transform = `translate(-50%, calc(-50% - 2px)) scale(${placement.scale / 10.9})`;
+    //label.style.transform = `translate(-50%, calc(-50% - 2px)) scale(${placement.scale}%)`;
+    label.style.transform = `translate(-50%, calc(-50% - 1px)) scale(${placement.scale / 35})`;
     label.style.transformOrigin = "center";
     setMapImagePosition(label, placement.x, placement.y);
     fragment.appendChild(label);
