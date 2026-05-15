@@ -645,17 +645,17 @@ footer {
   background-color: transparent;
 }
 
-.point-attacker-select {
+/* .point-attacker-select {
   justify-self: center;
-  /* margin-right: 9px; */
+  margin-right: 9px;
   align-self: center;
 }
 
 .point-defender-select {
   justify-self: center;
-  /* margin-left: -11px; */
+  margin-left: -11px;
   align-self: center;
-}
+} */
 
 .point select option {
   /* min-width: 220px; */
@@ -663,7 +663,6 @@ footer {
   background-color: #1f3238;
 }
 
-.point-mobile-icons,
 .point-chip {
   display: none;
 }
@@ -709,69 +708,6 @@ footer {
   /* max-width: 130px; */
 }
 
-.mobile-point-picker {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.28);
-}
-
-.mobile-point-picker[hidden] {
-  display: none;
-}
-
-.mobile-point-picker-panel {
-  width: min(100%, 480px);
-  padding: 12px;
-  border-radius: 12px 12px 0 0;
-  background: #ffffff;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
-}
-
-.mobile-point-picker-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.mobile-picker-close {
-  min-width: 36px;
-  padding: 4px 10px;
-}
-
-.mobile-point-picker-options {
-  display: grid;
-  gap: 12px;
-}
-
-.mobile-picker-group h4 {
-  margin: 0 0 6px;
-  font-size: 0.92rem;
-}
-
-.mobile-picker-group-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.mobile-picker-option {
-  min-height: 42px;
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-
-.mobile-picker-option[aria-pressed="true"] {
-  outline: 2px solid #222222;
-  outline-offset: 1px;
-  font-weight: 700;
-}
-
 @media (max-width: 720px) {
   .app-shell {
     padding: 10px;
@@ -809,6 +745,7 @@ footer {
     padding: 5px 10px;
   }
 
+   /* Mobile-specific point UI overrides disabled. */
   .point {
     padding: 0;
     border: 0;
@@ -823,24 +760,96 @@ footer {
     display: none;
   }
 
+  /* 盾 */
   .point-frame {
     display: none;
   }
 
-  .point-sword-frame,
-  .point-labels,
+
+  .point-sword-frame{
+    display: none;
+  }
+
   .point select {
     display: none;
   }
 
-  .point-mobile-icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    transform: translateY(-24px);
+  .point-name-label {
+    position: absolute;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    color: #e8d3a8;
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
+    font-size: clamp(1.0rem, 0.75vw, 0.7rem);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    text-shadow:
+      0 1px 1px rgba(31, 15, 5, 0.92),
+      0 0 3px rgba(47, 21, 6, 0.82),
+      0 0 5px rgba(88, 50, 18, 0.45);
+    pointer-events: none;
+    transform: translate(-50%, calc(-50% - 2px));
+    transform-origin: center;
+    white-space: nowrap;
   }
 
+  .point-labels{  
+    width: 30%;
+    top: 45%;
+    /* height: 30%; */
+  }
+
+  .point-labels::before,
+  .point-labels::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width:100%;
+    height: 6px;
+    border-radius: 0px;
+    pointer-events: none;
+  }
+
+  .point-labels::before {
+    top: 0;
+    left: 0px;
+    background:
+      linear-gradient(90deg,
+        rgba(22, 41, 47, 0) 0%,
+        rgba(22, 41, 47, 0.58) 15%,
+        rgba(18, 37, 43, 0.9) 50%,
+        rgba(18, 37, 43, 0.9) 85%,
+        rgba(22, 41, 47, 0) 100%);
+  }
+
+  .point-labels::after {
+    bottom: 0;
+    right: 0;
+    background:
+      linear-gradient(90deg,
+        rgba(93, 38, 42, 0) 0%,
+        rgba(70, 29, 33, 0.92) 15%,
+        rgba(70, 29, 33, 0.92) 50%,
+        rgba(70, 29, 33, 0.92) 85%,
+        rgba(93, 38, 42, 0) 100%);
+  }
+
+  .point select {
+    height: 10%;
+  }
+
+  .point-attacker-select {
+    
+  }
+
+  .point-defender-select {
+    
+  }
+
+  /* 
   .point-chip {
     display: grid;
     place-items: center;
@@ -878,10 +887,10 @@ footer {
     height: calc(100%);
     transform: none;
     filter:
-      drop-shadow(0 1px 1px rgba(255, 255, 255, 0.35))
-      drop-shadow(0 0 2px rgba(0, 0, 0, 0.45));
-  }
-
+    drop-shadow(0 1px 1px rgba(255, 255, 255, 0.35))
+    drop-shadow(0 0 2px rgba(0, 0, 0, 0.45));
+    }
+    
   .point-chip-mark {
     display: grid;
     place-items: center;
@@ -906,16 +915,16 @@ footer {
     filter:
       drop-shadow(0 1px 1px rgba(255, 255, 255, 0.55))
       drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
-  }
+  } */
 
+  /* 
   .point-chip-mark svg path:first-child {
     fill: rgba(255, 255, 255, 0.82);
   }
-
   .point-chip-mark .marker-diamond,
   .point-chip-mark .marker-teardrop,
   .point-chip-mark .marker-crystal,
   .point-chip-mark .marker-star-gem {
     transform: none;
-  }
+  } */
 }
