@@ -8,7 +8,8 @@
 </head>
 <body>
   <main class="app-shell">
-    <section class="panel source-panel">
+    <div class="top-layout">
+      <section class="panel source-panel">
       <div class="source-grid">
         <label>
           <span>サーバー</span>
@@ -61,9 +62,9 @@
       <p id="status-message" class="status-message" aria-live="polite"></p>
     </section>
 
-    <hr class="section-divider">
+      <hr class="section-divider">
 
-    <section class="panel score-panel" aria-labelledby="score-heading">
+      <section class="panel score-panel" aria-labelledby="score-heading">
       <h2 id="score-heading">獲得ポイント</h2>
       <p id="cumulative-scope" class="cumulative-scope"></p>
       <div class="table-scroll">
@@ -84,7 +85,10 @@
       </div>
     </section>
 
-    <div class="tab-row">
+    </div>
+
+    <section class="panel map-panel">
+      <div class="tab-row">
       <nav id="occupation-tabs" class="occupation-tabs" aria-label="拠点状況タブ"></nav>
       <button type="button" id="delete-tab-button" class="delete-tab-button">選択中のタブを削除</button>
       <button type="button" id="reset-data-button" class="reset-data-button">全データ初期化</button>
@@ -93,6 +97,7 @@
     <section class="map-container" aria-label="拠点マップ">
       <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
       <div id="battle-points"></div>
+    </section>
     </section>
 
     <div id="mobile-point-picker" class="mobile-point-picker" hidden>

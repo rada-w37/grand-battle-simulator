@@ -59,26 +59,43 @@ footer {
 }
 
 .app-shell {
-  width: min(100%, 1180px);
+  width: min(100%, 1280px);
   margin: 0 auto;
   padding: 16px;
 }
 
 .panel {
-  margin: 0 auto 16px;
+  margin: 0;
+}
+
+.top-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .source-panel {
   display: grid;
   gap: 12px;
-  justify-items: center;
+  justify-items: stretch;
+}
+
+.score-panel {
+  min-width: 0;
+}
+
+.map-panel {
+  display: grid;
+  gap: 12px;
 }
 
 .source-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(136px, 1fr));
+  grid-template-columns: repeat(2, minmax(136px, 1fr));
   gap: 10px;
-  width: min(100%, 760px);
+  width: 100%;
 }
 
 .source-grid label {
@@ -155,7 +172,7 @@ footer {
 }
 
 .guild-display {
-  width: min(100%, 380px);
+  width: 100%;
 }
 
 .guild-grid {
@@ -240,6 +257,7 @@ footer {
 }
 
 .section-divider {
+  display: none;
   width: 100%;
   margin: 4px 0 16px;
   border: 0;
@@ -248,7 +266,7 @@ footer {
 
 .table-scroll {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   overflow-x: auto;
 }
 
@@ -397,6 +415,7 @@ footer {
   position: relative;
   display: inline-block;
   max-width: 100%;
+  justify-self: center;
 }
 
 .map-image {
@@ -723,8 +742,17 @@ footer {
     padding: 10px;
   } */
 
+  .top-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
   .source-grid {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .table-scroll {
+    justify-content: flex-start;
   }
 
   .tab-row {
