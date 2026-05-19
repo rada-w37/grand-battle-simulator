@@ -798,7 +798,7 @@ footer {
     min-width: 0;
     color: #e8d3a8;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-    font-size: clamp(1.0rem, 0.75vw, 0.7rem);
+    font-size: clamp(0.7rem, 0.8vw, 0.9rem);
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -812,10 +812,13 @@ footer {
     white-space: nowrap;
   }
 
-  .point-labels{  
-    width: 30%;
-    top: 25%;
-  }
+  .point-labels {
+      width: 30%;
+      top: 40%;
+      grid-template-rows: repeat(2, 6px);
+      gap: 1px;
+      align-items: center;
+    }
 
   .point-labels::before,
   .point-labels::after {
@@ -850,7 +853,11 @@ footer {
 
   .point select {
     width : 100%;
-    height: auto;
+    height: 6px;
+    min-height: 6px;
+    line-height: 6px;
+    padding: 0;
+    font-size: 0.2rem;
   }
 
   .point-attacker-select {    
@@ -858,93 +865,10 @@ footer {
   }
 
   .point-defender-select {
-    /* width: 50%;
-    top: 35%; */
     align-self: center;
   }
 
   .point select:focus {
     width: 200%;
-    /* min-width: 0; */
-    /* max-width: 130px; */
   }
-
-  /* 
-  .point-chip {
-    display: grid;
-    place-items: center;
-    position: relative;
-    z-index: 1;
-    width: 18px;
-    height: 18px;
-    min-height: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    color: var(--chip-guild-color, #222222);
-    font-size: 0.7rem;
-    font-weight: 700;
-    line-height: 1;
-    overflow: visible;
-    background: transparent !important;
-    box-shadow: none;
-  }
-
-  .point-defender-chip::before {
-    content: "";
-    position: absolute;
-    inset: -34px;
-    z-index: -1;
-    background: url("resource/shield-marker.png") center center / contain no-repeat;
-    pointer-events: none;
-  }
-
-  .point-attacker-chip .sword-marker-icon {
-    position: absolute;
-    inset: -4px;
-    z-index: -1;
-    width: calc(100%);
-    height: calc(100%);
-    transform: none;
-    filter:
-    drop-shadow(0 1px 1px rgba(255, 255, 255, 0.35))
-    drop-shadow(0 0 2px rgba(0, 0, 0, 0.45));
-    }
-    
-  .point-chip-mark {
-    display: grid;
-    place-items: center;
-    position: relative;
-    z-index: 1;
-    width: 8px;
-    height: 8px;
-    transform: none;
-  }
-
-  .point-attacker-chip .point-chip-mark {
-    transform: none;
-  }
-
-  .point-chip-mark svg {
-    position: relative;
-    z-index: 1;
-    width: 8px;
-    height: 8px;
-    stroke-width: 1.65;
-    transform: none;
-    filter:
-      drop-shadow(0 1px 1px rgba(255, 255, 255, 0.55))
-      drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
-  } */
-
-  /* 
-  .point-chip-mark svg path:first-child {
-    fill: rgba(255, 255, 255, 0.82);
-  }
-  .point-chip-mark .marker-diamond,
-  .point-chip-mark .marker-teardrop,
-  .point-chip-mark .marker-crystal,
-  .point-chip-mark .marker-star-gem {
-    transform: none;
-  } */
 }
