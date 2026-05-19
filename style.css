@@ -558,6 +558,11 @@ footer {
   background: url("resource/sword-marker.png") center / contain no-repeat;
 }
 
+.point.has-self-attack .point-sword-frame {
+  color: #8a8f93;
+  opacity: 0.45;
+}
+
 .point-labels {
   position: absolute;
   z-index: 2;
@@ -600,6 +605,15 @@ footer {
       rgba(93, 38, 42, 0) 100%);
 }
 
+.point.has-self-attack .point-labels::before {
+  background:
+    linear-gradient(90deg,
+      rgba(72, 76, 78, 0.82) 0%,
+      rgba(54, 58, 60, 0.88) 62%,
+      rgba(72, 76, 78, 0.5) 84%,
+      rgba(72, 76, 78, 0) 100%);
+}
+
 .point-labels::after {
   bottom: 0;
   right: 0;
@@ -634,6 +648,10 @@ footer {
 
 .point select.is-highlight-guild {
   color: limegreen;
+}
+
+.point select.is-self-attack {
+  color: #9ca3a7;
 }
 
 /* .point-attacker-select {
@@ -831,6 +849,16 @@ footer {
         rgba(70, 29, 33, 0.92) 50%,
         rgba(70, 29, 33, 0.92) 85%,
         rgba(93, 38, 42, 0) 100%);
+  }
+
+  .point.has-self-attack .point-labels::before {
+    background:
+      linear-gradient(90deg,
+        rgba(72, 76, 78, 0) 0%,
+        rgba(54, 58, 60, 0.82) 15%,
+        rgba(54, 58, 60, 0.82) 50%,
+        rgba(54, 58, 60, 0.82) 85%,
+        rgba(72, 76, 78, 0) 100%);
   }
 
   .point-labels::after {

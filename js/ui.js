@@ -78,11 +78,21 @@ export function updatePointDeclaration(point, guildName) {
   updatePointChip(point, guildName, "attacker");
 }
 
+export function updatePointSelfAttackState(point) {
+  const attackerSelect = point.querySelector(".point-attacker-select");
+  const defenderSelect = point.querySelector(".point-defender-select");
+  const isSelfAttack = Boolean(attackerSelect?.value) && attackerSelect.value === defenderSelect?.value;
+
+  point.classList.toggle("has-self-attack", isSelfAttack);
+  attackerSelect?.classList.toggle("is-self-attack", isSelfAttack);
+}
+
 export function updateAllPointChips() {
   document.querySelectorAll(".point").forEach(point => {
     const select = point.querySelector(".point-defender-select");
     updatePointChip(point, select.value);
     updatePointDeclaration(point, point.querySelector(".point-attacker-select")?.value || "");
+    updatePointSelfAttackState(point);
   });
 }
 
@@ -247,6 +257,7 @@ export function updateGuildOptions() {
     setPointAura(point, defenderSelect.value);
     updatePointChip(point, defenderSelect.value);
     updatePointDeclaration(point, attackerSelect.value);
+    updatePointSelfAttackState(point);
   });
 }
 
@@ -306,6 +317,7 @@ export function updateScores() {
     addPointScore(activeScores, selectedGuild, type);
     setPointAura(point, selectedGuild);
     updatePointChip(point, selectedGuild);
+    updatePointSelfAttackState(point);
   });
 
   const rows = Array.from({ length: 4 }, (_, index) => {
@@ -354,6 +366,7 @@ export function applySelectStates(selectStates = createEmptyOccupationStates()) 
     setPointAura(point, pointState.defender);
     updatePointChip(point, pointState.defender);
     updatePointDeclaration(point, pointState.attacker);
+    updatePointSelfAttackState(point);
   });
   updateScores();
 }
@@ -811,6 +824,7 @@ export function applyBattleData() {
     setPointAura(point, guildName);
     updatePointChip(point, guildName);
     updatePointDeclaration(point, attackerGuildName);
+    updatePointSelfAttackState(point);
   });
 
   saveSelectStates();

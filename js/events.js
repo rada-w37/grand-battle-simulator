@@ -96,6 +96,7 @@ export function bindEvents() {
         ui.setPointAura(point, select.value);
         ui.updatePointChip(point, select.value);
       }
+      ui.updatePointSelfAttackState(point);
       ui.saveSelectStates();
       ui.updateScores();
     });
