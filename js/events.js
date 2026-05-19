@@ -23,7 +23,12 @@ export function bindEvents() {
 
   state.elements.world.addEventListener("input", ui.renderWorldSuggestions);
 
-  state.elements.world.addEventListener("focus", ui.showWorldSuggestions);
+  state.elements.world.addEventListener("focus", () => {
+    ui.showWorldSuggestions();
+    window.setTimeout(() => {
+      state.elements.world.select();
+    }, 0);
+  });
 
   state.elements.world.addEventListener("blur", () => {
     if (state.isSelectingWorldSuggestion) {
