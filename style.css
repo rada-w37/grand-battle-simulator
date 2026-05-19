@@ -709,9 +709,9 @@ footer {
 }
 
 @media (max-width: 720px) {
-  .app-shell {
+  /* .app-shell {
     padding: 10px;
-  }
+  } */
 
   .source-grid {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -746,32 +746,48 @@ footer {
   }
 
    /* Mobile-specific point UI overrides disabled. */
-  .point {
+  /* .point {
     padding: 0;
     border: 0;
     background: transparent !important;
-  }
+  } */
 
   .point::after {
     display: none;
   }
 
   .point-aura {
-    display: none;
-  }
+    width: 20%;
+    height: 20%;
+  } 
 
   /* 盾 */
   .point-frame {
     display: none;
   }
-
-
+  /* 剣 */
   .point-sword-frame{
     display: none;
   }
 
   .point select {
-    display: none;
+    width:80%;
+    font-size : 0.2rem;
+  }
+
+  .point select option {
+    font-size: 0.75rem;
+    background-color: #1f3238;
+  }
+
+  .point-banner {
+    position: absolute;
+    z-index: 3;
+    display: block;
+    max-width: none;
+    height: auto;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
   }
 
   .point-name-label {
@@ -798,8 +814,7 @@ footer {
 
   .point-labels{  
     width: 30%;
-    top: 45%;
-    /* height: 30%; */
+    top: 25%;
   }
 
   .point-labels::before,
@@ -814,20 +829,6 @@ footer {
   }
 
   .point-labels::before {
-    top: 0;
-    left: 0px;
-    background:
-      linear-gradient(90deg,
-        rgba(22, 41, 47, 0) 0%,
-        rgba(22, 41, 47, 0.58) 15%,
-        rgba(18, 37, 43, 0.9) 50%,
-        rgba(18, 37, 43, 0.9) 85%,
-        rgba(22, 41, 47, 0) 100%);
-  }
-
-  .point-labels::after {
-    bottom: 0;
-    right: 0;
     background:
       linear-gradient(90deg,
         rgba(93, 38, 42, 0) 0%,
@@ -837,16 +838,35 @@ footer {
         rgba(93, 38, 42, 0) 100%);
   }
 
-  .point select {
-    height: 10%;
+  .point-labels::after {
+    background:
+      linear-gradient(90deg,
+        rgba(22, 41, 47, 0) 0%,
+        rgba(22, 41, 47, 0.58) 15%,
+        rgba(18, 37, 43, 0.9) 50%,
+        rgba(18, 37, 43, 0.9) 85%,
+        rgba(22, 41, 47, 0) 100%);
   }
 
-  .point-attacker-select {
-    
+  .point select {
+    width : 100%;
+    height: auto;
+  }
+
+  .point-attacker-select {    
+    align-self: center;
   }
 
   .point-defender-select {
-    
+    /* width: 50%;
+    top: 35%; */
+    align-self: center;
+  }
+
+  .point select:focus {
+    width: 200%;
+    /* min-width: 0; */
+    /* max-width: 130px; */
   }
 
   /* 

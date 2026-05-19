@@ -136,24 +136,24 @@ export function renderBattlePoints() {
     labels.appendChild(defenderSelect);
     wrapper.appendChild(labels);
 
-    const mobileIcons = document.createElement("div");
-    mobileIcons.className = "point-mobile-icons";
+    // const mobileIcons = document.createElement("div");
+    // mobileIcons.className = "point-mobile-icons";
 
-    const attackerChip = document.createElement("button");
-    attackerChip.type = "button";
-    attackerChip.className = "point-chip point-attacker-chip";
-    attackerChip.setAttribute("aria-label", `${point.id}の布告ギルドを選択`);
-    attackerChip.addEventListener("click", () => openMobilePointPicker(wrapper));
-    mobileIcons.appendChild(attackerChip);
+    // const attackerChip = document.createElement("button");
+    // attackerChip.type = "button";
+    // attackerChip.className = "point-chip point-attacker-chip";
+    // attackerChip.setAttribute("aria-label", `${point.id}の布告ギルドを選択`);
+    // attackerChip.addEventListener("click", () => openMobilePointPicker(wrapper));
+    // mobileIcons.appendChild(attackerChip);
 
-    const defenderChip = document.createElement("button");
-    defenderChip.type = "button";
-    defenderChip.className = "point-chip point-defender-chip";
-    defenderChip.setAttribute("aria-label", `${point.id}の占拠ギルドを選択`);
-    defenderChip.addEventListener("click", () => openMobilePointPicker(wrapper));
-    mobileIcons.appendChild(defenderChip);
+    // const defenderChip = document.createElement("button");
+    // defenderChip.type = "button";
+    // defenderChip.className = "point-chip point-defender-chip";
+    // defenderChip.setAttribute("aria-label", `${point.id}の占拠ギルドを選択`);
+    // defenderChip.addEventListener("click", () => openMobilePointPicker(wrapper));
+    // mobileIcons.appendChild(defenderChip);
 
-    wrapper.appendChild(mobileIcons);
+    // wrapper.appendChild(mobileIcons);
 
     fragment.appendChild(wrapper);
   });

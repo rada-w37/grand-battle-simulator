@@ -12,7 +12,7 @@ export const STORAGE_KEYS = {
 // Guild Colors
 export const GUILD_COLORS = ["#ff9999", "#9999ff", "#99ff99", "#ffff99"];
 export const GUILD_MARKER_COLORS = ["#ff4d5a", "#5f72ff", "#26c85a", "#f2b600"];
-export const GUILD_AURA_COLORS = ["#a11d14", "#093ea8", "#63b104", "#f6d65a"];
+export const GUILD_AURA_COLORS = ["#e31a0b", "#084dd9", "#80de0e", "#f5c711"];
 export const EMPTY_POINT_COLOR = "rgba(255, 255, 255, 0.86)";
 
 // Guild Icons

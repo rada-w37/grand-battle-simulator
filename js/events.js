@@ -101,8 +101,4 @@ export function bindEvents() {
     });
   });
 
-  state.elements.mobilePointPickerClose.addEventListener("click", ui.closeMobilePointPicker);
-  state.elements.mobilePointPicker.addEventListener("click", event => {
-    if (event.target === state.elements.mobilePointPicker) ui.closeMobilePointPicker();
-  });
 }
