@@ -1,13 +1,19 @@
 :root {
-  --guild-1: #ff9999;
-  --guild-2: #9999ff;
-  --guild-3: #99ff99;
-  --guild-4: #ffff99;
+  --guild-1: #df8f91;
+  --guild-2: #9297d8;
+  --guild-3: #8fcf9a;
+  --guild-4: #d9cb7a;
   --empty-point: rgba(255, 255, 255, 0.86);
-  --border: #b8b8b8;
-  --surface: #ffffff;
-  --page: #f7f7f4;
-  --text: #222222;
+  --border: rgba(199, 166, 96, 0.58);
+  --surface: rgba(17, 31, 39, 0.78);
+  --surface-strong: rgba(10, 22, 30, 0.88);
+  --page: #d9e1de;
+  --text: #eef5f2;
+  --muted: #aebbb7;
+  --gold: #c7a660;
+  --gold-soft: rgba(199, 166, 96, 0.24);
+  --field-bg: rgba(7, 19, 27, 0.78);
+  --field-border: rgba(199, 166, 96, 0.46);
 }
 
 * {
@@ -19,7 +25,12 @@ body {
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   text-align: center;
-  background: var(--page);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.56) 0 10%, transparent 28%),
+    radial-gradient(circle at 82% 4%, rgba(188, 212, 217, 0.5) 0 12%, transparent 34%),
+    radial-gradient(circle at 54% 38%, rgba(255, 255, 255, 0.28) 0 14%, transparent 38%),
+    linear-gradient(145deg, #cbd8d6 0%, #dde5df 38%, #aebfbd 100%);
+  background-attachment: fixed;
 }
 
 button,
@@ -31,30 +42,35 @@ select {
 button {
   min-height: 36px;
   padding: 6px 12px;
-  border: 1px solid #888888;
+  border: 1px solid var(--field-border);
   border-radius: 6px;
-  background: #ffffff;
+  color: var(--text);
+  background: linear-gradient(180deg, rgba(27, 47, 57, 0.9), rgba(12, 27, 36, 0.9));
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 button:hover {
-  background: #eeeeee;
+  border-color: rgba(226, 196, 126, 0.86);
+  background: linear-gradient(180deg, rgba(41, 65, 75, 0.94), rgba(17, 35, 45, 0.94));
 }
 
 button:disabled {
-  color: #777777;
+  color: #7d8987;
   cursor: not-allowed;
+  background: rgba(21, 32, 39, 0.5);
 }
 
 h2,
 h3 {
   margin: 0 0 10px;
+  color: #f4e9c9;
   font-size: 1rem;
 }
 
 footer {
   margin: 40px 0 16px;
-  color: #777777;
+  color: rgba(26, 43, 48, 0.68);
   font-size: 0.8rem;
 }
 
@@ -66,6 +82,15 @@ footer {
 
 .panel {
   margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(28, 48, 58, 0.82), rgba(11, 25, 34, 0.78));
+  box-shadow:
+    0 14px 30px rgba(25, 38, 39, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .top-layout {
@@ -104,12 +129,22 @@ footer {
   text-align: left;
   font-size: 0.9rem;
   font-weight: 700;
+  color: #dce8e5;
 }
 
 .source-grid input,
 .source-grid select {
   width: 100%;
   min-height: 34px;
+  border: 1px solid var(--field-border);
+  border-radius: 5px;
+  color: var(--text);
+  background: var(--field-bg);
+}
+
+.source-grid select option {
+  color: var(--text);
+  background: #10222d;
 }
 
 .combo-box {
@@ -118,14 +153,21 @@ footer {
 }
 
 .combo-box input {
-  border: 1px solid #999999;
-  border-radius: 4px;
   padding: 5px 8px;
 }
 
 .combo-box input::placeholder {
-  color: #b8b8b8;
+  color: #91a19d;
   opacity: 1;
+}
+
+.source-grid input:focus,
+.source-grid select:focus,
+.combo-box input:focus,
+button:focus-visible {
+  outline: 2px solid rgba(210, 236, 181, 0.46);
+  outline-offset: 2px;
+  border-color: rgba(226, 196, 126, 0.9);
 }
 
 .combo-options {
@@ -136,9 +178,9 @@ footer {
   right: 0;
   max-height: 220px;
   overflow-y: auto;
-  border: 1px solid #999999;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #ffffff;
+  background: rgba(12, 26, 35, 0.96);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
@@ -151,11 +193,12 @@ footer {
   border: 0;
   border-radius: 0;
   text-align: left;
-  background: #ffffff;
+  color: var(--text);
+  background: transparent;
 }
 
 .combo-options button:hover {
-  background: #eeeeee;
+  background: rgba(199, 166, 96, 0.16);
 }
 
 .combo-group-button {
@@ -168,7 +211,7 @@ footer {
 }
 
 .combo-empty {
-  color: #777777;
+  color: var(--muted);
 }
 
 .guild-display {
@@ -185,8 +228,10 @@ footer {
 .guild-cell {
   min-height: 34px;
   padding: 6px 8px;
-  border: 1px solid #999999;
+  border: 1px solid rgba(12, 24, 31, 0.42);
   border-radius: 4px;
+  color: #172127;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
@@ -209,34 +254,34 @@ footer {
 .apply-data-button {
   width: 100%;
   margin-top: 10px;
-  border-color: #315f8f;
-  background: #346fa8;
+  border-color: rgba(120, 176, 216, 0.62);
+  background: linear-gradient(180deg, #2c6f92, #16455d);
   color: #ffffff;
   font-weight: 700;
 }
 
 .apply-data-button:hover {
-  background: #285c91;
+  background: linear-gradient(180deg, #347fa6, #1b526e);
 }
 
 .apply-data-button.has-pending {
-  border-color: #1f6f3d;
-  background: #23824a;
+  border-color: rgba(138, 219, 154, 0.66);
+  background: linear-gradient(180deg, #2c8a58, #1b603d);
 }
 
 .apply-data-button.has-pending:hover {
-  background: #1d713f;
+  background: linear-gradient(180deg, #319966, #207047);
 }
 
 .apply-data-button:disabled {
-  border-color: #9aa8b5;
-  background: #d7dde3;
-  color: #6f7a84;
+  border-color: rgba(154, 168, 181, 0.32);
+  background: rgba(48, 61, 69, 0.58);
+  color: #8d9998;
 }
 
 .pending-message {
   margin: 6px 0 0;
-  color: #1f6f3d;
+  color: #9ee0a9;
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -244,16 +289,16 @@ footer {
 .status-message {
   min-height: 1.4em;
   margin: 0;
-  color: #555555;
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
 .status-message[data-type="success"] {
-  color: #23642f;
+  color: #9ee0a9;
 }
 
 .status-message[data-type="error"] {
-  color: #9b1c1c;
+  color: #ffb4aa;
 }
 
 .section-divider {
@@ -273,19 +318,20 @@ footer {
 .cumulative-scope {
   min-height: 1.3em;
   margin: -4px 0 8px;
-  color: #666666;
+  color: #c9d5d2;
   font-size: 0.85rem;
 }
 
 .score-table {
   border-collapse: collapse;
-  background: var(--surface);
+  color: var(--text);
+  background: rgba(8, 20, 28, 0.52);
 }
 
 .score-table th,
 .score-table td {
   min-width: 64px;
-  border: 1px solid #aaaaaa;
+  border: 1px solid rgba(199, 166, 96, 0.28);
   padding: 4px 8px;
   text-align: center;
 }
@@ -300,18 +346,25 @@ footer {
   min-width: 144px;
 }
 
+.score-table td:nth-child(2) {
+  color: #172127;
+  font-weight: 700;
+}
+
 .score-table thead {
-  background-color: #eeeeee;
+  color: #f4e9c9;
+  background-color: rgba(199, 166, 96, 0.18);
 }
 
 .score-total,
 .score-cumulative {
   font-weight: 700;
-  background: #f5f5f5;
+  color: #f6f0dd;
+  background: rgba(199, 166, 96, 0.16);
 }
 
 .score-cumulative {
-  background: #edf4fb;
+  background: rgba(116, 169, 198, 0.2);
 }
 
 .score-guild-radio-cell {
@@ -322,6 +375,7 @@ footer {
 .score-guild-radio-cell input {
   display: block;
   margin: 0 auto;
+  accent-color: var(--gold);
 }
 
 .tab-row {
@@ -347,14 +401,14 @@ footer {
   min-width: 42px;
   min-height: 34px;
   padding: 5px 12px;
-  border-color: #999999;
-  background: #ffffff;
+  border-color: var(--field-border);
+  background: rgba(15, 31, 40, 0.82);
 }
 
 .tab-button.is-active {
-  border-color: #333333;
-  background: #333333;
-  color: #ffffff;
+  border-color: rgba(226, 196, 126, 0.92);
+  background: rgba(199, 166, 96, 0.26);
+  color: #fff4d7;
   font-weight: 700;
 }
 
@@ -367,20 +421,21 @@ footer {
   width: 88px;
   min-height: 34px;
   padding: 5px 8px;
-  border: 1px solid #333333;
+  border: 1px solid var(--field-border);
   border-radius: 6px;
+  color: var(--text);
   font: inherit;
   text-align: center;
-  background: #ffffff;
+  background: var(--field-bg);
 }
 
 .tab-context-menu {
   position: fixed;
   z-index: 1000;
   padding: 4px;
-  border: 1px solid #999999;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #ffffff;
+  background: rgba(12, 26, 35, 0.96);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
@@ -392,7 +447,7 @@ footer {
 }
 
 .tab-context-menu button:hover {
-  background: #eeeeee;
+  background: rgba(199, 166, 96, 0.16);
 }
 
 .delete-tab-button {
@@ -402,13 +457,14 @@ footer {
 
 .reset-data-button {
   flex: 0 0 auto;
-  border-color: #a77b7b;
-  color: #7f2828;
+  border-color: rgba(185, 120, 116, 0.56);
+  color: #ffd3cd;
   white-space: nowrap;
 }
 
 .reset-data-button:hover {
-  background: #f7eaea;
+  border-color: rgba(226, 154, 146, 0.82);
+  background: rgba(108, 44, 45, 0.58);
 }
 
 .map-container {
