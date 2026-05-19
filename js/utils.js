@@ -1,4 +1,4 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, BATTLE_POINTS, MAP_IMAGE_SIZE, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
+import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, BATTLE_POINTS, MAP_IMAGE_SIZE, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
 import * as state from "./state.js";
 
 // Storage Utilities
@@ -111,17 +111,6 @@ export function createScoreCell(value, className = "") {
   const cell = document.createElement("td");
   cell.textContent = String(value);
   if (className) cell.className = className;
-  return cell;
-}
-
-export function createScoreIconCell(index, guildName) {
-  const cell = document.createElement("td");
-  const marker = document.createElement("span");
-  marker.className = "score-guild-marker";
-  marker.innerHTML = GUILD_MARKER_ICONS[index] || '<span class="point-chip-empty">-</span>';
-  cell.className = "score-icon-cell";
-  cell.style.backgroundColor = getColorForGuildName(guildName);
-  cell.appendChild(marker);
   return cell;
 }
 

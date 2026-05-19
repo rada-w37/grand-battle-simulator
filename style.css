@@ -296,27 +296,14 @@ footer {
   background: #edf4fb;
 }
 
-.score-icon-cell {
+.score-guild-radio-cell {
   padding: 4px;
+  text-align: center;
 }
 
-.score-guild-marker {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
+.score-guild-radio-cell input {
+  display: block;
   margin: 0 auto;
-  color: #222222;
-}
-
-.score-guild-marker svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .tab-row {
@@ -645,6 +632,10 @@ footer {
   background-color: transparent;
 }
 
+.point select.is-highlight-guild {
+  color: limegreen;
+}
+
 /* .point-attacker-select {
   justify-self: center;
   margin-right: 9px;
@@ -703,9 +694,10 @@ footer {
 }
 
 .point select:focus {
-  width: 200%;
+  width: 150%;
   min-width: 0;
-  /* max-width: 130px; */
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @media (max-width: 720px) {
@@ -869,6 +861,6 @@ footer {
   }
 
   .point select:focus {
-    width: 200%;
+    width: 100%;
   }
 }

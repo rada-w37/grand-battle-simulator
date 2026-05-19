@@ -1,6 +1,6 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, MAP_IMAGE_SIZE, SWORD_MARKER_ICON, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
 import * as state from "./state.js";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createScoreIconCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js";
+import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js";
 
 // Status Message
@@ -84,6 +84,33 @@ export function updateAllPointChips() {
     updatePointChip(point, select.value);
     updatePointDeclaration(point, point.querySelector(".point-attacker-select")?.value || "");
   });
+}
+
+function updateHighlightedGuildSelects() {
+  document.querySelectorAll(".point-attacker-select, .point-defender-select").forEach(select => {
+    select.classList.toggle("is-highlight-guild", Boolean(state.highlightedGuildName) && select.value === state.highlightedGuildName);
+  });
+}
+
+function createScoreGuildRadioCell(guildName) {
+  const cell = document.createElement("td");
+  const radio = document.createElement("input");
+
+  cell.className = "score-guild-radio-cell";
+  radio.type = "radio";
+  radio.name = "highlight-guild";
+  radio.value = guildName;
+  radio.checked = Boolean(guildName) && state.highlightedGuildName === guildName;
+  radio.disabled = !guildName;
+  radio.setAttribute("aria-label", guildName ? `${guildName}をマップ上で強調` : "ギルド未選択");
+  radio.addEventListener("change", () => {
+    if (!radio.checked) return;
+    state.setHighlightedGuildName(radio.value);
+    updateHighlightedGuildSelects();
+  });
+
+  cell.appendChild(radio);
+  return cell;
 }
 
 // Render Battle Points Map
@@ -269,6 +296,10 @@ export function updateScores() {
   const activeScores = createEmptyScores(guildNames);
   const cumulativeScores = getCumulativeScores(guildNames);
 
+  if (state.highlightedGuildName && !guildNames.includes(state.highlightedGuildName)) {
+    state.setHighlightedGuildName("");
+  }
+
   document.querySelectorAll(".point").forEach(point => {
     const selectedGuild = point.querySelector(".point-defender-select").value;
     const type = point.dataset.type || "church";
@@ -287,7 +318,7 @@ export function updateScores() {
     nameCell.textContent = guild.name;
     nameCell.style.backgroundColor = guild.color;
     row.append(
-      createScoreIconCell(index, guild.name),
+      createScoreGuildRadioCell(guild.name),
       nameCell,
       createScoreCell(score.temple),
       createScoreCell(score.castle),
@@ -300,6 +331,7 @@ export function updateScores() {
   });
 
   state.elements.scoreBody.replaceChildren(...rows);
+  updateHighlightedGuildSelects();
 }
 
 // Select States
@@ -800,6 +832,7 @@ export function resetAllData() {
   state.setCurrentGuilds([]);
   state.setPendingGuilds([]);
   state.setPendingSelectStates([]);
+  state.setHighlightedGuildName("");
   state.setOccupationTabs([createOccupationTab(1)]);
   state.setActiveTabId(state.occupationTabs[0].id);
   state.setEditingTabId("");

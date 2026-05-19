@@ -16,6 +16,7 @@ export let isSelectingWorldSuggestion = false;
 export let statusTimer = 0;
 export let hasUnappliedBattleData = false;
 export let activeMobilePoint = null;
+export let highlightedGuildName = "";
 
 // DOM Elements
 export const elements = {};
@@ -104,6 +105,11 @@ export function setHasUnappliedBattleData(value) {
 export function setActiveMobilePoint(value) {
   activeMobilePoint = value;
   return activeMobilePoint;
+}
+
+export function setHighlightedGuildName(value) {
+  highlightedGuildName = value;
+  return highlightedGuildName;
 }
 
 // Initialize DOM Elements
