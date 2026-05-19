@@ -113,7 +113,9 @@ footer {
 
 .map-panel {
   display: grid;
-  gap: 12px;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .source-grid {
@@ -380,40 +382,57 @@ button:focus-visible {
 
 .tab-row {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 12px;
   max-width: 100%;
-  margin: 0 0 12px;
+  margin: 0;
+  padding: 10px 12px 0;
+  border-bottom: 1px solid rgba(199, 166, 96, 0.62);
+  background:
+    linear-gradient(180deg, rgba(21, 41, 51, 0.9), rgba(9, 21, 30, 0.86));
 }
 
 .occupation-tabs {
   display: flex;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
-  padding: 2px 0 6px;
+  padding: 0 0 0;
 }
 
 .tab-button {
   flex: 0 0 auto;
   min-width: 42px;
-  min-height: 34px;
-  padding: 5px 12px;
+  min-height: 32px;
+  padding: 5px 14px;
+  border-radius: 8px 8px 0 0;
   border-color: var(--field-border);
-  background: rgba(15, 31, 40, 0.82);
+  border-bottom-color: transparent;
+  background: rgba(10, 23, 31, 0.72);
+  transform: translateY(1px);
 }
 
 .tab-button.is-active {
   border-color: rgba(226, 196, 126, 0.92);
-  background: rgba(199, 166, 96, 0.26);
+  border-bottom-color: rgba(17, 31, 39, 0.98);
+  background:
+    linear-gradient(180deg, rgba(199, 166, 96, 0.32), rgba(17, 31, 39, 0.98));
   color: #fff4d7;
   font-weight: 700;
+  box-shadow:
+    0 -1px 10px rgba(226, 196, 126, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .tab-add-button {
+  min-width: 36px;
+  padding-left: 10px;
+  padding-right: 10px;
+  color: #f5e7bd;
   font-weight: 700;
+  background: rgba(199, 166, 96, 0.16);
 }
 
 .tab-name-input {
@@ -455,6 +474,14 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+.map-actions {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
 .reset-data-button {
   flex: 0 0 auto;
   border-color: rgba(185, 120, 116, 0.56);
@@ -472,6 +499,11 @@ button:focus-visible {
   display: inline-block;
   max-width: 100%;
   justify-self: center;
+  margin: 12px;
+  border: 1px solid rgba(199, 166, 96, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(255, 244, 215, 0.08),
+    0 16px 32px rgba(0, 0, 0, 0.24);
 }
 
 .map-image {
@@ -813,30 +845,43 @@ button:focus-visible {
 
   .tab-row {
     flex-direction: column;
-    gap: 6px;
-    margin-left: -10px;
-    margin-right: -10px;
+    align-items: stretch;
+    gap: 8px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 8px 10px 0;
   }
 
   .occupation-tabs {
     justify-content: flex-start;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .map-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding-bottom: 8px;
   }
 
   .delete-tab-button {
-    width: calc(100% - 20px);
-    margin: 0 10px;
+    width: 100%;
+    margin: 0;
   }
 
   .reset-data-button {
-    width: calc(100% - 20px);
-    margin: 0 10px;
+    width: 100%;
+    margin: 0;
   }
 
   .tab-button {
     min-width: 40px;
     padding: 5px 10px;
+  }
+
+  .map-container {
+    margin: 10px;
   }
 
    /* Mobile-specific point UI overrides disabled. */
