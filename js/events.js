@@ -456,6 +456,7 @@ export function bindEvents() {
   state.elements.tabAddButton.addEventListener("click", ui.addOccupationTab);
   state.elements.deleteTabButton.addEventListener("click", ui.deleteActiveOccupationTab);
   state.elements.resetDataButton.addEventListener("click", ui.resetAllData);
+  window.addEventListener("resize", ui.updateTabScrollState);
 
   getAllPointSelects().forEach(select => {
     select.addEventListener("change", () => {

@@ -394,6 +394,16 @@ function scrollOccupationTabsToEnd() {
   });
 }
 
+export function updateTabScrollState() {
+  requestAnimationFrame(() => {
+    const tabs = state.elements.occupationTabs;
+    const tabRow = tabs?.closest(".tab-row");
+    if (!tabs || !tabRow) return;
+
+    tabRow.classList.toggle("has-tab-scroll", tabs.scrollWidth > tabs.clientWidth + 1);
+  });
+}
+
 export function persistCurrentTabState() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
@@ -536,6 +546,7 @@ export function renderOccupationTabs() {
 
   state.elements.occupationTabs.replaceChildren(...buttons);
   state.elements.deleteTabButton.disabled = state.occupationTabs.length <= 1;
+  updateTabScrollState();
 }
 
 export function switchOccupationTab(tabId) {
