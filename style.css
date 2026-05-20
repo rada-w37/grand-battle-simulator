@@ -1,23 +1,23 @@
 :root {
-  --guild-1: #6f3a38;
-  --guild-2: #3f465d;
-  --guild-3: #3f5a43;
-  --guild-4: #5d5637;
-  --guild-1-rgb: 111, 58, 56;
-  --guild-2-rgb: 63, 70, 93;
-  --guild-3-rgb: 63, 90, 67;
-  --guild-4-rgb: 93, 86, 55;
+  --guild-1: #56302f;
+  --guild-2: #33384d;
+  --guild-3: #34483a;
+  --guild-4: #4c4730;
+  --guild-1-rgb: 86, 48, 47;
+  --guild-2-rgb: 51, 56, 77;
+  --guild-3-rgb: 52, 72, 58;
+  --guild-4-rgb: 76, 71, 48;
   --empty-point: rgba(255, 255, 255, 0.86);
-  --border: rgba(199, 166, 96, 0.58);
-  --surface: rgba(17, 31, 39, 0.78);
-  --surface-strong: rgba(10, 22, 30, 0.88);
-  --page: #d9e1de;
-  --text: #eef5f2;
-  --muted: #aebbb7;
-  --gold: #c7a660;
-  --gold-soft: rgba(199, 166, 96, 0.24);
-  --field-bg: rgba(7, 19, 27, 0.78);
-  --field-border: rgba(199, 166, 96, 0.46);
+  --border: rgba(170, 139, 82, 0.36);
+  --surface: rgba(12, 14, 23, 0.82);
+  --surface-strong: rgba(6, 8, 14, 0.9);
+  --page: #070a12;
+  --text: #e8e1d1;
+  --muted: #a79f91;
+  --gold: #aa8b52;
+  --gold-soft: rgba(170, 139, 82, 0.18);
+  --field-bg: rgba(6, 8, 14, 0.78);
+  --field-border: rgba(170, 139, 82, 0.34);
 }
 
 * {
@@ -30,10 +30,10 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   text-align: center;
   background:
-    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.56) 0 10%, transparent 28%),
-    radial-gradient(circle at 82% 4%, rgba(188, 212, 217, 0.5) 0 12%, transparent 34%),
-    radial-gradient(circle at 54% 38%, rgba(255, 255, 255, 0.28) 0 14%, transparent 38%),
-    linear-gradient(145deg, #cbd8d6 0%, #dde5df 38%, #aebfbd 100%);
+    radial-gradient(circle at 18% 10%, rgba(82, 84, 106, 0.28) 0 9%, transparent 30%),
+    radial-gradient(circle at 78% 2%, rgba(61, 66, 88, 0.32) 0 12%, transparent 35%),
+    radial-gradient(circle at 46% 42%, rgba(126, 119, 100, 0.12) 0 15%, transparent 40%),
+    linear-gradient(145deg, #05070d 0%, #0b0e18 42%, #171927 100%);
   background-attachment: fixed;
 }
 
@@ -49,20 +49,20 @@ button {
   border: 1px solid var(--field-border);
   border-radius: 6px;
   color: var(--text);
-  background: linear-gradient(180deg, rgba(27, 47, 57, 0.9), rgba(12, 27, 36, 0.9));
+  background: linear-gradient(180deg, rgba(27, 28, 39, 0.92), rgba(9, 11, 18, 0.92));
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 button:hover {
-  border-color: rgba(226, 196, 126, 0.86);
-  background: linear-gradient(180deg, rgba(41, 65, 75, 0.94), rgba(17, 35, 45, 0.94));
+  border-color: rgba(190, 161, 96, 0.68);
+  background: linear-gradient(180deg, rgba(38, 39, 52, 0.94), rgba(14, 16, 25, 0.94));
 }
 
 button:disabled {
   color: #7d8987;
   cursor: not-allowed;
-  background: rgba(21, 32, 39, 0.5);
+  background: rgba(20, 21, 28, 0.54);
 }
 
 h2,
@@ -74,7 +74,7 @@ h3 {
 
 footer {
   margin: 40px 0 16px;
-  color: rgba(26, 43, 48, 0.68);
+  color: rgba(169, 160, 140, 0.56);
   font-size: 0.8rem;
 }
 
@@ -91,9 +91,9 @@ footer {
   border-radius: 8px;
   color: var(--text);
   background:
-    linear-gradient(180deg, rgba(28, 48, 58, 0.82), rgba(11, 25, 34, 0.78));
+    linear-gradient(180deg, rgba(18, 20, 31, 0.86), rgba(7, 9, 15, 0.8));
   box-shadow:
-    0 14px 30px rgba(25, 38, 39, 0.18),
+    0 14px 30px rgba(0, 0, 0, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
@@ -135,7 +135,7 @@ footer {
   text-align: left;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #dce8e5;
+  color: #ddd4c2;
 }
 
 .source-grid input,
@@ -150,7 +150,7 @@ footer {
 
 .source-grid select option {
   color: var(--text);
-  background: #10222d;
+  background: #0b0d16;
 }
 
 .combo-box {
@@ -163,7 +163,7 @@ footer {
 }
 
 .combo-box input::placeholder {
-  color: #91a19d;
+  color: #8e897e;
   opacity: 1;
 }
 
@@ -173,7 +173,7 @@ footer {
 button:focus-visible {
   outline: 2px solid rgba(210, 236, 181, 0.46);
   outline-offset: 2px;
-  border-color: rgba(226, 196, 126, 0.9);
+  border-color: rgba(190, 161, 96, 0.74);
 }
 
 .combo-options {
@@ -186,7 +186,7 @@ button:focus-visible {
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: rgba(12, 26, 35, 0.96);
+  background: rgba(8, 10, 17, 0.97);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
@@ -271,23 +271,23 @@ button:focus-visible {
 .apply-data-button {
   width: 100%;
   margin-top: 10px;
-  border-color: rgba(120, 176, 216, 0.62);
-  background: linear-gradient(180deg, #2c6f92, #16455d);
+  border-color: rgba(118, 125, 162, 0.5);
+  background: linear-gradient(180deg, #2a304b, #15192b);
   color: #ffffff;
   font-weight: 700;
 }
 
 .apply-data-button:hover {
-  background: linear-gradient(180deg, #347fa6, #1b526e);
+  background: linear-gradient(180deg, #343a59, #1b2036);
 }
 
 .apply-data-button.has-pending {
-  border-color: rgba(138, 219, 154, 0.66);
-  background: linear-gradient(180deg, #2c8a58, #1b603d);
+  border-color: rgba(132, 169, 116, 0.56);
+  background: linear-gradient(180deg, #354f38, #1d3224);
 }
 
 .apply-data-button.has-pending:hover {
-  background: linear-gradient(180deg, #319966, #207047);
+  background: linear-gradient(180deg, #3e5b41, #263d2b);
 }
 
 .apply-data-button:disabled {
@@ -298,7 +298,7 @@ button:focus-visible {
 
 .pending-message {
   margin: 6px 0 0;
-  color: #9ee0a9;
+  color: #b8d5a6;
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -311,7 +311,7 @@ button:focus-visible {
 }
 
 .status-message[data-type="success"] {
-  color: #9ee0a9;
+  color: #b8d5a6;
 }
 
 .status-message[data-type="error"] {
@@ -335,14 +335,14 @@ button:focus-visible {
 .cumulative-scope {
   min-height: 1.3em;
   margin: -4px 0 8px;
-  color: #c9d5d2;
+  color: #c7beab;
   font-size: 0.85rem;
 }
 
 .score-table {
   border-collapse: collapse;
   color: var(--text);
-  background: rgba(8, 20, 28, 0.52);
+  background: rgba(6, 8, 14, 0.56);
 }
 
 .score-table th,
@@ -384,7 +384,7 @@ button:focus-visible {
 }
 
 .score-cumulative {
-  background: rgba(116, 169, 198, 0.2);
+  background: rgba(86, 91, 130, 0.22);
 }
 
 .score-guild-radio-cell {
@@ -413,7 +413,7 @@ button:focus-visible {
   padding: 10px 12px 0;
   border-bottom: 1px solid rgba(199, 166, 96, 0.62);
   background:
-    linear-gradient(180deg, rgba(21, 41, 51, 0.9), rgba(9, 21, 30, 0.86));
+    linear-gradient(180deg, rgba(16, 18, 29, 0.92), rgba(6, 8, 14, 0.88));
 }
 
 .occupation-tabs {
@@ -434,15 +434,15 @@ button:focus-visible {
   border-radius: 8px 8px 0 0;
   border-color: var(--field-border);
   border-bottom-color: transparent;
-  background: rgba(10, 23, 31, 0.72);
+  background: rgba(8, 10, 17, 0.74);
   transform: translateY(1px);
 }
 
 .tab-button.is-active {
   border-color: rgba(226, 196, 126, 0.92);
-  border-bottom-color: rgba(17, 31, 39, 0.98);
+  border-bottom-color: rgba(12, 14, 23, 0.98);
   background:
-    linear-gradient(180deg, rgba(199, 166, 96, 0.32), rgba(17, 31, 39, 0.98));
+    linear-gradient(180deg, rgba(170, 139, 82, 0.26), rgba(12, 14, 23, 0.98));
   color: #fff4d7;
   font-weight: 700;
   box-shadow:
@@ -478,7 +478,7 @@ button:focus-visible {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: rgba(12, 26, 35, 0.96);
+  background: rgba(8, 10, 17, 0.97);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
