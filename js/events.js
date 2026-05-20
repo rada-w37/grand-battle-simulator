@@ -17,7 +17,7 @@ const mapView = {
   dragStartY: 0,
   dragOriginX: 0,
   dragOriginY: 0,
-  isPinching: false,
+  isTouchMapGesture: false,
   pinchStartDistance: 0,
   pinchStartScale: 1
 };
@@ -153,6 +153,18 @@ function getTouchCenter(touches, viewport) {
   };
 }
 
+function startTouchMapGesture(touches) {
+  mapView.isTouchMapGesture = true;
+  mapView.pinchStartDistance = getTouchDistance(touches);
+  mapView.pinchStartScale = mapView.scale;
+}
+
+function endTouchMapGesture() {
+  mapView.isTouchMapGesture = false;
+  mapView.pinchStartDistance = 0;
+  mapView.pinchStartScale = mapView.scale;
+}
+
 function bindMapViewEvents() {
   const { viewport, resetButton, zoomInButton, zoomOutButton } = getMapElements();
   if (!viewport) return;
@@ -214,15 +226,15 @@ function bindMapViewEvents() {
     if (event.touches.length !== 2) return;
 
     event.preventDefault();
-    mapView.isPinching = true;
-    mapView.pinchStartDistance = getTouchDistance(event.touches);
-    mapView.pinchStartScale = mapView.scale;
+    startTouchMapGesture(event.touches);
   }, { passive: false });
 
   viewport.addEventListener("touchmove", event => {
-    if (!mapView.isPinching || event.touches.length !== 2) return;
+    if (!mapView.isTouchMapGesture) return;
 
     event.preventDefault();
+    if (event.touches.length !== 2) return;
+
     const distance = getTouchDistance(event.touches);
     if (mapView.pinchStartDistance <= 0) return;
 
@@ -233,11 +245,11 @@ function bindMapViewEvents() {
 
   viewport.addEventListener("touchend", event => {
     if (event.touches.length >= 2) return;
-    mapView.isPinching = false;
+    endTouchMapGesture();
   });
 
   viewport.addEventListener("touchcancel", () => {
-    mapView.isPinching = false;
+    endTouchMapGesture();
   });
 
   resetButton?.addEventListener("click", resetMapView);
