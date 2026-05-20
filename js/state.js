@@ -122,6 +122,7 @@ export function initializeElements() {
   elements.scoreBody = document.getElementById("score-body");
   elements.battlePoints = document.getElementById("battle-points");
   elements.occupationTabs = document.getElementById("occupation-tabs");
+  elements.tabAddButton = document.getElementById("tab-add-button");
   elements.deleteTabButton = document.getElementById("delete-tab-button");
   elements.resetDataButton = document.getElementById("reset-data-button");
   elements.mobilePointPicker = document.getElementById("mobile-point-picker");

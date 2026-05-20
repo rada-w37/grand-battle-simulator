@@ -457,6 +457,7 @@ button:focus-visible {
 }
 
 .tab-add-button {
+  flex: 0 0 auto;
   min-width: 36px;
   padding-left: 10px;
   padding-right: 10px;

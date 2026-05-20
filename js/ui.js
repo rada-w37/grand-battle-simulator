@@ -388,6 +388,12 @@ export function createOccupationTab(index, selectStates = createEmptyOccupationS
   };
 }
 
+function scrollOccupationTabsToEnd() {
+  requestAnimationFrame(() => {
+    state.elements.occupationTabs.scrollLeft = state.elements.occupationTabs.scrollWidth;
+  });
+}
+
 export function persistCurrentTabState() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
@@ -528,14 +534,7 @@ export function renderOccupationTabs() {
     return button;
   });
 
-  const addButton = document.createElement("button");
-  addButton.type = "button";
-  addButton.className = "tab-button tab-add-button";
-  addButton.textContent = "+";
-  addButton.setAttribute("aria-label", "拠点状況タブを追加");
-  addButton.addEventListener("click", addOccupationTab);
-
-  state.elements.occupationTabs.replaceChildren(...buttons, addButton);
+  state.elements.occupationTabs.replaceChildren(...buttons);
   state.elements.deleteTabButton.disabled = state.occupationTabs.length <= 1;
 }
 
@@ -560,6 +559,7 @@ export function addOccupationTab() {
   state.setActiveTabId(newTab.id);
   saveOccupationTabs();
   renderOccupationTabs();
+  scrollOccupationTabsToEnd();
   updateGuildOptions();
   applySelectStates(newTab.selectStates);
 }

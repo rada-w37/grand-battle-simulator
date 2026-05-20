@@ -453,6 +453,7 @@ export function bindEvents() {
   state.elements.block.addEventListener("change", api.fetchBattleDataIfReady);
 
   state.elements.applyButton.addEventListener("click", ui.applyBattleData);
+  state.elements.tabAddButton.addEventListener("click", ui.addOccupationTab);
   state.elements.deleteTabButton.addEventListener("click", ui.deleteActiveOccupationTab);
   state.elements.resetDataButton.addEventListener("click", ui.resetAllData);
 
