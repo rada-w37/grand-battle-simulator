@@ -16,7 +16,10 @@ const mapView = {
   dragStartX: 0,
   dragStartY: 0,
   dragOriginX: 0,
-  dragOriginY: 0
+  dragOriginY: 0,
+  isPinching: false,
+  pinchStartDistance: 0,
+  pinchStartScale: 1
 };
 
 function clamp(value, min, max) {
@@ -136,6 +139,20 @@ function zoomMapFromCenter(step) {
   zoomMapTo(mapView.scale + step, viewport.clientWidth / 2, viewport.clientHeight / 2);
 }
 
+function getTouchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+function getTouchCenter(touches, viewport) {
+  const rect = viewport.getBoundingClientRect();
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2 - rect.left,
+    y: (touches[0].clientY + touches[1].clientY) / 2 - rect.top
+  };
+}
+
 function bindMapViewEvents() {
   const { viewport, resetButton, zoomInButton, zoomOutButton } = getMapElements();
   if (!viewport) return;
@@ -191,6 +208,36 @@ function bindMapViewEvents() {
   viewport.addEventListener("dblclick", event => {
     if (isMapControlTarget(event.target)) return;
     resetMapView();
+  });
+
+  viewport.addEventListener("touchstart", event => {
+    if (event.touches.length !== 2) return;
+
+    event.preventDefault();
+    mapView.isPinching = true;
+    mapView.pinchStartDistance = getTouchDistance(event.touches);
+    mapView.pinchStartScale = mapView.scale;
+  }, { passive: false });
+
+  viewport.addEventListener("touchmove", event => {
+    if (!mapView.isPinching || event.touches.length !== 2) return;
+
+    event.preventDefault();
+    const distance = getTouchDistance(event.touches);
+    if (mapView.pinchStartDistance <= 0) return;
+
+    const center = getTouchCenter(event.touches, viewport);
+    const nextScale = mapView.pinchStartScale * (distance / mapView.pinchStartDistance);
+    zoomMapTo(nextScale, center.x, center.y);
+  }, { passive: false });
+
+  viewport.addEventListener("touchend", event => {
+    if (event.touches.length >= 2) return;
+    mapView.isPinching = false;
+  });
+
+  viewport.addEventListener("touchcancel", () => {
+    mapView.isPinching = false;
   });
 
   resetButton?.addEventListener("click", resetMapView);
