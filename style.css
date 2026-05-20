@@ -498,11 +498,6 @@ button:focus-visible {
   white-space: nowrap;
 }
 
-.map-view-reset-button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
 .map-actions {
   display: flex;
   flex: 0 0 auto;
@@ -540,6 +535,53 @@ button:focus-visible {
 
 .map-container.is-dragging {
   cursor: grabbing;
+}
+
+.map-zoom-controls {
+  position: absolute;
+  z-index: 20;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(170, 139, 82, 0.44);
+  border-radius: 7px;
+  background: rgba(7, 9, 15, 0.78);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.map-zoom-value {
+  min-width: 44px;
+  color: #f4e9c9;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.map-zoom-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.map-zoom-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -920,11 +962,6 @@ button:focus-visible {
     margin: 0;
   }
 
-  .map-view-reset-button {
-    width: 100%;
-    margin: 0;
-  }
-
   .reset-data-button {
     width: 100%;
     margin: 0;
@@ -938,6 +975,10 @@ button:focus-visible {
   .map-container {
     margin: 10px;
     touch-action: auto;
+  }
+
+  .map-zoom-controls {
+    display: none;
   }
 
    /* Mobile-specific point UI overrides disabled. */

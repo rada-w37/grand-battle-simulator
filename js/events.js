@@ -6,6 +6,7 @@ import { getAllPointSelects, normalizeWorldName } from "./utils.js";
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
 const MAP_ZOOM_STEP = 0.0015;
+const MAP_BUTTON_ZOOM_STEP = 0.25;
 
 const mapView = {
   scale: 1,
@@ -30,8 +31,36 @@ function getMapElements() {
   return {
     viewport: document.querySelector(".map-container"),
     inner: document.getElementById("map-inner"),
-    resetButton: document.getElementById("map-view-reset-button")
+    resetButton: document.getElementById("map-view-reset-button"),
+    zoomInButton: document.getElementById("map-zoom-in-button"),
+    zoomOutButton: document.getElementById("map-zoom-out-button"),
+    zoomValue: document.getElementById("map-zoom-value")
   };
+}
+
+function isAtMinScale() {
+  return mapView.scale <= MAP_MIN_SCALE + 0.001;
+}
+
+function isAtMaxScale() {
+  return mapView.scale >= MAP_MAX_SCALE - 0.001;
+}
+
+function updateMapZoomControls() {
+  const { resetButton, zoomInButton, zoomOutButton, zoomValue } = getMapElements();
+
+  if (zoomValue) {
+    zoomValue.textContent = `${Math.round(mapView.scale * 100)}%`;
+  }
+  if (zoomInButton) {
+    zoomInButton.disabled = isAtMaxScale();
+  }
+  if (zoomOutButton) {
+    zoomOutButton.disabled = isAtMinScale();
+  }
+  if (resetButton) {
+    resetButton.disabled = isAtMinScale() && mapView.x === 0 && mapView.y === 0;
+  }
 }
 
 function constrainMapView() {
@@ -70,6 +99,7 @@ function applyMapView() {
   constrainMapView();
   inner.style.transform = `matrix(${mapView.scale}, 0, 0, ${mapView.scale}, ${mapView.x}, ${mapView.y})`;
   viewport?.classList.toggle("is-zoomed", mapView.scale > 1);
+  updateMapZoomControls();
 }
 
 function resetMapView() {
@@ -79,8 +109,35 @@ function resetMapView() {
   applyMapView();
 }
 
+function zoomMapTo(nextScale, originX, originY) {
+  const nextClampedScale = clamp(nextScale, MAP_MIN_SCALE, MAP_MAX_SCALE);
+
+  if (nextClampedScale === 1) {
+    mapView.scale = 1;
+    mapView.x = 0;
+    mapView.y = 0;
+    applyMapView();
+    return;
+  }
+
+  const worldX = (originX - mapView.x) / mapView.scale;
+  const worldY = (originY - mapView.y) / mapView.scale;
+
+  mapView.scale = nextClampedScale;
+  mapView.x = originX - worldX * nextClampedScale;
+  mapView.y = originY - worldY * nextClampedScale;
+  applyMapView();
+}
+
+function zoomMapFromCenter(step) {
+  const { viewport } = getMapElements();
+  if (!viewport) return;
+
+  zoomMapTo(mapView.scale + step, viewport.clientWidth / 2, viewport.clientHeight / 2);
+}
+
 function bindMapViewEvents() {
-  const { viewport, resetButton } = getMapElements();
+  const { viewport, resetButton, zoomInButton, zoomOutButton } = getMapElements();
   if (!viewport) return;
 
   viewport.addEventListener("wheel", event => {
@@ -91,19 +148,9 @@ function bindMapViewEvents() {
     const rect = viewport.getBoundingClientRect();
     const pointerX = event.clientX - rect.left;
     const pointerY = event.clientY - rect.top;
-    const worldX = (pointerX - mapView.x) / mapView.scale;
-    const worldY = (pointerY - mapView.y) / mapView.scale;
     const nextScale = clamp(mapView.scale * (1 - event.deltaY * MAP_ZOOM_STEP), MAP_MIN_SCALE, MAP_MAX_SCALE);
 
-    mapView.scale = nextScale;
-    if (nextScale === 1) {
-      mapView.x = 0;
-      mapView.y = 0;
-    } else {
-      mapView.x = pointerX - worldX * nextScale;
-      mapView.y = pointerY - worldY * nextScale;
-    }
-    applyMapView();
+    zoomMapTo(nextScale, pointerX, pointerY);
   }, { passive: false });
 
   viewport.addEventListener("pointerdown", event => {
@@ -147,6 +194,8 @@ function bindMapViewEvents() {
   });
 
   resetButton?.addEventListener("click", resetMapView);
+  zoomInButton?.addEventListener("click", () => zoomMapFromCenter(MAP_BUTTON_ZOOM_STEP));
+  zoomOutButton?.addEventListener("click", () => zoomMapFromCenter(-MAP_BUTTON_ZOOM_STEP));
   window.addEventListener("resize", applyMapView);
   resetMapView();
 }
