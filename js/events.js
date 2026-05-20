@@ -39,6 +39,7 @@ function getMapElements() {
     inner: document.getElementById("map-inner"),
     resetButton: document.getElementById("map-view-reset-button"),
     zoomToggleButton: document.getElementById("map-zoom-toggle-button"),
+    zoomCloseButton: document.getElementById("map-zoom-close-button"),
     zoomInButton: document.getElementById("map-zoom-in-button"),
     zoomOutButton: document.getElementById("map-zoom-out-button"),
     zoomValue: document.getElementById("map-zoom-value")
@@ -74,7 +75,8 @@ function createSvgIcon(paths) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
 }
 
-const MAP_ZOOM_OPEN_ICON = '<path d="M11.5 5l-6 7 6 7" stroke-width="1.55" /><path d="M18 5l-6 7 6 7" stroke-width="1.55" />';
+const MAP_ZOOM_OPEN_ICON = '<path d="M11.5 5l-6 7 6 7" /><path d="M18 5l-6 7 6 7" />';
+const MAP_ZOOM_CLOSE_ICON = '<path d="M5 6l6 6-6 6" />';
 
 function setupMapActionButtons() {
   state.elements.deleteTabButton.classList.add("danger-icon-button");
@@ -96,17 +98,31 @@ function setupMapActionButtons() {
 
 function ensureMapZoomToggleButton() {
   const { zoomControls } = getMapElements();
-  if (!zoomControls || document.getElementById("map-zoom-toggle-button")) return;
+  if (!zoomControls) return;
 
-  const toggleButton = document.createElement("button");
-  toggleButton.type = "button";
-  toggleButton.id = "map-zoom-toggle-button";
-  toggleButton.className = "map-zoom-toggle-button";
-  toggleButton.setAttribute("aria-label", "ズーム操作を表示");
-  toggleButton.title = "ズーム操作を表示";
-  toggleButton.setAttribute("aria-expanded", "false");
-  toggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
-  zoomControls.prepend(toggleButton);
+  let toggleButton = document.getElementById("map-zoom-toggle-button");
+  if (!toggleButton) {
+    toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.id = "map-zoom-toggle-button";
+    toggleButton.className = "map-zoom-toggle-button";
+    toggleButton.setAttribute("aria-label", "ズーム操作を表示");
+    toggleButton.title = "ズーム操作を表示";
+    toggleButton.setAttribute("aria-expanded", "false");
+    toggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
+    zoomControls.prepend(toggleButton);
+  }
+
+  if (document.getElementById("map-zoom-close-button")) return;
+
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.id = "map-zoom-close-button";
+  closeButton.className = "map-zoom-close-button";
+  closeButton.setAttribute("aria-label", "ズーム操作を閉じる");
+  closeButton.title = "ズーム操作を閉じる";
+  closeButton.innerHTML = createSvgIcon(MAP_ZOOM_CLOSE_ICON);
+  toggleButton.insertAdjacentElement("afterend", closeButton);
 }
 
 function setMapZoomControlsOpen(isOpen) {
@@ -118,14 +134,6 @@ function setMapZoomControlsOpen(isOpen) {
   zoomToggleButton.setAttribute("aria-label", "ズーム操作を表示");
   zoomToggleButton.title = "ズーム操作を表示";
   zoomToggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
-}
-
-function closeMapZoomControlsFromOutside(event) {
-  const { zoomControls } = getMapElements();
-  if (!zoomControls?.classList.contains("is-open")) return;
-  if (event.target.closest(".map-zoom-controls")) return;
-
-  setMapZoomControlsOpen(false);
 }
 
 function constrainMapView() {
@@ -260,7 +268,7 @@ function updateTouchMapGesture(touches, viewport) {
 
 function bindMapViewEvents() {
   ensureMapZoomToggleButton();
-  const { viewport, resetButton, zoomToggleButton, zoomInButton, zoomOutButton } = getMapElements();
+  const { viewport, resetButton, zoomToggleButton, zoomCloseButton, zoomInButton, zoomOutButton } = getMapElements();
   if (!viewport) return;
 
   viewport.addEventListener("wheel", event => {
@@ -347,6 +355,10 @@ function bindMapViewEvents() {
     const { zoomControls } = getMapElements();
     setMapZoomControlsOpen(!zoomControls?.classList.contains("is-open"));
   });
+  zoomCloseButton?.addEventListener("click", event => {
+    event.stopPropagation();
+    setMapZoomControlsOpen(false);
+  });
   zoomInButton?.addEventListener("click", () => zoomMapFromCenter(MAP_BUTTON_ZOOM_STEP));
   zoomOutButton?.addEventListener("click", () => zoomMapFromCenter(-MAP_BUTTON_ZOOM_STEP));
   window.addEventListener("resize", applyMapView);
@@ -355,8 +367,6 @@ function bindMapViewEvents() {
 
 export function bindEvents() {
   setupMapActionButtons();
-
-  document.addEventListener("pointerdown", closeMapZoomControlsFromOutside);
 
   document.addEventListener("click", event => {
     if (state.suppressNextMenuClose) return;

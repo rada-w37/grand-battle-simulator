@@ -645,6 +645,10 @@ button:focus-visible {
   display: none;
 }
 
+.map-zoom-close-button {
+  display: none;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .map-container.is-zoomed {
     cursor: grab;
@@ -1102,16 +1106,44 @@ button:focus-visible {
     display: none;
   }
 
+  .map-zoom-controls.is-open .map-zoom-close-button {
+    display: grid;
+  }
+
   .map-zoom-button,
   .map-zoom-toggle-button {
     width: 32px;
     height: 32px;
   }
 
-  .map-zoom-toggle-button svg {
+  .map-zoom-close-button {
+    width: 16px;
+    height: 32px;
+  }
+
+  .map-zoom-close-button {
+    place-items: center;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    color: rgba(226, 196, 126, 0.48);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .map-zoom-close-button:hover,
+  .map-zoom-close-button:focus-visible {
+    background: rgba(38, 34, 24, 0.18);
+    outline: 1px solid rgba(226, 196, 126, 0.24);
+  }
+
+  .map-zoom-toggle-button svg,
+  .map-zoom-close-button svg {
     width: 24px;
     height: 24px;
-    stroke-width: 2.35;
+    stroke-width: 1.55;
+    fill: none;
+    stroke: currentColor;
   }
 
   .map-zoom-value {
