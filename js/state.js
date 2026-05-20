@@ -7,7 +7,6 @@ export let pendingSelectStates = [];
 export let occupationTabs = [];
 export let activeTabId = "";
 export let editingTabId = "";
-export let longPressTimer = 0;
 export let contextMenuTabId = "";
 export let suppressNextMenuClose = false;
 export let expandedWorldRangeKeys = new Set();
@@ -60,11 +59,6 @@ export function setActiveTabId(value) {
 export function setEditingTabId(value) {
   editingTabId = value;
   return editingTabId;
-}
-
-export function setLongPressTimer(value) {
-  longPressTimer = value;
-  return longPressTimer;
 }
 
 export function setContextMenuTabId(value) {

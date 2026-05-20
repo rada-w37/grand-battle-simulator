@@ -483,23 +483,6 @@ export function showTabContextMenu(tabId, x, y) {
   document.body.appendChild(menu);
 }
 
-export function scheduleLongPressRename(tabId, target) {
-  window.clearTimeout(state.longPressTimer);
-  state.setLongPressTimer(window.setTimeout(() => {
-    const rect = target.getBoundingClientRect();
-    showTabContextMenu(tabId, rect.left, rect.bottom + 4);
-    state.setSuppressNextMenuClose(true);
-    window.setTimeout(() => {
-      state.setSuppressNextMenuClose(false);
-    }, 500);
-  }, 650));
-}
-
-export function cancelLongPressRename() {
-  window.clearTimeout(state.longPressTimer);
-  state.setLongPressTimer(0);
-}
-
 export function renderOccupationTabs() {
   const buttons = state.occupationTabs.map(tab => {
     if (tab.id === state.editingTabId) {
@@ -538,13 +521,10 @@ export function renderOccupationTabs() {
       event.preventDefault();
       showTabContextMenu(tab.id, event.clientX, event.clientY);
     });
-    button.addEventListener("pointerdown", event => {
-      if (event.pointerType === "mouse") return;
-      scheduleLongPressRename(tab.id, button);
+    button.addEventListener("dblclick", event => {
+      event.preventDefault();
+      startEditingTab(tab.id);
     });
-    button.addEventListener("pointerup", cancelLongPressRename);
-    button.addEventListener("pointerleave", cancelLongPressRename);
-    button.addEventListener("pointercancel", cancelLongPressRename);
     return button;
   });
 
@@ -578,10 +558,8 @@ export function addOccupationTab() {
   const newTab = createOccupationTab(nextIndex, cloneOccupationStates(sourceStates));
   state.occupationTabs.push(newTab);
   state.setActiveTabId(newTab.id);
-  state.setEditingTabId(newTab.id);
   saveOccupationTabs();
   renderOccupationTabs();
-  focusEditingTabName();
   updateGuildOptions();
   applySelectStates(newTab.selectStates);
 }
