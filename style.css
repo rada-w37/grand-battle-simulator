@@ -423,14 +423,15 @@ button:focus-visible {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 0 0 0;
 }
 
 .tab-button {
   flex: 0 0 auto;
   min-width: 42px;
-  min-height: 32px;
-  padding: 5px 14px;
+  min-height: 28px;
+  padding: 3px 12px;
   border-radius: 8px 8px 0 0;
   border-color: var(--field-border);
   border-bottom-color: transparent;
@@ -498,6 +499,23 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+.danger-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.danger-icon-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .map-actions {
   display: flex;
   flex: 0 0 auto;
@@ -516,6 +534,18 @@ button:focus-visible {
 .reset-data-button:hover {
   border-color: rgba(226, 154, 146, 0.82);
   background: rgba(108, 44, 45, 0.58);
+}
+
+.delete-tab-button,
+.reset-data-button {
+  border-color: rgba(185, 120, 116, 0.46);
+  color: #f0c0b8;
+}
+
+.delete-tab-button:hover,
+.reset-data-button:hover {
+  border-color: rgba(214, 144, 133, 0.7);
+  background: rgba(96, 37, 39, 0.48);
 }
 
 .map-container {
@@ -561,7 +591,8 @@ button:focus-visible {
   text-align: center;
 }
 
-.map-zoom-button {
+.map-zoom-button,
+.map-zoom-toggle-button {
   display: grid;
   place-items: center;
   width: 28px;
@@ -582,6 +613,10 @@ button:focus-visible {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.map-zoom-toggle-button {
+  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -938,10 +973,10 @@ button:focus-visible {
   .tab-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 5px;
     margin-left: 0;
     margin-right: 0;
-    padding: 8px 10px 0;
+    padding: 6px 8px 0;
   }
 
   .occupation-tabs {
@@ -951,34 +986,74 @@ button:focus-visible {
   }
 
   .map-actions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    justify-content: flex-end;
     gap: 6px;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
   }
 
   .delete-tab-button {
-    width: 100%;
+    width: 34px;
+    height: 34px;
     margin: 0;
+    padding: 0;
   }
 
   .reset-data-button {
-    width: 100%;
+    width: 34px;
+    height: 34px;
     margin: 0;
+    padding: 0;
+  }
+
+  .danger-icon-button .action-label {
+    display: none;
+  }
+
+  .danger-icon-button svg {
+    width: 18px;
+    height: 18px;
   }
 
   .tab-button {
-    min-width: 40px;
-    padding: 5px 10px;
+    min-width: 38px;
+    min-height: 27px;
+    padding: 3px 9px;
   }
 
   .map-container {
     margin: 10px;
     touch-action: pan-y;
   }
-
   .map-zoom-controls {
+    top: 6px;
+    right: 6px;
+    gap: 3px;
+    padding: 3px;
+  }
+
+  .map-zoom-toggle-button {
+    display: grid;
+  }
+
+  .map-zoom-controls:not(.is-open) .map-zoom-value,
+  .map-zoom-controls:not(.is-open) .map-zoom-button {
     display: none;
+  }
+
+  .map-zoom-controls.is-open {
+    background: rgba(7, 9, 15, 0.9);
+  }
+
+  .map-zoom-button,
+  .map-zoom-toggle-button {
+    width: 26px;
+    height: 26px;
+  }
+
+  .map-zoom-value {
+    min-width: 38px;
+    font-size: 0.72rem;
   }
 
    /* Mobile-specific point UI overrides disabled. */

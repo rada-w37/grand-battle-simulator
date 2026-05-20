@@ -593,7 +593,7 @@ export function deleteActiveOccupationTab() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
 
-  const confirmed = window.confirm(`タブ「${activeTab.name}」の拠点状態を削除しますか？`);
+  const confirmed = window.confirm("選択中のタブを削除します。\nこの操作はUndoでは戻せません。");
   if (!confirmed) return;
 
   hideTabContextMenu();
@@ -837,7 +837,7 @@ export function applyBattleData() {
 
 // Reset Data
 export function resetAllData() {
-  const confirmed = window.confirm("すべてのタブ、拠点状態、保存済み設定を初期化しますか？");
+  const confirmed = window.confirm("全ての占拠データを初期化します。\nこの操作はUndoでは戻せません。");
   if (!confirmed) return;
 
   Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
