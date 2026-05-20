@@ -463,14 +463,22 @@ button:focus-visible {
 .tab-name-input {
   flex: 0 0 auto;
   width: 88px;
-  min-height: 34px;
-  padding: 5px 8px;
+  min-height: 28px;
+  padding: 3px 8px;
   border: 1px solid var(--field-border);
   border-radius: 6px;
   color: var(--text);
   font: inherit;
   text-align: center;
   background: var(--field-bg);
+}
+
+.tab-name-input:focus {
+  outline: 0;
+  border-color: var(--field-border);
+  box-shadow:
+    0 0 0 2px rgba(210, 236, 181, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .tab-context-menu {
