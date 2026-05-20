@@ -329,8 +329,7 @@ button:focus-visible {
 }
 
 .table-scroll {
-  display: flex;
-  justify-content: flex-end;
+  display: block;
   width: 100%;
   max-width: 100%;
   padding-bottom: 6px;
@@ -377,6 +376,8 @@ button:focus-visible {
 
 .score-table {
   flex: 0 0 auto;
+  min-width: 720px;
+  margin: 0 auto;
   border-collapse: collapse;
   color: var(--text);
   background: rgba(6, 8, 14, 0.56);
@@ -1079,10 +1080,6 @@ button:focus-visible {
 
   .source-grid {
     grid-template-columns: repeat(2, minmax(120px, 1fr));
-  }
-
-  .table-scroll {
-    justify-content: flex-start;
   }
 
   .tab-row {
