@@ -531,9 +531,8 @@ button:focus-visible {
   margin: 12px;
   border: 1px solid rgba(199, 166, 96, 0.72);
   overflow: hidden;
-  touch-action: none;
+  touch-action: auto;
   user-select: none;
-  cursor: grab;
   box-shadow:
     0 0 0 1px rgba(255, 244, 215, 0.08),
     0 16px 32px rgba(0, 0, 0, 0.24);
@@ -541,6 +540,12 @@ button:focus-visible {
 
 .map-container.is-dragging {
   cursor: grabbing;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .map-container.is-zoomed {
+    cursor: grab;
+  }
 }
 
 .map-inner {

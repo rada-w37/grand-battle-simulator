@@ -3,7 +3,7 @@ import * as api from "./api.js";
 import * as ui from "./ui.js";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js";
 
-const MAP_MIN_SCALE = 0.8;
+const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
 const MAP_ZOOM_STEP = 0.0015;
 
@@ -38,6 +38,13 @@ function constrainMapView() {
   const { viewport, inner } = getMapElements();
   if (!viewport || !inner) return;
 
+  if (mapView.scale <= 1) {
+    mapView.scale = 1;
+    mapView.x = 0;
+    mapView.y = 0;
+    return;
+  }
+
   const viewportWidth = viewport.clientWidth;
   const viewportHeight = viewport.clientHeight;
   const contentWidth = inner.offsetWidth * mapView.scale;
@@ -57,11 +64,12 @@ function constrainMapView() {
 }
 
 function applyMapView() {
-  const { inner } = getMapElements();
+  const { viewport, inner } = getMapElements();
   if (!inner) return;
 
   constrainMapView();
   inner.style.transform = `matrix(${mapView.scale}, 0, 0, ${mapView.scale}, ${mapView.x}, ${mapView.y})`;
+  viewport?.classList.toggle("is-zoomed", mapView.scale > 1);
 }
 
 function resetMapView() {
@@ -76,7 +84,7 @@ function bindMapViewEvents() {
   if (!viewport) return;
 
   viewport.addEventListener("wheel", event => {
-    if (isMapControlTarget(event.target)) return;
+    if (!event.ctrlKey) return;
 
     event.preventDefault();
 
@@ -88,13 +96,18 @@ function bindMapViewEvents() {
     const nextScale = clamp(mapView.scale * (1 - event.deltaY * MAP_ZOOM_STEP), MAP_MIN_SCALE, MAP_MAX_SCALE);
 
     mapView.scale = nextScale;
-    mapView.x = pointerX - worldX * nextScale;
-    mapView.y = pointerY - worldY * nextScale;
+    if (nextScale === 1) {
+      mapView.x = 0;
+      mapView.y = 0;
+    } else {
+      mapView.x = pointerX - worldX * nextScale;
+      mapView.y = pointerY - worldY * nextScale;
+    }
     applyMapView();
   }, { passive: false });
 
   viewport.addEventListener("pointerdown", event => {
-    if (event.pointerType !== "mouse" || event.button !== 0 || isMapControlTarget(event.target)) return;
+    if (event.pointerType !== "mouse" || event.button !== 0 || mapView.scale <= 1 || isMapControlTarget(event.target)) return;
 
     mapView.isDragging = true;
     mapView.dragStartX = event.clientX;
