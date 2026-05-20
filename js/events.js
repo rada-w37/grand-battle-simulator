@@ -3,6 +3,141 @@ import * as api from "./api.js";
 import * as ui from "./ui.js";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js";
 
+const MAP_MIN_SCALE = 0.8;
+const MAP_MAX_SCALE = 2.5;
+const MAP_ZOOM_STEP = 0.0015;
+
+const mapView = {
+  scale: 1,
+  x: 0,
+  y: 0,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragOriginX: 0,
+  dragOriginY: 0
+};
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function isMapControlTarget(target) {
+  return Boolean(target.closest(".point, select, button, input, textarea"));
+}
+
+function getMapElements() {
+  return {
+    viewport: document.querySelector(".map-container"),
+    inner: document.getElementById("map-inner"),
+    resetButton: document.getElementById("map-view-reset-button")
+  };
+}
+
+function constrainMapView() {
+  const { viewport, inner } = getMapElements();
+  if (!viewport || !inner) return;
+
+  const viewportWidth = viewport.clientWidth;
+  const viewportHeight = viewport.clientHeight;
+  const contentWidth = inner.offsetWidth * mapView.scale;
+  const contentHeight = inner.offsetHeight * mapView.scale;
+
+  if (contentWidth <= viewportWidth) {
+    mapView.x = (viewportWidth - contentWidth) / 2;
+  } else {
+    mapView.x = clamp(mapView.x, viewportWidth - contentWidth, 0);
+  }
+
+  if (contentHeight <= viewportHeight) {
+    mapView.y = (viewportHeight - contentHeight) / 2;
+  } else {
+    mapView.y = clamp(mapView.y, viewportHeight - contentHeight, 0);
+  }
+}
+
+function applyMapView() {
+  const { inner } = getMapElements();
+  if (!inner) return;
+
+  constrainMapView();
+  inner.style.transform = `matrix(${mapView.scale}, 0, 0, ${mapView.scale}, ${mapView.x}, ${mapView.y})`;
+}
+
+function resetMapView() {
+  mapView.scale = 1;
+  mapView.x = 0;
+  mapView.y = 0;
+  applyMapView();
+}
+
+function bindMapViewEvents() {
+  const { viewport, resetButton } = getMapElements();
+  if (!viewport) return;
+
+  viewport.addEventListener("wheel", event => {
+    if (isMapControlTarget(event.target)) return;
+
+    event.preventDefault();
+
+    const rect = viewport.getBoundingClientRect();
+    const pointerX = event.clientX - rect.left;
+    const pointerY = event.clientY - rect.top;
+    const worldX = (pointerX - mapView.x) / mapView.scale;
+    const worldY = (pointerY - mapView.y) / mapView.scale;
+    const nextScale = clamp(mapView.scale * (1 - event.deltaY * MAP_ZOOM_STEP), MAP_MIN_SCALE, MAP_MAX_SCALE);
+
+    mapView.scale = nextScale;
+    mapView.x = pointerX - worldX * nextScale;
+    mapView.y = pointerY - worldY * nextScale;
+    applyMapView();
+  }, { passive: false });
+
+  viewport.addEventListener("pointerdown", event => {
+    if (event.pointerType !== "mouse" || event.button !== 0 || isMapControlTarget(event.target)) return;
+
+    mapView.isDragging = true;
+    mapView.dragStartX = event.clientX;
+    mapView.dragStartY = event.clientY;
+    mapView.dragOriginX = mapView.x;
+    mapView.dragOriginY = mapView.y;
+    viewport.classList.add("is-dragging");
+    viewport.setPointerCapture(event.pointerId);
+  });
+
+  viewport.addEventListener("pointermove", event => {
+    if (!mapView.isDragging) return;
+
+    mapView.x = mapView.dragOriginX + event.clientX - mapView.dragStartX;
+    mapView.y = mapView.dragOriginY + event.clientY - mapView.dragStartY;
+    applyMapView();
+  });
+
+  viewport.addEventListener("pointerup", event => {
+    if (!mapView.isDragging) return;
+
+    mapView.isDragging = false;
+    viewport.classList.remove("is-dragging");
+    if (viewport.hasPointerCapture(event.pointerId)) {
+      viewport.releasePointerCapture(event.pointerId);
+    }
+  });
+
+  viewport.addEventListener("pointercancel", () => {
+    mapView.isDragging = false;
+    viewport.classList.remove("is-dragging");
+  });
+
+  viewport.addEventListener("dblclick", event => {
+    if (isMapControlTarget(event.target)) return;
+    resetMapView();
+  });
+
+  resetButton?.addEventListener("click", resetMapView);
+  window.addEventListener("resize", applyMapView);
+  resetMapView();
+}
+
 export function bindEvents() {
   document.addEventListener("click", event => {
     if (state.suppressNextMenuClose) return;
@@ -107,4 +242,5 @@ export function bindEvents() {
     });
   });
 
+  bindMapViewEvents();
 }
