@@ -408,9 +408,12 @@ button:focus-visible {
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
   margin: 0;
   padding: 8px 10px 0;
+  overflow: hidden;
   border-bottom: 1px solid rgba(199, 166, 96, 0.62);
   background:
     linear-gradient(180deg, rgba(16, 18, 29, 0.92), rgba(6, 8, 14, 0.88));
@@ -420,10 +423,10 @@ button:focus-visible {
   display: flex;
   justify-content: flex-start;
   gap: 4px;
-  width: 100%;
+  width: auto;
   min-width: 0;
   max-width: 100%;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 0 0;
@@ -1010,9 +1013,11 @@ button:focus-visible {
   }
 
   .occupation-tabs {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-width: 0;
     justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding-left: 0;
     padding-right: 0;
   }
