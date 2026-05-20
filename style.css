@@ -525,15 +525,83 @@ button:focus-visible {
   justify-self: center;
   margin: 12px;
   border: 1px solid rgba(199, 166, 96, 0.72);
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
   box-shadow:
     0 0 0 1px rgba(255, 244, 215, 0.08),
     0 16px 32px rgba(0, 0, 0, 0.24);
+}
+
+.map-container.is-dragging {
+  cursor: grabbing;
+}
+
+.map-zoom-controls {
+  position: absolute;
+  z-index: 20;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(170, 139, 82, 0.44);
+  border-radius: 7px;
+  background: rgba(7, 9, 15, 0.78);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.map-zoom-value {
+  min-width: 44px;
+  color: #f4e9c9;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.map-zoom-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.map-zoom-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .map-container.is-zoomed {
+    cursor: grab;
+  }
+}
+
+.map-inner {
+  position: relative;
+  display: inline-block;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .map-image {
   display: block;
   width: 100%;
   height: auto;
+  pointer-events: none;
 }
 
 .point {
@@ -906,6 +974,11 @@ button:focus-visible {
 
   .map-container {
     margin: 10px;
+    touch-action: pan-y;
+  }
+
+  .map-zoom-controls {
+    display: none;
   }
 
    /* Mobile-specific point UI overrides disabled. */

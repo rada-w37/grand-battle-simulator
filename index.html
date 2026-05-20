@@ -97,8 +97,24 @@
     </div>
 
     <section class="map-container" aria-label="拠点マップ">
-      <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
-      <div id="battle-points"></div>
+      <div id="map-inner" class="map-inner">
+        <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
+        <div id="battle-points"></div>
+      </div>
+      <div class="map-zoom-controls" aria-label="MAP表示操作">
+        <span id="map-zoom-value" class="map-zoom-value" aria-live="polite">100%</span>
+        <button type="button" id="map-zoom-in-button" class="map-zoom-button" aria-label="MAPを拡大">+</button>
+        <button type="button" id="map-zoom-out-button" class="map-zoom-button" aria-label="MAPを縮小">-</button>
+        <button type="button" id="map-view-reset-button" class="map-zoom-button" aria-label="MAP表示をリセット">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 4H4v4" />
+            <path d="M16 4h4v4" />
+            <path d="M20 16v4h-4" />
+            <path d="M4 16v4h4" />
+            <path d="M9 9h6v6H9z" />
+          </svg>
+        </button>
+      </div>
     </section>
     </section>
 
