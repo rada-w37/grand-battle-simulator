@@ -18,6 +18,8 @@
   --gold-soft: rgba(170, 139, 82, 0.18);
   --field-bg: rgba(6, 8, 14, 0.78);
   --field-border: rgba(170, 139, 82, 0.34);
+   --action-button-size: 36px;
+   --action-button-size-mobile: 34px;
 }
 
 * {
@@ -457,13 +459,35 @@ button:focus-visible {
 }
 
 .tab-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
   min-width: 36px;
-  padding-left: 10px;
-  padding-right: 10px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 6px;
+  border-color: rgba(199, 166, 96, 0.52);
   color: #f5e7bd;
-  font-weight: 700;
-  background: rgba(199, 166, 96, 0.16);
+  background: rgba(199, 166, 96, 0.12);
+  transform: none;
+}
+
+.tab-add-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab-add-button:hover {
+  border-color: rgba(226, 196, 126, 0.76);
+  background: rgba(199, 166, 96, 0.22);
 }
 
 .tab-name-input {
@@ -554,6 +578,16 @@ button:focus-visible {
 .reset-data-button {
   border-color: rgba(185, 120, 116, 0.46);
   color: #f0c0b8;
+}
+
+.delete-tab-button,
+.reset-data-button,
+.tab-add-button {
+  /* width: var(--action-button-size); */
+  height: var(--action-button-size);
+  /* min-width: var(--action-button-size); */
+  min-height: var(--action-button-size);
+  margin-bottom: 4px;
 }
 
 .delete-tab-button:hover,
@@ -1032,17 +1066,30 @@ button:focus-visible {
   }
 
   .delete-tab-button {
-    width: 34px;
-    height: 34px;
     margin: 0;
     padding: 0;
+    margin-bottom: 4px;
   }
 
   .reset-data-button {
-    width: 34px;
-    height: 34px;
     margin: 0;
     padding: 0;
+    margin-bottom: 4px;
+  }
+
+  /* .tab-add-button {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  } */
+
+  .delete-tab-button,
+  .reset-data-button,
+  .tab-add-button {
+    width: var(--action-button-size-mobile);
+    height: var(--action-button-size-mobile);
+    min-width: var(--action-button-size-mobile);
+    min-height: var(--action-button-size-mobile);
   }
 
   .danger-icon-button .action-label {

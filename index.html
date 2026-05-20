@@ -90,7 +90,12 @@
     <section class="panel map-panel">
       <div class="tab-row">
         <nav id="occupation-tabs" class="occupation-tabs" aria-label="拠点状況タブ"></nav>
-        <button type="button" id="tab-add-button" class="tab-button tab-add-button" aria-label="拠点状況タブを追加">+</button>
+        <button type="button" id="tab-add-button" class="tab-add-button" aria-label="タブを追加" title="タブを追加">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        </button>
         <div class="map-actions">
           <button type="button" id="delete-tab-button" class="delete-tab-button">選択中のタブを削除</button>
           <button type="button" id="reset-data-button" class="reset-data-button">全データ初期化</button>
