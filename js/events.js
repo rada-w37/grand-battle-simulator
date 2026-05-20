@@ -74,6 +74,8 @@ function createSvgIcon(paths) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
 }
 
+const MAP_ZOOM_OPEN_ICON = '<path d="M11.5 5l-6 7 6 7" stroke-width="1.55" /><path d="M18 5l-6 7 6 7" stroke-width="1.55" />';
+
 function setupMapActionButtons() {
   state.elements.deleteTabButton.classList.add("danger-icon-button");
   state.elements.deleteTabButton.setAttribute("aria-label", "選択中のタブを削除");
@@ -100,16 +102,30 @@ function ensureMapZoomToggleButton() {
   toggleButton.type = "button";
   toggleButton.id = "map-zoom-toggle-button";
   toggleButton.className = "map-zoom-toggle-button";
-  toggleButton.setAttribute("aria-label", "MAPズーム操作を開閉");
+  toggleButton.setAttribute("aria-label", "ズーム操作を表示");
+  toggleButton.title = "ズーム操作を表示";
   toggleButton.setAttribute("aria-expanded", "false");
-  toggleButton.innerHTML = createSvgIcon('<path d="M11 5v12" /><path d="M5 11h12" /><path d="M16.5 16.5L21 21" /><circle cx="11" cy="11" r="7" />');
+  toggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
   zoomControls.prepend(toggleButton);
 }
 
 function setMapZoomControlsOpen(isOpen) {
   const { zoomControls, zoomToggleButton } = getMapElements();
   zoomControls?.classList.toggle("is-open", isOpen);
-  zoomToggleButton?.setAttribute("aria-expanded", String(isOpen));
+  if (!zoomToggleButton) return;
+
+  zoomToggleButton.setAttribute("aria-expanded", String(isOpen));
+  zoomToggleButton.setAttribute("aria-label", "ズーム操作を表示");
+  zoomToggleButton.title = "ズーム操作を表示";
+  zoomToggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
+}
+
+function closeMapZoomControlsFromOutside(event) {
+  const { zoomControls } = getMapElements();
+  if (!zoomControls?.classList.contains("is-open")) return;
+  if (event.target.closest(".map-zoom-controls")) return;
+
+  setMapZoomControlsOpen(false);
 }
 
 function constrainMapView() {
@@ -340,11 +356,12 @@ function bindMapViewEvents() {
 export function bindEvents() {
   setupMapActionButtons();
 
+  document.addEventListener("pointerdown", closeMapZoomControlsFromOutside);
+
   document.addEventListener("click", event => {
     if (state.suppressNextMenuClose) return;
     if (!event.target.closest(".tab-context-menu")) ui.hideTabContextMenu();
     if (!event.target.closest(".combo-box")) ui.hideWorldSuggestions();
-    if (!event.target.closest(".map-container")) setMapZoomControlsOpen(false);
   });
 
   state.elements.server.addEventListener("change", () => {

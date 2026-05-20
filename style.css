@@ -407,10 +407,10 @@ button:focus-visible {
 .tab-row {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 8px;
   max-width: 100%;
   margin: 0;
-  padding: 10px 12px 0;
+  padding: 8px 10px 0;
   border-bottom: 1px solid rgba(199, 166, 96, 0.62);
   background:
     linear-gradient(180deg, rgba(16, 18, 29, 0.92), rgba(6, 8, 14, 0.88));
@@ -421,7 +421,9 @@ button:focus-visible {
   justify-content: flex-start;
   gap: 4px;
   width: 100%;
+  min-width: 0;
   max-width: 100%;
+  flex: 1 1 auto;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 0 0;
@@ -529,7 +531,7 @@ button:focus-visible {
   flex: 0 0 auto;
   justify-content: flex-end;
   gap: 8px;
-  padding-bottom: 6px;
+  padding-bottom: 0;
 }
 
 .reset-data-button {
@@ -599,8 +601,7 @@ button:focus-visible {
   text-align: center;
 }
 
-.map-zoom-button,
-.map-zoom-toggle-button {
+.map-zoom-button {
   display: grid;
   place-items: center;
   width: 28px;
@@ -618,9 +619,26 @@ button:focus-visible {
   height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+}
+
+.map-zoom-toggle-button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  color: #d6b875;
+  background: rgba(8, 10, 16, 0.72);
+  border: 1px solid rgba(214, 184, 117, 0.45);
+  border-radius: 8px;
+}
+
+.map-zoom-toggle-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
 }
 
 .map-zoom-toggle-button {
@@ -979,15 +997,17 @@ button:focus-visible {
   }
 
   .tab-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 5px;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 6px;
     margin-left: 0;
     margin-right: 0;
-    padding: 6px 8px 0;
+    padding: 6px 7px 0;
   }
 
   .occupation-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
     justify-content: flex-start;
     padding-left: 0;
     padding-right: 0;
@@ -995,9 +1015,10 @@ button:focus-visible {
 
   .map-actions {
     display: flex;
+    flex: 0 0 auto;
     justify-content: flex-end;
-    gap: 6px;
-    padding-bottom: 6px;
+    gap: 4px;
+    padding-bottom: 0;
   }
 
   .delete-tab-button {
@@ -1037,11 +1058,34 @@ button:focus-visible {
     top: 6px;
     right: 6px;
     gap: 3px;
-    padding: 3px;
+    padding: 2px;
+    border-color: rgba(170, 139, 82, 0.16);
+    border-radius: 7px;
+    background: rgba(7, 9, 15, 0.34);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
   }
 
   .map-zoom-toggle-button {
     display: grid;
+    border-color: rgba(226, 196, 126, 0.34);
+    border-radius: 5px;
+    color: rgba(226, 196, 126, 0.68);
+    background: rgba(7, 9, 15, 0.18);
+    box-shadow:
+      0 0 0 1px rgba(255, 244, 215, 0.06),
+      0 3px 8px rgba(0, 0, 0, 0.16);
+    filter:
+      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85))
+      drop-shadow(0 0 3px rgba(226, 196, 126, 0.22));
+  }
+
+  .map-zoom-toggle-button:hover,
+  .map-zoom-toggle-button:focus-visible {
+    border-color: rgba(226, 196, 126, 0.48);
+    color: rgba(226, 196, 126, 0.48);
+    background: rgba(38, 34, 24, 0.28);
+    outline: 2px solid rgba(226, 196, 126, 0.24);
+    outline-offset: 1px;
   }
 
   .map-zoom-controls:not(.is-open) .map-zoom-value,
@@ -1050,13 +1094,24 @@ button:focus-visible {
   }
 
   .map-zoom-controls.is-open {
-    background: rgba(7, 9, 15, 0.9);
+    border-radius: 8px;
+    background: rgba(7, 9, 15, 0.82);
+  }
+
+  .map-zoom-controls.is-open .map-zoom-toggle-button {
+    display: none;
   }
 
   .map-zoom-button,
   .map-zoom-toggle-button {
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .map-zoom-toggle-button svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.35;
   }
 
   .map-zoom-value {
