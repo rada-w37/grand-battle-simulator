@@ -19,7 +19,9 @@ const mapView = {
   dragOriginY: 0,
   isTouchMapGesture: false,
   pinchStartDistance: 0,
-  pinchStartScale: 1
+  pinchStartScale: 1,
+  pinchStartWorldX: 0,
+  pinchStartWorldY: 0
 };
 
 function clamp(value, min, max) {
@@ -153,16 +155,47 @@ function getTouchCenter(touches, viewport) {
   };
 }
 
-function startTouchMapGesture(touches) {
+function startTouchMapGesture(touches, viewport) {
+  const center = getTouchCenter(touches, viewport);
+
   mapView.isTouchMapGesture = true;
   mapView.pinchStartDistance = getTouchDistance(touches);
   mapView.pinchStartScale = mapView.scale;
+  mapView.pinchStartWorldX = (center.x - mapView.x) / mapView.scale;
+  mapView.pinchStartWorldY = (center.y - mapView.y) / mapView.scale;
 }
 
 function endTouchMapGesture() {
   mapView.isTouchMapGesture = false;
   mapView.pinchStartDistance = 0;
   mapView.pinchStartScale = mapView.scale;
+  mapView.pinchStartWorldX = 0;
+  mapView.pinchStartWorldY = 0;
+}
+
+function updateTouchMapGesture(touches, viewport) {
+  const distance = getTouchDistance(touches);
+  if (mapView.pinchStartDistance <= 0) return;
+
+  const center = getTouchCenter(touches, viewport);
+  const nextScale = clamp(
+    mapView.pinchStartScale * (distance / mapView.pinchStartDistance),
+    MAP_MIN_SCALE,
+    MAP_MAX_SCALE
+  );
+
+  if (nextScale === 1) {
+    mapView.scale = 1;
+    mapView.x = 0;
+    mapView.y = 0;
+    applyMapView();
+    return;
+  }
+
+  mapView.scale = nextScale;
+  mapView.x = center.x - mapView.pinchStartWorldX * nextScale;
+  mapView.y = center.y - mapView.pinchStartWorldY * nextScale;
+  applyMapView();
 }
 
 function bindMapViewEvents() {
@@ -226,7 +259,7 @@ function bindMapViewEvents() {
     if (event.touches.length !== 2) return;
 
     event.preventDefault();
-    startTouchMapGesture(event.touches);
+    startTouchMapGesture(event.touches, viewport);
   }, { passive: false });
 
   viewport.addEventListener("touchmove", event => {
@@ -235,12 +268,7 @@ function bindMapViewEvents() {
     event.preventDefault();
     if (event.touches.length !== 2) return;
 
-    const distance = getTouchDistance(event.touches);
-    if (mapView.pinchStartDistance <= 0) return;
-
-    const center = getTouchCenter(event.touches, viewport);
-    const nextScale = mapView.pinchStartScale * (distance / mapView.pinchStartDistance);
-    zoomMapTo(nextScale, center.x, center.y);
+    updateTouchMapGesture(event.touches, viewport);
   }, { passive: false });
 
   viewport.addEventListener("touchend", event => {
