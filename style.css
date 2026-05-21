@@ -432,9 +432,11 @@ button:focus-visible {
 
 .score-table th,
 .score-table td {
+  height: 36px;
   min-width: 56px;
   border: 1px solid rgba(199, 166, 96, 0.28);
-  padding: 4px 6px;
+  padding: 5px 6px;
+  line-height: 1.2;
   text-align: center;
 }
 
@@ -487,7 +489,10 @@ button:focus-visible {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  padding: 3px 5px;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 2px 5px;
   border: 1px solid rgba(226, 196, 126, 0.24);
   border-radius: 5px;
   color: #fff4d7;
