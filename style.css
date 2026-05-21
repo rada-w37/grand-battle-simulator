@@ -1483,7 +1483,7 @@ button:focus-visible {
     min-width: 0;
     color: #e8d3a8;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-    font-size: clamp(0.7rem, 0.8vw, 0.9rem);
+    font-size: calc(clamp(0.7rem, 0.8vw, 0.9rem) * var(--map-label-font-scale, 1));
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -1552,7 +1552,7 @@ button:focus-visible {
     min-height: 6px;
     line-height: 6px;
     padding: 0;
-    font-size: 0.2rem;
+    font-size: calc(0.2rem * var(--map-label-font-scale, 1));
   }
 
   .point-attacker-select {    

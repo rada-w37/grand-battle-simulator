@@ -469,10 +469,10 @@ export function bindEvents() {
   });
 
   getAllPointSelects().forEach(select => {
-    ["pointerdown", "mousedown", "click", "touchstart"].forEach(eventName => {
+    ["pointerdown", "pointerup", "mousedown", "mouseup", "click", "touchstart", "touchend"].forEach(eventName => {
       select.addEventListener(eventName, event => {
         event.stopPropagation();
-      }, { passive: true });
+      });
     });
 
     select.addEventListener("change", () => {
