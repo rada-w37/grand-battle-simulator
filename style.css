@@ -919,7 +919,9 @@ button:focus-visible {
   border-radius: 6px;
   background-color: transparent;
   text-align: center;
-  transform: translate(-50%, -50%);
+  backface-visibility: hidden;
+  transform: translate(-50%, -50%) translateZ(0);
+  will-change: transform;
 }
 
 .point-aura {
@@ -1001,6 +1003,9 @@ button:focus-visible {
   font-weight: 700;
   line-height: 1;
   text-align: center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
   text-shadow:
     0 1px 1px rgba(31, 15, 5, 0.92),
     0 0 3px rgba(47, 21, 6, 0.82),
@@ -1008,7 +1013,14 @@ button:focus-visible {
   pointer-events: none;
   transform: translate(-50%, calc(-50% - 2px));
   transform-origin: center;
+  will-change: transform;
   white-space: nowrap;
+}
+
+.map-container.is-zoomed .point-name-label {
+  text-shadow:
+    0 1px 1px rgba(31, 15, 5, 0.82),
+    0 0 2px rgba(47, 21, 6, 0.62);
 }
   
 .point-aura-temple {
@@ -1075,8 +1087,10 @@ button:focus-visible {
   /* grid-template-rows: repeat(2, 18px); */
   gap: 2px;
   width: 49%;
-  transform: translate(-50%, -50%);
+  backface-visibility: hidden;
+  transform: translate(-50%, -50%) translateZ(0);
   align-items: start;
+  will-change: transform;
 }
 
 .point-labels::before,
@@ -1145,6 +1159,9 @@ button:focus-visible {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
   background-color: transparent;
 }
@@ -1157,6 +1174,10 @@ button:focus-visible {
 .point-defender-select {
   text-align: center;
   text-align-last: center;
+}
+
+.map-container.is-zoomed .point select {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.68);
 }
 
 .point select.is-highlight-guild {
