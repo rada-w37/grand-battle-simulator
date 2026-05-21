@@ -460,6 +460,12 @@ export function bindEvents() {
   state.elements.deleteTabButton.addEventListener("click", ui.deleteActiveOccupationTab);
   state.elements.resetDataButton.addEventListener("click", ui.resetAllData);
   window.addEventListener("resize", ui.updateTabScrollState);
+  state.elements.mapUndoButton.addEventListener("click", () => {
+    ui.undoOccupationChange();
+  });
+  state.elements.mapRedoButton.addEventListener("click", () => {
+    ui.redoOccupationChange();
+  });
 
   getAllPointSelects().forEach(select => {
     select.addEventListener("change", () => {
@@ -474,6 +480,7 @@ export function bindEvents() {
       ui.recordCurrentOccupationEdit();
       ui.saveSelectStates();
       ui.updateScores();
+      ui.updateOccupationHistoryControls();
     });
   });
 

@@ -458,6 +458,7 @@ function pushOccupationHistory(entry, tabId = state.activeTabId) {
     history.undoStack.shift();
   }
   history.redoStack = [];
+  updateOccupationHistoryControls();
 }
 
 function applyOccupationHistoryEntry(entry, direction) {
@@ -472,6 +473,7 @@ function applyOccupationHistoryEntry(entry, direction) {
 
   applySelectStates(nextStates);
   saveSelectStates();
+  updateOccupationHistoryControls();
 }
 
 export function recordCurrentOccupationEdit() {
@@ -489,6 +491,15 @@ export function canRedoOccupation(tabId = state.activeTabId) {
   return Boolean(getOccupationHistory(tabId)?.redoStack.length);
 }
 
+export function updateOccupationHistoryControls() {
+  if (state.elements.mapUndoButton) {
+    state.elements.mapUndoButton.disabled = !canUndoOccupation();
+  }
+  if (state.elements.mapRedoButton) {
+    state.elements.mapRedoButton.disabled = !canRedoOccupation();
+  }
+}
+
 export function undoOccupationChange() {
   const history = getOccupationHistory();
   if (!history?.undoStack.length) return false;
@@ -496,6 +507,7 @@ export function undoOccupationChange() {
   const entry = history.undoStack.pop();
   applyOccupationHistoryEntry(entry, "undo");
   history.redoStack.push(entry);
+  updateOccupationHistoryControls();
   return true;
 }
 
@@ -506,6 +518,7 @@ export function redoOccupationChange() {
   const entry = history.redoStack.pop();
   applyOccupationHistoryEntry(entry, "redo");
   history.undoStack.push(entry);
+  updateOccupationHistoryControls();
   return true;
 }
 
@@ -516,6 +529,7 @@ function deleteOccupationHistory(tabId) {
 
 function clearOccupationHistory() {
   state.setOccupationHistoryByTabId({});
+  updateOccupationHistoryControls();
 }
 
 export function getCurrentSelectStates() {
@@ -729,6 +743,7 @@ export function switchOccupationTab(tabId) {
   renderOccupationTabs();
   updateGuildOptions();
   applySelectStates(getActiveTab()?.selectStates);
+  updateOccupationHistoryControls();
 }
 
 export function addOccupationTab() {
@@ -744,6 +759,7 @@ export function addOccupationTab() {
   scrollOccupationTabsToEnd();
   updateGuildOptions();
   applySelectStates(newTab.selectStates);
+  updateOccupationHistoryControls();
 }
 
 export function deleteActiveOccupationTab() {
@@ -767,6 +783,7 @@ export function deleteActiveOccupationTab() {
   renderOccupationTabs();
   updateGuildOptions();
   applySelectStates(getActiveTab()?.selectStates);
+  updateOccupationHistoryControls();
 }
 
 export function resetOccupationTabs() {
@@ -776,6 +793,7 @@ export function resetOccupationTabs() {
   state.setPendingSelectStates(state.occupationTabs[0].selectStates);
   saveOccupationTabs();
   renderOccupationTabs();
+  updateOccupationHistoryControls();
 }
 
 // World Suggestions
@@ -967,6 +985,7 @@ export function applyBattleData() {
     if (_setPendingStateFn) {
       _setPendingStateFn(false);
     }
+    updateOccupationHistoryControls();
     setStatus("仮名ギルドを反映しました。", "success");
     return;
   }
@@ -1014,6 +1033,7 @@ export function applyBattleData() {
   if (_setPendingStateFn) {
     _setPendingStateFn(false);
   }
+  updateOccupationHistoryControls();
   setStatus("拠点情報を反映しました。", "success");
 }
 
@@ -1054,5 +1074,6 @@ export function resetAllData() {
     _setPendingStateFn(false);
   }
   state.elements.applyButton.disabled = true;
+  updateOccupationHistoryControls();
   setStatus("全データを初期化しました。", "success");
 }

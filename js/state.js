@@ -148,6 +148,8 @@ export function initializeElements() {
   elements.applyButton = document.getElementById("apply-data-button");
   elements.scoreBody = document.getElementById("score-body");
   elements.battlePoints = document.getElementById("battle-points");
+  elements.mapUndoButton = document.getElementById("map-undo-button");
+  elements.mapRedoButton = document.getElementById("map-redo-button");
   elements.occupationTabs = document.getElementById("occupation-tabs");
   elements.tabAddButton = document.getElementById("tab-add-button");
   elements.deleteTabButton = document.getElementById("delete-tab-button");

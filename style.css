@@ -762,6 +762,47 @@ button:focus-visible {
   cursor: grabbing;
 }
 
+.map-history-controls {
+  position: absolute;
+  z-index: 20;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(170, 139, 82, 0.36);
+  border-radius: 7px;
+  background: rgba(7, 9, 15, 0.68);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.map-history-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 5px;
+  border-color: rgba(199, 166, 96, 0.46);
+  color: #e9d6a6;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  background: rgba(199, 166, 96, 0.1);
+}
+
+.map-history-button:hover:not(:disabled),
+.map-history-button:focus-visible:not(:disabled) {
+  border-color: rgba(226, 196, 126, 0.72);
+  background: rgba(199, 166, 96, 0.2);
+}
+
+.map-history-button:disabled {
+  opacity: 0.34;
+  cursor: default;
+}
+
 .map-zoom-controls {
   position: absolute;
   z-index: 20;
@@ -1270,6 +1311,22 @@ button:focus-visible {
     margin: 10px;
     touch-action: pan-y;
   }
+
+  .map-history-controls {
+    top: 6px;
+    left: 6px;
+    gap: 3px;
+    padding: 2px;
+    border-color: rgba(170, 139, 82, 0.16);
+    background: rgba(7, 9, 15, 0.34);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
+  }
+
+  .map-history-button {
+    width: 32px;
+    height: 32px;
+  }
+
   .map-zoom-controls {
     top: 6px;
     right: 6px;
