@@ -883,8 +883,8 @@ button:focus-visible {
   z-index: 0;
   left: calc(82%);
   top: calc(50% + 16px);
-  width: 90px;
-  height: 90px;
+  width: 87px;
+  height: 87px;
   background: url("resource/shield-marker.png") center / contain no-repeat;
   pointer-events: none;
   transform: translate(-50%, -50%);
