@@ -171,6 +171,7 @@ function applyMapView() {
 
   constrainMapView();
   inner.style.transform = `matrix(${mapView.scale}, 0, 0, ${mapView.scale}, ${mapView.x}, ${mapView.y})`;
+  inner.style.setProperty("--map-label-font-scale", String(Math.min(1.45, 1 + (mapView.scale - 1) * 0.3)));
   viewport?.classList.toggle("is-zoomed", mapView.scale > 1);
   updateMapZoomControls();
 }
@@ -468,6 +469,12 @@ export function bindEvents() {
   });
 
   getAllPointSelects().forEach(select => {
+    ["pointerdown", "mousedown", "click", "touchstart"].forEach(eventName => {
+      select.addEventListener(eventName, event => {
+        event.stopPropagation();
+      }, { passive: true });
+    });
+
     select.addEventListener("change", () => {
       const point = select.closest(".point");
       if (select.classList.contains("point-attacker-select")) {

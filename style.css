@@ -999,7 +999,7 @@ button:focus-visible {
   min-width: 0;
   color: #e8d3a8;
   font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-  font-size: clamp(1.8rem, 0.75vw, 0.7rem);
+  font-size: calc(clamp(1.8rem, 0.75vw, 0.7rem) * var(--map-label-font-scale, 1));
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -1089,6 +1089,7 @@ button:focus-visible {
   width: 49%;
   backface-visibility: hidden;
   transform: translate(-50%, -50%) translateZ(0);
+  transform-origin: center;
   align-items: start;
   will-change: transform;
 }
@@ -1152,7 +1153,7 @@ button:focus-visible {
   border: 0;
   border-radius: 0;
   color: #eef4f8;
-  font-size: 0.55rem;
+  font-size: calc(0.55rem * var(--map-label-font-scale, 1));
   font-weight: 700;
   /* text-align: center;
   text-align-last: center; */
@@ -1232,10 +1233,7 @@ button:focus-visible {
 }
 
 .point select:focus {
-  width: 150%;
-  min-width: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  outline: 0;
 }
 
 @media (max-width: 720px) {
@@ -1568,6 +1566,6 @@ button:focus-visible {
   }
 
   .point select:focus {
-    width: 100%;
+    outline: 0;
   }
 }
