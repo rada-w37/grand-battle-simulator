@@ -425,6 +425,99 @@ export function updateScores() {
 }
 
 // Select States
+const OCCUPATION_HISTORY_LIMIT = 10;
+
+function getOccupationHistory(tabId = state.activeTabId) {
+  if (!tabId) return null;
+  if (!state.occupationHistoryByTabId[tabId]) {
+    state.occupationHistoryByTabId[tabId] = { undoStack: [], redoStack: [] };
+  }
+  return state.occupationHistoryByTabId[tabId];
+}
+
+function createOccupationHistoryEntry(beforeStates, afterStates) {
+  const changes = BATTLE_POINTS.map((point, index) => {
+    const before = normalizePointState(beforeStates[index]);
+    const after = normalizePointState(afterStates[index]);
+
+    if (before.attacker === after.attacker && before.defender === after.defender) return null;
+    return { pointId: point.id, before, after };
+  }).filter(Boolean);
+
+  return changes.length ? { changes } : null;
+}
+
+function pushOccupationHistory(entry, tabId = state.activeTabId) {
+  if (!entry?.changes?.length) return;
+
+  const history = getOccupationHistory(tabId);
+  if (!history) return;
+
+  history.undoStack.push(entry);
+  if (history.undoStack.length > OCCUPATION_HISTORY_LIMIT) {
+    history.undoStack.shift();
+  }
+  history.redoStack = [];
+}
+
+function applyOccupationHistoryEntry(entry, direction) {
+  const nextStates = getCurrentSelectStates();
+  const stateKey = direction === "undo" ? "before" : "after";
+
+  entry.changes.forEach(change => {
+    const pointIndex = BATTLE_POINTS.findIndex(point => point.id === change.pointId);
+    if (pointIndex < 0) return;
+    nextStates[pointIndex] = { ...change[stateKey] };
+  });
+
+  applySelectStates(nextStates);
+  saveSelectStates();
+}
+
+export function recordCurrentOccupationEdit() {
+  const activeTab = getActiveTab();
+  if (!activeTab) return;
+
+  pushOccupationHistory(createOccupationHistoryEntry(activeTab.selectStates, getCurrentSelectStates()), activeTab.id);
+}
+
+export function canUndoOccupation(tabId = state.activeTabId) {
+  return Boolean(getOccupationHistory(tabId)?.undoStack.length);
+}
+
+export function canRedoOccupation(tabId = state.activeTabId) {
+  return Boolean(getOccupationHistory(tabId)?.redoStack.length);
+}
+
+export function undoOccupationChange() {
+  const history = getOccupationHistory();
+  if (!history?.undoStack.length) return false;
+
+  const entry = history.undoStack.pop();
+  applyOccupationHistoryEntry(entry, "undo");
+  history.redoStack.push(entry);
+  return true;
+}
+
+export function redoOccupationChange() {
+  const history = getOccupationHistory();
+  if (!history?.redoStack.length) return false;
+
+  const entry = history.redoStack.pop();
+  applyOccupationHistoryEntry(entry, "redo");
+  history.undoStack.push(entry);
+  return true;
+}
+
+function deleteOccupationHistory(tabId) {
+  if (!tabId) return;
+  delete state.occupationHistoryByTabId[tabId];
+}
+
+function clearOccupationHistory() {
+  state.setOccupationHistoryByTabId({});
+}
+
 export function getCurrentSelectStates() {
   return Array.from(document.querySelectorAll(".point")).map(point => ({
     defender: point.querySelector(".point-defender-select")?.value || "",
@@ -665,6 +758,7 @@ export function deleteActiveOccupationTab() {
 
   hideTabContextMenu();
   state.setEditingTabId("");
+  deleteOccupationHistory(activeTab.id);
   state.occupationTabs.splice(activeIndex, 1);
   const nextIndex = Math.max(0, activeIndex - 1);
   state.setActiveTabId(state.occupationTabs[nextIndex].id);
@@ -857,6 +951,8 @@ export function _setSetPendingStateFn(fn) {
 
 // Apply Battle Data
 export function applyBattleData() {
+  const beforeSelectStates = getCurrentSelectStates();
+
   if (state.usesFallbackGuilds) {
     const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : getEditableGuildNames();
     state.setCurrentGuilds(nextGuilds);
@@ -865,6 +961,7 @@ export function applyBattleData() {
     resetOccupationTabs();
     updateGuildOptions();
     applySelectStates(state.occupationTabs[0].selectStates);
+    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
     updateScores();
     state.setUsesFallbackGuilds(false);
     if (_setPendingStateFn) {
@@ -911,6 +1008,7 @@ export function applyBattleData() {
     updatePointSelfAttackState(point);
   });
 
+  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
   saveSelectStates();
   updateScores();
   if (_setPendingStateFn) {
@@ -925,6 +1023,7 @@ export function resetAllData() {
   if (!confirmed) return;
 
   Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+  clearOccupationHistory();
 
   state.setCurrentBattleData(null);
   state.setCurrentGuilds([]);

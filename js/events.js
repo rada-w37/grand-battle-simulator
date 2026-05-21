@@ -471,6 +471,7 @@ export function bindEvents() {
         ui.updatePointChip(point, select.value);
       }
       ui.updatePointSelfAttackState(point);
+      ui.recordCurrentOccupationEdit();
       ui.saveSelectStates();
       ui.updateScores();
     });

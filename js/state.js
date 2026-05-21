@@ -19,6 +19,7 @@ export let highlightedGuildName = "";
 export let isEditingGuildNames = false;
 export let guildNameDrafts = [];
 export let usesFallbackGuilds = false;
+export let occupationHistoryByTabId = {};
 
 // DOM Elements
 export const elements = {};
@@ -122,6 +123,11 @@ export function setGuildNameDrafts(value) {
 export function setUsesFallbackGuilds(value) {
   usesFallbackGuilds = value;
   return usesFallbackGuilds;
+}
+
+export function setOccupationHistoryByTabId(value) {
+  occupationHistoryByTabId = value;
+  return occupationHistoryByTabId;
 }
 
 // Initialize DOM Elements
