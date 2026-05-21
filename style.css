@@ -919,7 +919,9 @@ button:focus-visible {
   border-radius: 6px;
   background-color: transparent;
   text-align: center;
-  transform: translate(-50%, -50%);
+  backface-visibility: hidden;
+  transform: translate(-50%, -50%) translateZ(0);
+  will-change: transform;
 }
 
 .point-aura {
@@ -997,10 +999,13 @@ button:focus-visible {
   min-width: 0;
   color: #e8d3a8;
   font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-  font-size: clamp(1.8rem, 0.75vw, 0.7rem);
+  font-size: calc(clamp(1.8rem, 0.75vw, 0.7rem) * var(--map-label-font-scale, 1));
   font-weight: 700;
   line-height: 1;
   text-align: center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
   text-shadow:
     0 1px 1px rgba(31, 15, 5, 0.92),
     0 0 3px rgba(47, 21, 6, 0.82),
@@ -1008,7 +1013,14 @@ button:focus-visible {
   pointer-events: none;
   transform: translate(-50%, calc(-50% - 2px));
   transform-origin: center;
+  will-change: transform;
   white-space: nowrap;
+}
+
+.map-container.is-zoomed .point-name-label {
+  text-shadow:
+    0 1px 1px rgba(31, 15, 5, 0.82),
+    0 0 2px rgba(47, 21, 6, 0.62);
 }
   
 .point-aura-temple {
@@ -1075,8 +1087,11 @@ button:focus-visible {
   /* grid-template-rows: repeat(2, 18px); */
   gap: 2px;
   width: 49%;
-  transform: translate(-50%, -50%);
+  backface-visibility: hidden;
+  transform: translate(-50%, -50%) translateZ(0);
+  transform-origin: center;
   align-items: start;
+  will-change: transform;
 }
 
 .point-labels::before,
@@ -1138,13 +1153,16 @@ button:focus-visible {
   border: 0;
   border-radius: 0;
   color: #eef4f8;
-  font-size: 0.55rem;
+  font-size: calc(0.55rem * var(--map-label-font-scale, 1));
   font-weight: 700;
   /* text-align: center;
   text-align-last: center; */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
   background-color: transparent;
 }
@@ -1157,6 +1175,10 @@ button:focus-visible {
 .point-defender-select {
   text-align: center;
   text-align-last: center;
+}
+
+.map-container.is-zoomed .point select {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.68);
 }
 
 .point select.is-highlight-guild {
@@ -1211,10 +1233,7 @@ button:focus-visible {
 }
 
 .point select:focus {
-  width: 150%;
-  min-width: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  outline: 0;
 }
 
 @media (max-width: 720px) {
@@ -1464,7 +1483,7 @@ button:focus-visible {
     min-width: 0;
     color: #e8d3a8;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-    font-size: clamp(0.7rem, 0.8vw, 0.9rem);
+    font-size: calc(clamp(0.7rem, 0.8vw, 0.9rem) * var(--map-label-font-scale, 1));
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -1533,7 +1552,7 @@ button:focus-visible {
     min-height: 6px;
     line-height: 6px;
     padding: 0;
-    font-size: 0.2rem;
+    font-size: calc(0.2rem * var(--map-label-font-scale, 1));
   }
 
   .point-attacker-select {    
@@ -1547,6 +1566,6 @@ button:focus-visible {
   }
 
   .point select:focus {
-    width: 100%;
+    outline: 0;
   }
 }
