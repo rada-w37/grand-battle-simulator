@@ -460,6 +460,12 @@ export function bindEvents() {
   state.elements.deleteTabButton.addEventListener("click", ui.deleteActiveOccupationTab);
   state.elements.resetDataButton.addEventListener("click", ui.resetAllData);
   window.addEventListener("resize", ui.updateTabScrollState);
+  state.elements.mapUndoButton.addEventListener("click", () => {
+    ui.undoOccupationChange();
+  });
+  state.elements.mapRedoButton.addEventListener("click", () => {
+    ui.redoOccupationChange();
+  });
 
   getAllPointSelects().forEach(select => {
     select.addEventListener("change", () => {
@@ -471,10 +477,22 @@ export function bindEvents() {
         ui.updatePointChip(point, select.value);
       }
       ui.updatePointSelfAttackState(point);
+      ui.recordCurrentOccupationEdit();
       ui.saveSelectStates();
       ui.updateScores();
+      ui.updateOccupationHistoryControls();
     });
   });
+
+  // Debug only
+  // if (import.meta.env.DEV) {
+    window.debug = {
+      undoOccupationChange: ui.undoOccupationChange,
+      redoOccupationChange: ui.redoOccupationChange,
+      canUndoOccupation: ui.canUndoOccupation,
+      canRedoOccupation: ui.canRedoOccupation,
+    };
+  // }
 
   bindMapViewEvents();
 }

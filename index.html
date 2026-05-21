@@ -123,6 +123,14 @@
         <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
         <div id="battle-points"></div>
       </div>
+      <div class="map-history-controls" aria-label="MAP編集履歴操作">
+        <button type="button" id="map-undo-button" class="map-history-button" aria-label="MAP編集を元に戻す" title="MAP編集を元に戻す" disabled>
+          <span class="map-history-icon" aria-hidden="true"></span>
+        </button>
+        <button type="button" id="map-redo-button" class="map-history-button" aria-label="MAP編集をやり直す" title="MAP編集をやり直す" disabled>
+          <span class="map-history-icon is-redo" aria-hidden="true"></span>
+        </button>
+      </div>
       <div class="map-zoom-controls" aria-label="MAP表示操作">
         <span id="map-zoom-value" class="map-zoom-value" aria-live="polite">100%</span>
         <button type="button" id="map-zoom-in-button" class="map-zoom-button" aria-label="MAPを拡大">+</button>

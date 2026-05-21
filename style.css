@@ -762,6 +762,60 @@ button:focus-visible {
   cursor: grabbing;
 }
 
+.map-history-controls {
+  position: absolute;
+  z-index: 20;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(170, 139, 82, 0.36);
+  border-radius: 7px;
+  background: rgba(7, 9, 15, 0.68);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.map-history-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 5px;
+  border-color: rgba(199, 166, 96, 0.36);
+  color: #e9d6a6;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  background: rgba(199, 166, 96, 0.1);
+}
+
+.map-history-icon {
+  margin-top: 1px;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: url("resource/undo.svg") center / contain no-repeat;
+  mask: url("resource/undo.svg") center / contain no-repeat;
+}
+
+.map-history-icon.is-redo {
+  transform: scaleX(-1);
+}
+
+.map-history-button:hover:not(:disabled),
+.map-history-button:focus-visible:not(:disabled) {
+  border-color: rgba(226, 196, 126, 0.72);
+  background: rgba(199, 166, 96, 0.2);
+}
+
+.map-history-button:disabled {
+  opacity: 0.34;
+  cursor: default;
+}
+
 .map-zoom-controls {
   position: absolute;
   z-index: 20;
@@ -1077,7 +1131,7 @@ button:focus-visible {
 .point select {
   position: relative;
   z-index: 2;
-  width: 90%;
+  width: 100%;
   min-height: 18px;
   /* min-width: 50; */
   /* text-overflow: ellipsis; */
@@ -1086,13 +1140,23 @@ button:focus-visible {
   color: #eef4f8;
   font-size: 0.55rem;
   font-weight: 700;
-  text-align: center;
-  text-align-last: center;
+  /* text-align: center;
+  text-align-last: center; */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
   background-color: transparent;
+}
+
+.point-attacker-select {
+  text-align: center;
+  text-align-last: center;
+}
+
+.point-defender-select {
+  text-align: center;
+  text-align-last: center;
 }
 
 .point select.is-highlight-guild {
@@ -1103,21 +1167,7 @@ button:focus-visible {
   color: #9ca3a7;
 }
 
-/* .point-attacker-select {
-  justify-self: center;
-  margin-right: 9px;
-  align-self: center;
-}
-
-.point-defender-select {
-  justify-self: center;
-  margin-left: -11px;
-  align-self: center;
-} */
-
 .point select option {
-  /* min-width: 220px; */
-  /* color: #f3f7f8; */
   background-color: #1f3238;
 }
 
@@ -1220,12 +1270,6 @@ button:focus-visible {
     margin-bottom: 4px;
   }
 
-  /* .tab-add-button {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-  } */
-
   .delete-tab-button,
   .reset-data-button,
   .tab-add-button {
@@ -1270,9 +1314,25 @@ button:focus-visible {
     margin: 10px;
     touch-action: pan-y;
   }
+
+  .map-history-controls {
+    top: 3px;
+    left: 3px;
+    gap: 3px;
+    padding: 2px;
+    border-color: rgba(170, 139, 82, 0.16);
+    background: rgba(7, 9, 15, 0.34);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
+  }
+
+  .map-history-button {
+    width: 24px;
+    height: 24px;
+  }
+
   .map-zoom-controls {
-    top: 6px;
-    right: 6px;
+    top: 3px;
+    right: 3px;
     gap: 3px;
     padding: 2px;
     border-color: rgba(170, 139, 82, 0.16);
@@ -1324,13 +1384,13 @@ button:focus-visible {
 
   .map-zoom-button,
   .map-zoom-toggle-button {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
   }
 
   .map-zoom-close-button {
     width: 16px;
-    height: 32px;
+    height: 24px;
   }
 
   .map-zoom-close-button {
@@ -1351,9 +1411,9 @@ button:focus-visible {
 
   .map-zoom-toggle-button svg,
   .map-zoom-close-button svg {
-    width: 24px;
-    height: 24px;
-    stroke-width: 1.55;
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.3;
     fill: none;
     stroke: currentColor;
   }
@@ -1362,13 +1422,6 @@ button:focus-visible {
     min-width: 38px;
     font-size: 0.72rem;
   }
-
-   /* Mobile-specific point UI overrides disabled. */
-  /* .point {
-    padding: 0;
-    border: 0;
-    background: transparent !important;
-  } */
 
   .point::after {
     display: none;
@@ -1386,11 +1439,6 @@ button:focus-visible {
   /* 剣 */
   .point-sword-frame{
     display: none;
-  }
-
-  .point select {
-    width:80%;
-    font-size : 0.2rem;
   }
 
   .point select option {
@@ -1489,11 +1537,13 @@ button:focus-visible {
   }
 
   .point-attacker-select {    
-    align-self: center;
+    text-align: center;
+    text-align-last: center;
   }
 
   .point-defender-select {
-    align-self: center;
+    text-align: center;
+    text-align-last: center;
   }
 
   .point select:focus {
