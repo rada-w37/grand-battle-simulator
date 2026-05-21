@@ -477,5 +477,15 @@ export function bindEvents() {
     });
   });
 
+  // Debug only
+  // if (import.meta.env.DEV) {
+    window.debug = {
+      undoOccupationChange: ui.undoOccupationChange,
+      redoOccupationChange: ui.redoOccupationChange,
+      canUndoOccupation: ui.canUndoOccupation,
+      canRedoOccupation: ui.canRedoOccupation,
+    };
+  // }
+
   bindMapViewEvents();
 }
