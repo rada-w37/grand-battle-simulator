@@ -453,6 +453,9 @@ export function bindEvents() {
   state.elements.block.addEventListener("change", api.fetchBattleDataIfReady);
 
   state.elements.applyButton.addEventListener("click", ui.applyBattleData);
+  state.elements.editGuildNamesButton.addEventListener("click", ui.startGuildNameEditing);
+  state.elements.confirmGuildNamesButton.addEventListener("click", ui.confirmGuildNameEditing);
+  state.elements.cancelGuildNamesButton.addEventListener("click", ui.cancelGuildNameEditing);
   state.elements.tabAddButton.addEventListener("click", ui.addOccupationTab);
   state.elements.deleteTabButton.addEventListener("click", ui.deleteActiveOccupationTab);
   state.elements.resetDataButton.addEventListener("click", ui.resetAllData);

@@ -42,6 +42,70 @@ export function saveAppliedGuilds() {
   localStorage.setItem(STORAGE_KEYS.appliedGuilds, JSON.stringify(state.currentGuilds));
 }
 
+function getEditableGuildNames() {
+  return Array.from({ length: 4 }, (_, index) => state.currentGuilds[index] || `ギルド${index + 1}`);
+}
+
+function updateGuildNameEditControls() {
+  state.elements.editGuildNamesButton.hidden = state.isEditingGuildNames;
+  state.elements.confirmGuildNamesButton.hidden = !state.isEditingGuildNames;
+  state.elements.cancelGuildNamesButton.hidden = !state.isEditingGuildNames;
+}
+
+function renameGuildReferences(previousNames, nextNames) {
+  const nameMap = new Map(previousNames.map((name, index) => [name, nextNames[index]]).filter(([from, to]) => from && to && from !== to));
+  if (nameMap.size === 0) return;
+
+  const renameState = pointState => ({
+    defender: nameMap.get(pointState.defender) || pointState.defender,
+    attacker: nameMap.get(pointState.attacker) || pointState.attacker
+  });
+
+  state.occupationTabs.forEach(tab => {
+    tab.selectStates = tab.selectStates.map(pointState => renameState(normalizePointState(pointState)));
+  });
+  state.setPendingSelectStates(state.pendingSelectStates.map(pointState => renameState(normalizePointState(pointState))));
+
+  if (nameMap.has(state.highlightedGuildName)) {
+    state.setHighlightedGuildName(nameMap.get(state.highlightedGuildName));
+  }
+}
+
+export function startGuildNameEditing() {
+  state.setGuildNameDrafts(getEditableGuildNames());
+  state.setIsEditingGuildNames(true);
+  updateGuildNameEditControls();
+  updateScores();
+}
+
+export function cancelGuildNameEditing() {
+  state.setGuildNameDrafts([]);
+  state.setIsEditingGuildNames(false);
+  updateGuildNameEditControls();
+  updateScores();
+}
+
+export function confirmGuildNameEditing() {
+  persistCurrentTabState();
+  const previousNames = getEditableGuildNames();
+  const nextNames = previousNames.map((name, index) => {
+    const draft = (state.guildNameDrafts[index] || "").trim();
+    return draft || name;
+  });
+
+  renameGuildReferences(previousNames, nextNames);
+  state.setCurrentGuilds(nextNames);
+  saveAppliedGuilds();
+  saveOccupationTabs();
+  renderGuildGrid(state.currentGuilds);
+  state.setGuildNameDrafts([]);
+  state.setIsEditingGuildNames(false);
+  updateGuildNameEditControls();
+  updateGuildOptions();
+  applySelectStates(getActiveTab()?.selectStates);
+  updateScores();
+}
+
 // Point Aura and Chip Updates
 export function setPointAura(point, guildName) {
   const aura = document.querySelector(`.point-aura[data-point-id="${point.dataset.id}"]`);
@@ -327,7 +391,21 @@ export function updateScores() {
     const row = document.createElement("tr");
     const nameCell = document.createElement("td");
 
-    nameCell.textContent = guild.name;
+    if (state.isEditingGuildNames) {
+      const input = document.createElement("input");
+      input.className = "score-guild-name-input";
+      input.value = state.guildNameDrafts[index] || guild.name || `ギルド${index + 1}`;
+      input.maxLength = 24;
+      input.setAttribute("aria-label", `ギルド${index + 1}名`);
+      input.addEventListener("input", () => {
+        const drafts = [...state.guildNameDrafts];
+        drafts[index] = input.value;
+        state.setGuildNameDrafts(drafts);
+      });
+      nameCell.appendChild(input);
+    } else {
+      nameCell.textContent = guild.name;
+    }
     nameCell.style.backgroundColor = guild.color;
     row.append(
       createScoreGuildRadioCell(guild.name),
@@ -779,6 +857,23 @@ export function _setSetPendingStateFn(fn) {
 
 // Apply Battle Data
 export function applyBattleData() {
+  if (state.usesFallbackGuilds) {
+    const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : getEditableGuildNames();
+    state.setCurrentGuilds(nextGuilds);
+    saveAppliedGuilds();
+    renderGuildGrid(state.currentGuilds);
+    resetOccupationTabs();
+    updateGuildOptions();
+    applySelectStates(state.occupationTabs[0].selectStates);
+    updateScores();
+    state.setUsesFallbackGuilds(false);
+    if (_setPendingStateFn) {
+      _setPendingStateFn(false);
+    }
+    setStatus("仮名ギルドを反映しました。", "success");
+    return;
+  }
+
   if (!state.currentBattleData || !Array.isArray(state.currentBattleData.castles)) return;
 
   const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : Object.values(state.currentBattleData.guilds || {});
@@ -836,6 +931,9 @@ export function resetAllData() {
   state.setPendingGuilds([]);
   state.setPendingSelectStates([]);
   state.setHighlightedGuildName("");
+  state.setIsEditingGuildNames(false);
+  state.setGuildNameDrafts([]);
+  state.setUsesFallbackGuilds(false);
   state.setOccupationTabs([createOccupationTab(1)]);
   state.setActiveTabId(state.occupationTabs[0].id);
   state.setEditingTabId("");
@@ -847,6 +945,7 @@ export function resetAllData() {
   state.elements.block.value = "0";
 
   renderEmptyGuildGrid();
+  updateGuildNameEditControls();
   updateWorldOptions();
   renderOccupationTabs();
   updateGuildOptions();

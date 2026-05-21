@@ -374,6 +374,45 @@ button:focus-visible {
   font-size: 0.85rem;
 }
 
+.score-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: -2px 0 6px;
+}
+
+.score-edit-button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border-color: rgba(199, 166, 96, 0.46);
+  border-radius: 6px;
+  color: #e9d6a6;
+  background: rgba(199, 166, 96, 0.1);
+}
+
+.score-edit-button[hidden] {
+  display: none;
+}
+
+.score-edit-button:hover {
+  border-color: rgba(226, 196, 126, 0.72);
+  background: rgba(199, 166, 96, 0.2);
+}
+
+.score-edit-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .score-table {
   flex: 0 0 auto;
   min-width: 640px;
@@ -412,6 +451,26 @@ button:focus-visible {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.13),
     inset 0 -12px 18px rgba(9, 21, 30, 0.13);
+}
+
+.score-guild-name-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 5px;
+  border: 1px solid rgba(226, 196, 126, 0.42);
+  border-radius: 5px;
+  color: #fff4d7;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  background: rgba(6, 8, 14, 0.62);
+}
+
+.score-guild-name-input:focus {
+  outline: 0;
+  border-color: rgba(226, 196, 126, 0.78);
+  box-shadow: 0 0 0 2px rgba(226, 196, 126, 0.18);
 }
 
 .score-table thead {

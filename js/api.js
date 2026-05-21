@@ -2,6 +2,8 @@ import { API_BASE_URL, STORAGE_KEYS, BATTLE_POINTS } from "./constants.js";
 import * as state from "./state.js";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js";
 
+const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
+
 // UI Function References (set by main.js)
 let _setStatus = null;
 let _renderGuildGrid = null;
@@ -135,6 +137,7 @@ export function restoreBattleSelection() {
 export function resetFetchedData() {
   state.setCurrentBattleData(null);
   state.setPendingGuilds([]);
+  state.setUsesFallbackGuilds(false);
   state.elements.applyButton.disabled = true;
   setPendingState(false);
   if (_renderEmptyGuildGrid) _renderEmptyGuildGrid();
@@ -163,14 +166,21 @@ export async function fetchBattleDataIfReady() {
 
     state.setCurrentBattleData(await fetchJson(url));
     state.setPendingGuilds(Object.values(state.currentBattleData.guilds || {}));
+    state.setUsesFallbackGuilds(false);
 
     if (_renderGuildGrid) _renderGuildGrid(state.pendingGuilds);
     setPendingState(true);
     state.elements.applyButton.disabled = false;
     if (_setStatus) _setStatus("最新データを取得しました。", "success");
   } catch (error) {
-    resetFetchedData();
-    if (_setStatus) _setStatus(`エラー: ${error.message}`, "error");
+    state.setCurrentBattleData(null);
+    state.setPendingGuilds(FALLBACK_GUILDS);
+    state.setUsesFallbackGuilds(true);
+    state.elements.applyButton.disabled = false;
+    setPendingState(true);
+    if (_renderGuildGrid) _renderGuildGrid(FALLBACK_GUILDS);
+    if (_setStatus) _setStatus(`エラー: ${error.message} / 仮名ギルドで手動反映できます`, "error");
+    return;
   }
 }
 

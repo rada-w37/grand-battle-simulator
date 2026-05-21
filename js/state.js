@@ -16,6 +16,9 @@ export let statusTimer = 0;
 export let hasUnappliedBattleData = false;
 export let activeMobilePoint = null;
 export let highlightedGuildName = "";
+export let isEditingGuildNames = false;
+export let guildNameDrafts = [];
+export let usesFallbackGuilds = false;
 
 // DOM Elements
 export const elements = {};
@@ -106,6 +109,21 @@ export function setHighlightedGuildName(value) {
   return highlightedGuildName;
 }
 
+export function setIsEditingGuildNames(value) {
+  isEditingGuildNames = value;
+  return isEditingGuildNames;
+}
+
+export function setGuildNameDrafts(value) {
+  guildNameDrafts = value;
+  return guildNameDrafts;
+}
+
+export function setUsesFallbackGuilds(value) {
+  usesFallbackGuilds = value;
+  return usesFallbackGuilds;
+}
+
 // Initialize DOM Elements
 export function initializeElements() {
   elements.server = document.getElementById("server-select");
@@ -118,6 +136,9 @@ export function initializeElements() {
   elements.statusMessage = document.getElementById("status-message");
   elements.pendingMessage = document.getElementById("pending-message");
   elements.cumulativeScope = document.getElementById("cumulative-scope");
+  elements.editGuildNamesButton = document.getElementById("edit-guild-names-button");
+  elements.confirmGuildNamesButton = document.getElementById("confirm-guild-names-button");
+  elements.cancelGuildNamesButton = document.getElementById("cancel-guild-names-button");
   elements.applyButton = document.getElementById("apply-data-button");
   elements.scoreBody = document.getElementById("score-body");
   elements.battlePoints = document.getElementById("battle-points");
