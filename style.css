@@ -1131,7 +1131,7 @@ button:focus-visible {
 .point select {
   position: relative;
   z-index: 2;
-  width: 90%;
+  width: 100%;
   min-height: 18px;
   /* min-width: 50; */
   /* text-overflow: ellipsis; */
@@ -1140,13 +1140,23 @@ button:focus-visible {
   color: #eef4f8;
   font-size: 0.55rem;
   font-weight: 700;
-  text-align: center;
-  text-align-last: center;
+  /* text-align: center;
+  text-align-last: center; */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
   background-color: transparent;
+}
+
+.point-attacker-select {
+  text-align: center;
+  text-align-last: center;
+}
+
+.point-defender-select {
+  text-align: center;
+  text-align-last: center;
 }
 
 .point select.is-highlight-guild {
@@ -1157,21 +1167,7 @@ button:focus-visible {
   color: #9ca3a7;
 }
 
-/* .point-attacker-select {
-  justify-self: center;
-  margin-right: 9px;
-  align-self: center;
-}
-
-.point-defender-select {
-  justify-self: center;
-  margin-left: -11px;
-  align-self: center;
-} */
-
 .point select option {
-  /* min-width: 220px; */
-  /* color: #f3f7f8; */
   background-color: #1f3238;
 }
 
@@ -1445,11 +1441,6 @@ button:focus-visible {
     display: none;
   }
 
-  .point select {
-    width:80%;
-    font-size : 0.2rem;
-  }
-
   .point select option {
     font-size: 0.75rem;
     background-color: #1f3238;
@@ -1546,11 +1537,13 @@ button:focus-visible {
   }
 
   .point-attacker-select {    
-    align-self: center;
+    text-align: center;
+    text-align-last: center;
   }
 
   .point-defender-select {
-    align-self: center;
+    text-align: center;
+    text-align-last: center;
   }
 
   .point select:focus {
