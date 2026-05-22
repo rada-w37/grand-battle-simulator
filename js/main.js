@@ -2,6 +2,13 @@ import * as state from "./state.js";
 import * as api from "./api.js";
 import * as ui from "./ui.js";
 import { bindEvents } from "./events.js";
+import { applyMapLayoutCssVars } from "./layout-config.js";
+
+function bindMapLayoutConfigEvents() {
+  window.addEventListener("resize", () => {
+    applyMapLayoutCssVars();
+  });
+}
 
 // Initialize Application
 async function initializeApp() {
@@ -18,6 +25,7 @@ async function initializeApp() {
   });
 
   state.initializeElements();
+  applyMapLayoutCssVars();
   ui.renderEmptyGuildGrid();
   ui.renderBattlePoints();
   ui.loadAppliedGuilds();
@@ -27,6 +35,7 @@ async function initializeApp() {
   ui.restoreSelectStates();
   ui.updateScores();
   bindEvents();
+  bindMapLayoutConfigEvents();
 
   try {
     await api.loadGroups();

@@ -1,4 +1,5 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, MAP_IMAGE_SIZE, SWORD_MARKER_ICON, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
+import { MAP_IMAGE_SIZE, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT } from "./layout-config.js";
 import * as state from "./state.js";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js";
@@ -290,8 +291,7 @@ function renderBannerPlacements(fragment) {
     label.className = "point-name-label";
     label.textContent = placement.name;
     label.dataset.pointId = placement.pointId;
-    //label.style.transform = `translate(-50%, calc(-50% - 2px)) scale(${placement.scale}%)`;
-    label.style.transform = `translate(-50%, calc(-50% - 1px)) scale(${placement.scale / 35})`;
+    label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
     setMapImagePosition(label, placement.x, placement.y);
     fragment.appendChild(label);
