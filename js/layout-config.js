@@ -63,8 +63,8 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-band-height": "11px",
     "--map-point-band-radius": "2px",
     "--map-point-select-height": "11px",
-    "--map-point-select-left": "-1px",
-    "--map-point-select-top": "27px",
+    "--map-point-select-left": "-0.5px",
+    "--map-point-select-top": "0px",
     "--map-point-select-width": "57.2px",
     "--map-point-select-min-height": "11px",
     "--map-point-select-line-height": "11px",
@@ -114,7 +114,29 @@ export const MAP_POINT_UI_OFFSETS = {
       shield: { y: 6 }
     }
   },
-  mobile: {}
+  mobile: {
+    ganette: { pointLabels: { x: -2, y: 18 } },
+    rula: { pointLabels: { x: -1, y: 14 } },
+    cushel: { pointLabels: { y: 19 } },
+    pharia: { pointLabels: { x: 9, y: 14 } },
+    citri: { pointLabels: { x: 4, y: 20 } },
+    floryte: { pointLabels: { x: -8, y: 18 } },
+    toppaz: { pointLabels: { x: 1, y: 20 } },
+    perido: { pointLabels: { x: -8, y: 20 } },
+    meral: { pointLabels: { y: 10 } },
+    onyx: { pointLabels: { y: 10 } },
+    zircon: { pointLabels: { x: -18, y: 20 } },
+    amest: { pointLabels: { x: 3, y: 21 } },
+    lapis: { pointLabels: { x: 4, y: 18 } },
+    laven: { pointLabels: { x: -17, y: 18 } },
+    marin: { pointLabels: { x: 2, y: 18 } },
+    larimal: { pointLabels: { x: 4, y: 17 } },
+    tiferet: { pointLabels: { x: 5, y: 18 } },
+    yesod: { pointLabels: { y: 10 } },
+    keter: { pointLabels: { x: 7, y: 16 } },
+    malkuth: { pointLabels: { x: 1, y: 22 } },
+    ein: { pointLabels: { y: 23 } }
+  }
 };
 
 export const MAP_LABEL_LAYOUT = {
