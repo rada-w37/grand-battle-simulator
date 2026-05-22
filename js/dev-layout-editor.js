@@ -457,7 +457,6 @@ function setEditing(nextValue) {
   isEditing = nextValue;
   document.body.classList.toggle(EDITOR_CLASS, isEditing);
   toolbar.querySelector(".dev-layout-toggle").textContent = isEditing ? "Layout Edit: ON" : "Layout Edit";
-  layersPanel.hidden = !isEditing;
   if (!isEditing) {
     clearSelectedTargets();
     hoverTarget = null;
@@ -755,7 +754,6 @@ function createToolbar() {
 function createLayersPanel() {
   layersPanel = document.createElement("div");
   layersPanel.className = "dev-layout-layers-panel";
-  layersPanel.hidden = true;
   ["pointerdown", "mousedown", "click", "touchstart", "touchend"].forEach(eventName => {
     layersPanel.addEventListener(eventName, event => {
       event.stopPropagation();
