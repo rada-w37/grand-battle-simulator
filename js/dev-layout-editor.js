@@ -19,9 +19,12 @@ let hoverTarget = null;
 let selectionBox = null;
 let hoverBox = null;
 let toolbar = null;
+let layersPanel = null;
 let activeDrag = null;
 
 const changes = new Map();
+const hiddenTargetIds = new Set();
+const hiddenLayerKeys = new Set();
 
 function getViewportName() {
   return window.innerWidth <= MAP_LAYOUT_BREAKPOINT ? "mobile" : "desktop";
@@ -33,6 +36,28 @@ function round(value) {
 
 function getMapInner() {
   return document.getElementById("map-inner");
+}
+
+function getDevLayoutTargets() {
+  return Array.from(document.querySelectorAll(TARGET_SELECTOR));
+}
+
+function getLayerKey(element) {
+  const zIndex = window.getComputedStyle(element).zIndex;
+  return zIndex === "auto" ? "z-auto" : `z${zIndex}`;
+}
+
+function isLayerHidden(element) {
+  return hiddenLayerKeys.has(getLayerKey(element));
+}
+
+function isTargetHidden(element) {
+  return hiddenTargetIds.has(element.dataset.devLayoutId) || isLayerHidden(element);
+}
+
+function getVisibleTargetFromEvent(event) {
+  const target = event.target.closest(TARGET_SELECTOR);
+  return target && !isTargetHidden(target) ? target : null;
 }
 
 function getElementScale(element) {
@@ -226,7 +251,7 @@ function selectElement(element) {
 }
 
 function getTargetFromEvent(event) {
-  return event.target.closest(TARGET_SELECTOR);
+  return getVisibleTargetFromEvent(event);
 }
 
 function updateHoverTarget(event) {
@@ -351,6 +376,7 @@ function setEditing(nextValue) {
   isEditing = nextValue;
   document.body.classList.toggle(EDITOR_CLASS, isEditing);
   toolbar.querySelector(".dev-layout-toggle").textContent = isEditing ? "Layout Edit: ON" : "Layout Edit";
+  layersPanel.hidden = !isEditing;
   if (!isEditing) {
     clearSelectedTargets();
     hoverTarget = null;
@@ -358,6 +384,109 @@ function setEditing(nextValue) {
     updateSelectionBox();
     updateHoverBox();
   }
+}
+
+function applyLayerVisibility() {
+  getDevLayoutTargets().forEach(element => {
+    const isHidden = isTargetHidden(element);
+    element.style.visibility = isHidden ? "hidden" : "";
+    element.style.pointerEvents = isHidden ? "none" : "";
+    element.dataset.devLayoutHidden = String(isHidden);
+  });
+
+  if (selectedElement && isTargetHidden(selectedElement)) {
+    clearSelectedTargets();
+    updateSelectionBox();
+  }
+  if (hoverTarget && isTargetHidden(hoverTarget)) {
+    hoverTarget = null;
+    updateHoverBox();
+  }
+}
+
+function getLayerGroups() {
+  const groups = new Map();
+  getDevLayoutTargets().forEach(element => {
+    const layerKey = getLayerKey(element);
+    if (!groups.has(layerKey)) groups.set(layerKey, []);
+    groups.get(layerKey).push(element);
+  });
+
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => {
+      const aValue = a === "z-auto" ? Number.NEGATIVE_INFINITY : Number(a.slice(1));
+      const bValue = b === "z-auto" ? Number.NEGATIVE_INFINITY : Number(b.slice(1));
+      return bValue - aValue;
+    });
+}
+
+function getLayerLabelText(element) {
+  const { devLayoutId, devLayoutTargetType, devLayoutPointId } = element.dataset;
+  return `${devLayoutId} | ${devLayoutTargetType || "-"}${devLayoutPointId ? ` | ${devLayoutPointId}` : ""}`;
+}
+
+function renderLayersPanel() {
+  if (!layersPanel) return;
+
+  const details = getLayerGroups().map(([layerKey, elements]) => {
+    const layerChecked = !hiddenLayerKeys.has(layerKey);
+    const items = elements.map(element => {
+      const targetId = element.dataset.devLayoutId;
+      const checked = !hiddenTargetIds.has(targetId) && layerChecked;
+      return `
+        <label class="dev-layout-layer-item">
+          <input type="checkbox" data-dev-layer-target="${targetId}" ${checked ? "checked" : ""}>
+          <span>${getLayerLabelText(element)}</span>
+        </label>
+      `;
+    }).join("");
+
+    return `
+      <details class="dev-layout-layer-group" open>
+        <summary>
+          <label>
+            <input type="checkbox" data-dev-layer-key="${layerKey}" ${layerChecked ? "checked" : ""}>
+            <span>${layerKey}</span>
+          </label>
+        </summary>
+        <div class="dev-layout-layer-items">${items}</div>
+      </details>
+    `;
+  }).join("");
+
+  layersPanel.innerHTML = `
+    <details class="dev-layout-layers-root" open>
+      <summary>Layers</summary>
+      <div class="dev-layout-layers-content">${details}</div>
+    </details>
+  `;
+}
+
+function handleLayerPanelChange(event) {
+  const layerInput = event.target.closest("[data-dev-layer-key]");
+  if (layerInput) {
+    const layerKey = layerInput.dataset.devLayerKey;
+    if (layerInput.checked) {
+      hiddenLayerKeys.delete(layerKey);
+    } else {
+      hiddenLayerKeys.add(layerKey);
+    }
+    applyLayerVisibility();
+    renderLayersPanel();
+    return;
+  }
+
+  const targetInput = event.target.closest("[data-dev-layer-target]");
+  if (!targetInput) return;
+
+  const targetId = targetInput.dataset.devLayerTarget;
+  if (targetInput.checked) {
+    hiddenTargetIds.delete(targetId);
+  } else {
+    hiddenTargetIds.add(targetId);
+  }
+  applyLayerVisibility();
+  renderLayersPanel();
 }
 
 function injectStyles() {
@@ -377,6 +506,51 @@ function injectStyles() {
       background: rgba(8, 14, 24, 0.88);
       color: #d8e7ff;
       font: 12px/1.2 system-ui, sans-serif;
+    }
+    .dev-layout-layers-panel {
+      position: fixed;
+      right: 12px;
+      bottom: 58px;
+      z-index: 10000;
+      width: min(360px, calc(100vw - 24px));
+      max-height: min(460px, calc(100vh - 96px));
+      overflow: auto;
+      padding: 8px;
+      border: 1px solid rgba(29, 63, 108, 0.9);
+      border-radius: 6px;
+      background: rgba(8, 14, 24, 0.9);
+      color: #d8e7ff;
+      font: 12px/1.3 system-ui, sans-serif;
+    }
+    .dev-layout-layers-panel[hidden] {
+      display: none !important;
+    }
+    .dev-layout-layers-root > summary,
+    .dev-layout-layer-group > summary {
+      cursor: pointer;
+      user-select: none;
+    }
+    .dev-layout-layer-group {
+      margin-top: 6px;
+      border-top: 1px solid rgba(70, 112, 170, 0.24);
+      padding-top: 5px;
+    }
+    .dev-layout-layer-group summary label,
+    .dev-layout-layer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dev-layout-layer-items {
+      display: grid;
+      gap: 3px;
+      margin-top: 4px;
+      padding-left: 14px;
+    }
+    .dev-layout-layer-item span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .dev-layout-toolbar button {
       min-height: 28px;
@@ -435,6 +609,15 @@ function createToolbar() {
   toolbar.querySelector(".dev-layout-copy").addEventListener("click", copyChanges);
 }
 
+function createLayersPanel() {
+  layersPanel = document.createElement("div");
+  layersPanel.className = "dev-layout-layers-panel";
+  layersPanel.hidden = true;
+  layersPanel.addEventListener("change", handleLayerPanelChange);
+  document.body.appendChild(layersPanel);
+  renderLayersPanel();
+}
+
 function createSelectionBox() {
   selectionBox = document.createElement("div");
   selectionBox.className = "dev-layout-selection-overlay";
@@ -453,6 +636,7 @@ export function initDevLayoutEditor() {
 
   injectStyles();
   createToolbar();
+  createLayersPanel();
   createSelectionBox();
 
   document.addEventListener("pointerdown", startDrag, true);
