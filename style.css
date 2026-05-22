@@ -1089,6 +1089,7 @@ button:focus-visible {
   /* grid-template-rows: repeat(2, 18px); */
   gap: var(--map-point-labels-gap);
   width: var(--map-point-labels-width);
+  height: var(--map-point-labels-height);
   backface-visibility: hidden;
   transform: translate(-50%, -50%) translateZ(0);
   transform-origin: center;
