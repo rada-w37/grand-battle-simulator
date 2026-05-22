@@ -11,6 +11,7 @@ import {
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
 const EDITOR_UI_SELECTOR = ".dev-layout-toolbar, .dev-layout-layers-panel";
+const LAYER_PANEL_POSITION_KEY = "devLayoutLayerPanelPosition";
 const TARGET_TYPE_PRIORITY = {
   attackerSelect: 1,
   defenderSelect: 1,
@@ -40,6 +41,7 @@ let selectionBox = null;
 let hoverBox = null;
 let toolbar = null;
 let layersPanel = null;
+let layerPanelPosition = "right";
 let activeDrag = null;
 
 const changes = new Map();
@@ -500,6 +502,7 @@ function getLayerLabelText(element) {
 function renderLayersPanel() {
   if (!layersPanel) return;
 
+  layersPanel.dataset.position = layerPanelPosition;
   const details = getLayerGroups().map(([layerKey, elements]) => {
     const layerChecked = !hiddenLayerKeys.has(layerKey);
     const items = elements.map(element => {
@@ -528,10 +531,25 @@ function renderLayersPanel() {
 
   layersPanel.innerHTML = `
     <details class="dev-layout-layers-root" open>
-      <summary>Layers</summary>
+      <summary>
+        <span>Layers</span>
+        <button type="button" class="dev-layout-layer-position-button" aria-label="Layer Panelの左右位置を切り替え" title="Layer Panelの左右位置を切り替え">
+          ${layerPanelPosition === "right" ? "←" : "→"}
+        </button>
+      </summary>
       <div class="dev-layout-layers-content">${details}</div>
     </details>
   `;
+}
+
+function restoreLayerPanelPosition() {
+  layerPanelPosition = localStorage.getItem(LAYER_PANEL_POSITION_KEY) === "left" ? "left" : "right";
+}
+
+function toggleLayerPanelPosition() {
+  layerPanelPosition = layerPanelPosition === "right" ? "left" : "right";
+  localStorage.setItem(LAYER_PANEL_POSITION_KEY, layerPanelPosition);
+  renderLayersPanel();
 }
 
 function handleLayerPanelChange(event) {
@@ -561,6 +579,13 @@ function handleLayerPanelChange(event) {
   renderLayersPanel();
 }
 
+function handleLayerPanelClick(event) {
+  if (!event.target.closest(".dev-layout-layer-position-button")) return;
+
+  event.preventDefault();
+  toggleLayerPanelPosition();
+}
+
 function injectStyles() {
   const style = document.createElement("style");
   style.textContent = `
@@ -581,8 +606,7 @@ function injectStyles() {
     }
     .dev-layout-layers-panel {
       position: fixed;
-      right: 12px;
-      bottom: 58px;
+      top: 12px;
       z-index: 10000;
       width: min(360px, calc(100vw - 24px));
       max-height: min(460px, calc(100vh - 96px));
@@ -594,6 +618,14 @@ function injectStyles() {
       color: #d8e7ff;
       font: 12px/1.3 system-ui, sans-serif;
     }
+    .dev-layout-layers-panel[data-position="right"] {
+      right: 12px;
+      left: auto;
+    }
+    .dev-layout-layers-panel[data-position="left"] {
+      left: 12px;
+      right: auto;
+    }
     .dev-layout-layers-panel[hidden] {
       display: none !important;
     }
@@ -601,6 +633,21 @@ function injectStyles() {
     .dev-layout-layer-group > summary {
       cursor: pointer;
       user-select: none;
+    }
+    .dev-layout-layers-root > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .dev-layout-layer-position-button {
+      min-width: 28px;
+      min-height: 24px;
+      border: 1px solid rgba(70, 112, 170, 0.75);
+      border-radius: 4px;
+      background: rgba(21, 37, 58, 0.85);
+      color: inherit;
+      cursor: pointer;
     }
     .dev-layout-layer-group {
       margin-top: 6px;
@@ -690,6 +737,7 @@ function createLayersPanel() {
       event.stopPropagation();
     });
   });
+  layersPanel.addEventListener("click", handleLayerPanelClick);
   layersPanel.addEventListener("change", handleLayerPanelChange);
   document.body.appendChild(layersPanel);
   renderLayersPanel();
@@ -711,6 +759,7 @@ export function initDevLayoutEditor() {
   if (document.body.dataset.devLayoutEditorReady === "true") return;
   document.body.dataset.devLayoutEditorReady = "true";
 
+  restoreLayerPanelPosition();
   injectStyles();
   createToolbar();
   createLayersPanel();
