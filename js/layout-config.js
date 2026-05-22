@@ -21,8 +21,8 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-sword-left": "3.22px",
     "--map-sword-top": "8.46px",
     "--map-sword-size": "26px",
-    "--map-point-labels-left": "50%",
-    "--map-point-labels-top": "50%",
+    "--map-point-labels-left": "66px",
+    "--map-point-labels-top": "21px",
     "--map-point-labels-width": "100px",
     "--map-point-labels-height": "50px",
     "--map-point-labels-gap": "2px",
@@ -57,6 +57,47 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-frame-display": "none",
     "--map-point-sword-display": "none"
   }
+};
+
+export const MAP_POINT_UI_OFFSETS = {
+  desktop: {
+    citri: {
+      pointLabels: { x: 4, y: 6 },
+      sword: { x: 4, y: 6 },
+      shield: { x: 4, y: 6 }
+    },
+    perido: {
+      pointLabels: { y: 4 },
+      sword: { y: 4 },
+      shield: { y: 4 }
+    },
+    meral: {
+      pointLabels: { x: 6, y: -4 },
+      sword: { x: 6, y: -4 },
+      shield: { x: 6, y: -4 }
+    },
+    zircon: {
+      pointLabels: { x: -4, y: 2 },
+      sword: { x: -3, y: 2 },
+      shield: { x: -3, y: 2 }
+    },
+    yesod: {
+      pointLabels: { x: 4, y: -4 },
+      sword: { x: 4, y: -4 },
+      shield: { x: 4, y: -4 }
+    },
+    keter: {
+      pointLabels: { x: 4 },
+      sword: { x: 4 },
+      shield: { x: 4 }
+    },
+    ein: {
+      pointLabels: { y: 6 },
+      sword: { y: 6 },
+      shield: { y: 6 }
+    }
+  },
+  mobile: {}
 };
 
 export const MAP_LABEL_LAYOUT = {
@@ -213,30 +254,30 @@ export const LAYOUT_TARGET_UPDATE_RULES = {
   },
   MAP_LAYOUT_CSS_VARS: {
     shield: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
-      updateProperties: ["--map-shield-left", "--map-shield-top", "--map-shield-size"],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
+      updateProperties: ["shield.x", "shield.y", "shield.size"],
+      coordinateSpace: "cssPxOffsetFromBase",
+      updateMode: "pointOffset"
     },
     sword: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
-      updateProperties: ["--map-sword-left", "--map-sword-top", "--map-sword-size"],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
+      updateProperties: ["sword.x", "sword.y", "sword.size"],
+      coordinateSpace: "cssPxOffsetFromBase",
+      updateMode: "pointOffset"
     },
     pointLabels: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
       updateProperties: [
-        "--map-point-labels-left",
-        "--map-point-labels-top",
-        "--map-point-labels-width",
-        "--map-point-labels-height"
+        "pointLabels.x",
+        "pointLabels.y",
+        "pointLabels.width",
+        "pointLabels.height"
       ],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      coordinateSpace: "cssPxOffsetFromBase",
+      updateMode: "pointOffset"
     },
     attackerSelect: {
       configKey: "MAP_LAYOUT_CSS_VARS",
@@ -296,6 +337,12 @@ export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport =
   }
 
   if (layoutKey === "MAP_LAYOUT_CSS_VARS") {
+    if (rule.configKey === "MAP_POINT_UI_OFFSETS") {
+      return MAP_POINT_UI_OFFSETS[viewport]
+        ? { resolved: true, ...rule, configPath: `MAP_POINT_UI_OFFSETS.${viewport}.${pointId}` }
+        : { resolved: false, ...rule, skipReason: `MAP_POINT_UI_OFFSETS viewport not found: ${viewport}` };
+    }
+
     return MAP_LAYOUT_CSS_VARS[viewport]
       ? { resolved: true, ...rule, configPath: `MAP_LAYOUT_CSS_VARS.${viewport}` }
       : { resolved: false, ...rule, skipReason: `MAP_LAYOUT_CSS_VARS viewport not found: ${viewport}` };

@@ -1,5 +1,5 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
-import { MAP_IMAGE_SIZE, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT } from "./layout-config.js";
+import { MAP_IMAGE_SIZE, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, MAP_POINT_UI_OFFSETS, getMapLayoutCssVars } from "./layout-config.js";
 import * as state from "./state.js";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js";
@@ -198,6 +198,53 @@ function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = ""
   }
 }
 
+const POINT_UI_OFFSET_VARS = {
+  pointLabels: {
+    x: "--map-point-labels-left",
+    y: "--map-point-labels-top",
+    width: "--map-point-labels-width",
+    height: "--map-point-labels-height"
+  },
+  sword: {
+    x: "--map-sword-left",
+    y: "--map-sword-top",
+    size: "--map-sword-size"
+  },
+  shield: {
+    x: "--map-shield-left",
+    y: "--map-shield-top",
+    size: "--map-shield-size"
+  }
+};
+
+function getCssPxNumber(value) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatCssPx(value) {
+  return `${Math.round(value * 100) / 100}px`;
+}
+
+function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
+  const viewport = width <= 720 ? "mobile" : "desktop";
+  const offsets = MAP_POINT_UI_OFFSETS[viewport]?.[pointId];
+  if (!offsets) return;
+
+  const baseVars = getMapLayoutCssVars(width);
+  Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
+    const targetVars = POINT_UI_OFFSET_VARS[targetType];
+    if (!targetVars) return;
+
+    Object.entries(targetOffsets).forEach(([property, offset]) => {
+      const variableName = targetVars[property];
+      const baseValue = getCssPxNumber(baseVars[variableName]);
+      if (!variableName || baseValue === null) return;
+      element.style.setProperty(variableName, formatCssPx(baseValue + offset));
+    });
+  });
+}
+
 // Render Battle Points Map
 export function renderBattlePoints() {
   const fragment = document.createDocumentFragment();
@@ -231,6 +278,7 @@ export function renderBattlePoints() {
     wrapper.dataset.type = point.type;
     wrapper.dataset.id = point.id;
     wrapper.dataset.castleId = String(point.castleId);
+    applyPointUiOffsets(wrapper, point.id);
     setDevLayoutMetadata(wrapper, {
       targetId: `point:${point.id}`,
       layoutKey: "BATTLE_POINTS",

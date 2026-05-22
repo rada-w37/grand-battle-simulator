@@ -318,6 +318,71 @@ function toCssPx(value) {
   return `${round(value)}px`;
 }
 
+const POINT_UI_OFFSET_OUTPUT = {
+  pointLabels: {
+    section: "pointLabels",
+    properties: {
+      x: "--map-point-labels-left",
+      y: "--map-point-labels-top",
+      width: "--map-point-labels-width",
+      height: "--map-point-labels-height"
+    }
+  },
+  sword: {
+    section: "sword",
+    properties: {
+      x: "--map-sword-left",
+      y: "--map-sword-top",
+      size: "--map-sword-size"
+    }
+  },
+  shield: {
+    section: "shield",
+    properties: {
+      x: "--map-shield-left",
+      y: "--map-shield-top",
+      size: "--map-shield-size"
+    }
+  }
+};
+
+function getCssPxNumber(value) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function setNonZeroOffset(target, key, value) {
+  const rounded = round(value);
+  if (rounded !== 0) {
+    target[key] = rounded;
+  }
+}
+
+function getPointUiOffsetCurrent(targetType, snapshot) {
+  const output = POINT_UI_OFFSET_OUTPUT[targetType];
+  if (!output) return null;
+
+  const baseVars = getMapLayoutCssVars();
+  const currentValues = {
+    x: snapshot.x,
+    y: snapshot.y,
+    width: snapshot.width,
+    height: snapshot.height,
+    size: snapshot.width
+  };
+  const offsetValues = {};
+
+  Object.entries(output.properties).forEach(([property, variableName]) => {
+    const baseValue = getCssPxNumber(baseVars[variableName]);
+    if (baseValue === null) return;
+    setNonZeroOffset(offsetValues, property, currentValues[property] - baseValue);
+  });
+
+  return {
+    [output.section]: offsetValues
+  };
+}
+
 function getParentPercentPosition(element) {
   const parent = element.offsetParent;
   if (!parent) return {};
@@ -413,28 +478,15 @@ function getConfigCurrent(element, resolvedTarget) {
   }
 
   if (targetType === "shield") {
-    return {
-      "--map-shield-left": toCssPx(snapshot.x),
-      "--map-shield-top": toCssPx(snapshot.y),
-      "--map-shield-size": toCssPx(snapshot.width)
-    };
+    return getPointUiOffsetCurrent(targetType, snapshot);
   }
 
   if (targetType === "sword") {
-    return {
-      "--map-sword-left": toCssPx(snapshot.x),
-      "--map-sword-top": toCssPx(snapshot.y),
-      "--map-sword-size": toCssPx(snapshot.width)
-    };
+    return getPointUiOffsetCurrent(targetType, snapshot);
   }
 
   if (targetType === "pointLabels") {
-    return {
-      "--map-point-labels-left": toCssPx(snapshot.x),
-      "--map-point-labels-top": toCssPx(snapshot.y),
-      "--map-point-labels-width": toCssPx(snapshot.width),
-      "--map-point-labels-height": toCssPx(snapshot.height)
-    };
+    return getPointUiOffsetCurrent(targetType, snapshot);
   }
 
   if (targetType === "attackerSelect" || targetType === "defenderSelect") {
