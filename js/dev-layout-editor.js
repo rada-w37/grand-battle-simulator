@@ -10,6 +10,7 @@ import {
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
+const EDITOR_UI_SELECTOR = ".dev-layout-toolbar, .dev-layout-layers-panel";
 const TARGET_TYPE_PRIORITY = {
   attackerSelect: 1,
   defenderSelect: 1,
@@ -122,6 +123,7 @@ function getVisibleTargetFromPoint(clientX, clientY) {
 }
 
 function getVisibleTargetFromEvent(event) {
+  if (event.target.closest(EDITOR_UI_SELECTOR)) return null;
   return getVisibleTargetFromPoint(event.clientX, event.clientY);
 }
 
@@ -321,6 +323,11 @@ function getTargetFromEvent(event) {
 
 function updateHoverTarget(event) {
   if (!isEditing || activeDrag) return;
+  if (event.target.closest(EDITOR_UI_SELECTOR)) {
+    hoverTarget = null;
+    updateHoverBox();
+    return;
+  }
 
   const target = getTargetFromEvent(event);
   hoverTarget = target && !selectedTargets.includes(target) ? target : null;
@@ -678,6 +685,11 @@ function createLayersPanel() {
   layersPanel = document.createElement("div");
   layersPanel.className = "dev-layout-layers-panel";
   layersPanel.hidden = true;
+  ["pointerdown", "mousedown", "click", "touchstart", "touchend"].forEach(eventName => {
+    layersPanel.addEventListener(eventName, event => {
+      event.stopPropagation();
+    });
+  });
   layersPanel.addEventListener("change", handleLayerPanelChange);
   document.body.appendChild(layersPanel);
   renderLayersPanel();
