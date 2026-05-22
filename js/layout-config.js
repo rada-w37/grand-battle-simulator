@@ -160,6 +160,154 @@ export const MAP_BANNER_PLACEMENTS = [
   { pointId: "floryte", name: "フロライト", x: 261, y: 436, scale: 10.9 }
 ];
 
+export const LAYOUT_TARGET_UPDATE_RULES = {
+  BATTLE_POINTS: {
+    point: {
+      configKey: "BATTLE_POINTS",
+      findBy: "id",
+      updateProperties: ["left", "top"],
+      coordinateSpace: "percent",
+      updateMode: "point"
+    }
+  },
+  POINT_AURA_COORDINATES: {
+    aura: {
+      configKey: "POINT_AURA_COORDINATES",
+      findBy: "pointId",
+      updateProperties: ["x", "y"],
+      coordinateSpace: "mapPx",
+      updateMode: "point"
+    }
+  },
+  MAP_STRUCTURE_PLACEMENTS: {
+    structure: {
+      configKey: "MAP_STRUCTURE_PLACEMENTS",
+      findBy: "pointId",
+      updateProperties: ["x", "y", "scale"],
+      coordinateSpace: "mapPxAndPercentScale",
+      updateMode: "point"
+    }
+  },
+  MAP_BANNER_PLACEMENTS: {
+    banner: {
+      configKey: "MAP_BANNER_PLACEMENTS",
+      findBy: "pointId",
+      updateProperties: ["x", "y", "scale"],
+      coordinateSpace: "mapPxAndPercentScale",
+      updateMode: "point"
+    },
+    pointName: {
+      configKey: "MAP_BANNER_PLACEMENTS",
+      findBy: "pointId",
+      updateProperties: ["x", "y"],
+      coordinateSpace: "mapPx",
+      updateMode: "sharedWithBanner"
+    },
+    pointNameLabel: {
+      configKey: "MAP_BANNER_PLACEMENTS",
+      findBy: "pointId",
+      updateProperties: ["x", "y"],
+      coordinateSpace: "mapPx",
+      updateMode: "sharedWithBanner"
+    }
+  },
+  MAP_LAYOUT_CSS_VARS: {
+    shield: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: ["--map-shield-left", "--map-shield-top", "--map-shield-size"],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    },
+    sword: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: ["--map-sword-left", "--map-sword-top", "--map-sword-size"],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    },
+    pointLabels: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: [
+        "--map-point-labels-left",
+        "--map-point-labels-top",
+        "--map-point-labels-width",
+        "--map-point-labels-height"
+      ],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    },
+    attackerSelect: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: ["--map-point-select-height", "--map-point-select-min-height"],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    },
+    defenderSelect: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: ["--map-point-select-height", "--map-point-select-min-height"],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    }
+  }
+};
+
+function getLayoutTargetRule(layoutKey, targetType) {
+  return LAYOUT_TARGET_UPDATE_RULES[layoutKey]?.[targetType] || null;
+}
+
+export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport = "desktop" }) {
+  const rule = getLayoutTargetRule(layoutKey, targetType);
+  if (!rule) {
+    return {
+      resolved: false,
+      skipReason: `No update rule for layoutKey=${layoutKey}, targetType=${targetType}`
+    };
+  }
+
+  if (layoutKey === "BATTLE_POINTS") {
+    const index = BATTLE_POINTS.findIndex(point => point.id === pointId);
+    return index >= 0
+      ? { resolved: true, ...rule, configPath: `BATTLE_POINTS[${index}]`, index }
+      : { resolved: false, ...rule, skipReason: `BATTLE_POINTS entry not found for pointId=${pointId}` };
+  }
+
+  if (layoutKey === "POINT_AURA_COORDINATES") {
+    return POINT_AURA_COORDINATES[pointId]
+      ? { resolved: true, ...rule, configPath: `POINT_AURA_COORDINATES.${pointId}` }
+      : { resolved: false, ...rule, skipReason: `POINT_AURA_COORDINATES entry not found for pointId=${pointId}` };
+  }
+
+  if (layoutKey === "MAP_STRUCTURE_PLACEMENTS") {
+    const index = MAP_STRUCTURE_PLACEMENTS.findIndex(placement => placement.pointId === pointId);
+    return index >= 0
+      ? { resolved: true, ...rule, configPath: `MAP_STRUCTURE_PLACEMENTS[${index}]`, index }
+      : { resolved: false, ...rule, skipReason: `MAP_STRUCTURE_PLACEMENTS entry not found for pointId=${pointId}` };
+  }
+
+  if (layoutKey === "MAP_BANNER_PLACEMENTS") {
+    const index = MAP_BANNER_PLACEMENTS.findIndex(placement => placement.pointId === pointId);
+    return index >= 0
+      ? { resolved: true, ...rule, configPath: `MAP_BANNER_PLACEMENTS[${index}]`, index }
+      : { resolved: false, ...rule, skipReason: `MAP_BANNER_PLACEMENTS entry not found for pointId=${pointId}` };
+  }
+
+  if (layoutKey === "MAP_LAYOUT_CSS_VARS") {
+    return MAP_LAYOUT_CSS_VARS[viewport]
+      ? { resolved: true, ...rule, configPath: `MAP_LAYOUT_CSS_VARS.${viewport}` }
+      : { resolved: false, ...rule, skipReason: `MAP_LAYOUT_CSS_VARS viewport not found: ${viewport}` };
+  }
+
+  return {
+    resolved: false,
+    ...rule,
+    skipReason: `Unknown layoutKey=${layoutKey}`
+  };
+}
+
 export function getMapLayoutCssVars(width = window.innerWidth) {
   const mode = width <= MAP_LAYOUT_BREAKPOINT ? "mobile" : "desktop";
   return {

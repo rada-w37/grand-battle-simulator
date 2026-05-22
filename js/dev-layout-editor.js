@@ -5,7 +5,8 @@ import {
   MAP_LAYOUT_BREAKPOINT,
   MAP_STRUCTURE_PLACEMENTS,
   POINT_AURA_COORDINATES,
-  getMapLayoutCssVars
+  getMapLayoutCssVars,
+  resolveLayoutTarget
 } from "./layout-config.js";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
@@ -301,6 +302,128 @@ function getMoveSnapshot(element) {
     width: after.width,
     height: after.height
   };
+}
+
+function toCssPx(value) {
+  return `${round(value)}px`;
+}
+
+function getParentPercentPosition(element) {
+  const parent = element.offsetParent;
+  if (!parent) return {};
+
+  const position = getEditablePosition(element);
+  return {
+    left: round((position.left / parent.offsetWidth) * 100),
+    top: round((position.top / parent.offsetHeight) * 100)
+  };
+}
+
+function getMapPxPosition(element) {
+  const parent = element.offsetParent;
+  if (!parent) return {};
+
+  const position = getEditablePosition(element);
+  return {
+    x: round((position.left / parent.offsetWidth) * MAP_IMAGE_SIZE.width),
+    y: round((position.top / parent.offsetHeight) * MAP_IMAGE_SIZE.height)
+  };
+}
+
+function getWidthPercent(element) {
+  const width = Number.parseFloat(element.style.width);
+  if (Number.isFinite(width) && element.style.width.trim().endsWith("%")) {
+    return round(width);
+  }
+
+  const parent = element.offsetParent;
+  if (!parent) return null;
+  return round((element.getBoundingClientRect().width / parent.getBoundingClientRect().width) * 100);
+}
+
+function getResolvedLayoutPayload(resolvedTarget) {
+  const {
+    resolved,
+    skipReason,
+    configKey,
+    configPath,
+    updateProperties,
+    coordinateSpace,
+    updateMode
+  } = resolvedTarget;
+
+  return {
+    resolved,
+    configKey,
+    configPath,
+    updateProperties,
+    coordinateSpace,
+    updateMode,
+    ...(skipReason ? { skipReason } : {})
+  };
+}
+
+function getConfigCurrent(element, resolvedTarget) {
+  const targetType = element.dataset.devLayoutTargetType;
+  const layoutKey = element.dataset.devLayoutKey;
+  const snapshot = getMoveSnapshot(element);
+
+  if (!resolvedTarget.resolved) {
+    return snapshot;
+  }
+
+  if (layoutKey === "BATTLE_POINTS") {
+    return getParentPercentPosition(element);
+  }
+
+  if (layoutKey === "POINT_AURA_COORDINATES") {
+    return getMapPxPosition(element);
+  }
+
+  if (layoutKey === "MAP_STRUCTURE_PLACEMENTS" || targetType === "banner") {
+    return {
+      ...getMapPxPosition(element),
+      scale: getWidthPercent(element)
+    };
+  }
+
+  if (targetType === "pointName" || targetType === "pointNameLabel") {
+    return getMapPxPosition(element);
+  }
+
+  if (targetType === "shield") {
+    return {
+      "--map-shield-left": toCssPx(snapshot.x),
+      "--map-shield-top": toCssPx(snapshot.y),
+      "--map-shield-size": toCssPx(snapshot.width)
+    };
+  }
+
+  if (targetType === "sword") {
+    return {
+      "--map-sword-left": toCssPx(snapshot.x),
+      "--map-sword-top": toCssPx(snapshot.y),
+      "--map-sword-size": toCssPx(snapshot.width)
+    };
+  }
+
+  if (targetType === "pointLabels") {
+    return {
+      "--map-point-labels-left": toCssPx(snapshot.x),
+      "--map-point-labels-top": toCssPx(snapshot.y),
+      "--map-point-labels-width": toCssPx(snapshot.width),
+      "--map-point-labels-height": toCssPx(snapshot.height)
+    };
+  }
+
+  if (targetType === "attackerSelect" || targetType === "defenderSelect") {
+    return {
+      "--map-point-select-height": toCssPx(snapshot.height),
+      "--map-point-select-min-height": toCssPx(snapshot.height)
+    };
+  }
+
+  return snapshot;
 }
 
 function getMoveSnapshots(targets) {
@@ -632,11 +755,18 @@ async function copyChanges() {
   const currentChanges = Array.from(changes.keys())
     .map(targetId => document.querySelector(`[data-dev-layout-id="${CSS.escape(targetId)}"]`))
     .filter(Boolean)
-    .map(target => ({
-      viewport: getViewportName(),
-      ...getTargetMeta(target),
-      current: getMoveSnapshot(target)
-    }));
+    .map(target => {
+      const viewport = getViewportName();
+      const meta = getTargetMeta(target);
+      const resolvedTarget = resolveLayoutTarget({ ...meta, viewport });
+
+      return {
+        viewport,
+        ...meta,
+        layoutTarget: getResolvedLayoutPayload(resolvedTarget),
+        current: getConfigCurrent(target, resolvedTarget)
+      };
+    });
   const payload = JSON.stringify({
     changes: currentChanges
   }, null, 2);
