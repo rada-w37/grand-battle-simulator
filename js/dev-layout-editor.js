@@ -37,7 +37,7 @@ let selectedElement = null;
 let selectionMode = "single";
 let selectedTargets = [];
 let hoverTarget = null;
-let selectionBox = null;
+let selectionLayer = null;
 let hoverBox = null;
 let toolbar = null;
 let layersPanel = null;
@@ -293,7 +293,15 @@ function positionOverlay(overlay, element) {
 }
 
 function updateSelectionBox() {
-  positionOverlay(selectionBox, selectedElement);
+  if (!selectionLayer) return;
+
+  selectionLayer.replaceChildren();
+  selectedTargets.forEach(target => {
+    const overlay = document.createElement("div");
+    overlay.className = `dev-layout-selection-overlay dev-layout-selection-overlay-${selectionMode}`;
+    selectionLayer.appendChild(overlay);
+    positionOverlay(overlay, target);
+  });
 }
 
 function updateHoverBox() {
@@ -314,19 +322,37 @@ function clearSelectedTargets() {
   selectedTargets.forEach(target => target.classList.remove("dev-layout-selected"));
   selectedTargets = [];
   selectedElement = null;
+  updateSelectionBox();
+}
+
+function getVisibleTargetsByType(targetType) {
+  return getDevLayoutTargets()
+    .filter(target => target.dataset.devLayoutTargetType === targetType)
+    .filter(isSelectableTarget);
+}
+
+function applySelectedTargets(targets, mode, primaryTarget = targets[0]) {
+  clearSelectedTargets();
+  selectionMode = mode;
+  selectedTargets = targets;
+  selectedElement = primaryTarget || targets[0] || null;
+  selectedTargets.forEach(target => target.classList.add("dev-layout-selected"));
+  if (hoverTarget && selectedTargets.includes(hoverTarget)) {
+    hideHoverOverlay();
+  }
+  updateSelectionBox();
 }
 
 function selectElement(element) {
-  clearSelectedTargets();
-  selectionMode = "single";
-  selectedTargets = [element];
-  selectedElement = element;
-  selectedElement.classList.add("dev-layout-selected");
-  if (hoverTarget === element) {
-    hoverTarget = null;
-    updateHoverBox();
+  const isGroupMemberClick = selectionMode === "group" && selectedTargets.includes(element);
+  if (isGroupMemberClick) {
+    applySelectedTargets([element], "single", element);
+    return;
   }
-  updateSelectionBox();
+
+  const targetType = element.dataset.devLayoutTargetType;
+  const groupTargets = targetType ? getVisibleTargetsByType(targetType) : [element];
+  applySelectedTargets(groupTargets.length ? groupTargets : [element], "group", element);
 }
 
 function getTargetFromEvent(event) {
@@ -367,6 +393,12 @@ function moveElement(element, deltaX, deltaY) {
   element.style.left = `${position.left + deltaX / parentScale}px`;
   element.style.top = `${position.top + deltaY / parentScale}px`;
   rememberChange(element);
+}
+
+function moveSelectedTargets(deltaX, deltaY) {
+  selectedTargets.filter(isSelectableTarget).forEach(target => {
+    moveElement(target, deltaX, deltaY);
+  });
   updateSelectionBox();
 }
 
@@ -381,11 +413,11 @@ function startDrag(event) {
   selectElement(target);
 
   activeDrag = {
-    element: target,
     pointerId: event.pointerId,
     startX: event.clientX,
     startY: event.clientY,
-    startPosition: getEditablePosition(target)
+    targets: [...selectedTargets],
+    startPositions: new Map(selectedTargets.map(selectedTarget => [selectedTarget, getEditablePosition(selectedTarget)]))
   };
 
   target.setPointerCapture?.(event.pointerId);
@@ -397,17 +429,20 @@ function updateDrag(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  const parentScale = getPointerScale(activeDrag.element);
-  activeDrag.element.style.left = `${activeDrag.startPosition.left + (event.clientX - activeDrag.startX) / parentScale}px`;
-  activeDrag.element.style.top = `${activeDrag.startPosition.top + (event.clientY - activeDrag.startY) / parentScale}px`;
-  rememberChange(activeDrag.element);
+  activeDrag.targets.filter(isSelectableTarget).forEach(target => {
+    const parentScale = getPointerScale(target);
+    const startPosition = activeDrag.startPositions.get(target);
+    target.style.left = `${startPosition.left + (event.clientX - activeDrag.startX) / parentScale}px`;
+    target.style.top = `${startPosition.top + (event.clientY - activeDrag.startY) / parentScale}px`;
+    rememberChange(target);
+  });
   updateSelectionBox();
 }
 
 function endDrag(event) {
   if (!activeDrag) return;
   event.stopPropagation();
-  activeDrag.element.releasePointerCapture?.(activeDrag.pointerId);
+  selectedElement?.releasePointerCapture?.(activeDrag.pointerId);
   activeDrag = null;
 }
 
@@ -423,19 +458,25 @@ function handleKeydown(event) {
 
   event.preventDefault();
   const step = event.shiftKey ? 10 : 1;
-  moveElement(selectedElement, direction[0] * step, direction[1] * step);
+  moveSelectedTargets(direction[0] * step, direction[1] * step);
 }
 
 async function copyChanges() {
+  const visibleChanges = Array.from(changes.values()).filter(change => {
+    const target = document.querySelector(`[data-dev-layout-id="${CSS.escape(change.targetId)}"]`);
+    return target && !isTargetHidden(target);
+  });
   const payload = JSON.stringify({
     selectionMode,
-    selectedTargets: selectedTargets.map(target => ({
-      targetId: target.dataset.devLayoutId,
-      layoutKey: target.dataset.devLayoutKey,
-      pointId: target.dataset.devLayoutPointId,
-      targetType: target.dataset.devLayoutTargetType
-    })),
-    changes: Array.from(changes.values())
+    selectedTargets: selectedTargets
+      .filter(target => !isTargetHidden(target))
+      .map(target => ({
+        targetId: target.dataset.devLayoutId,
+        layoutKey: target.dataset.devLayoutKey,
+        pointId: target.dataset.devLayoutPointId,
+        targetType: target.dataset.devLayoutTargetType
+      })),
+    changes: visibleChanges
   }, null, 2);
   try {
     if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
@@ -474,9 +515,16 @@ function applyLayerVisibility() {
     element.dataset.devLayoutHidden = String(isHidden);
   });
 
-  if (selectedElement && isTargetHidden(selectedElement)) {
-    clearSelectedTargets();
-    updateSelectionBox();
+  const hiddenSelectedTargets = selectedTargets.filter(isTargetHidden);
+  if (hiddenSelectedTargets.length > 0) {
+    hiddenSelectedTargets.forEach(target => target.classList.remove("dev-layout-selected"));
+    selectedTargets = selectedTargets.filter(target => !isTargetHidden(target));
+    selectedElement = selectedTargets[0] || null;
+    if (selectedTargets.length === 0) {
+      clearSelectedTargets();
+    } else {
+      updateSelectionBox();
+    }
   }
   if (hoverTarget && isTargetHidden(hoverTarget)) {
     hoverTarget = null;
@@ -707,23 +755,42 @@ function injectStyles() {
       color: rgba(216, 231, 255, 0.78);
       white-space: nowrap;
     }
+    .dev-layout-selection-layer,
     .dev-layout-selection-overlay,
     .dev-layout-hover-overlay {
       position: fixed;
       z-index: 9999;
-      display: none;
       pointer-events: none;
     }
+    .dev-layout-selection-layer,
     .dev-layout-selection-overlay {
+      display: none;
+    }
+    .dev-layout-selection-layer {
+      inset: 0;
+    }
+    .dev-layout-selection-overlay {
+      position: fixed;
       border: 1px solid #153a75;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+    }
+    .dev-layout-selection-overlay-group {
+      border-color: rgba(45, 120, 255, 0.62);
+      box-shadow: none;
+    }
+    .dev-layout-selection-overlay-single {
+      border-color: #153a75;
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
     }
     .dev-layout-hover-overlay {
       border: 1px solid rgba(45, 120, 255, 0.45);
       background: rgba(45, 120, 255, 0.16);
     }
+    .dev-layout-hover-overlay {
+      display: block;
+    }
     body.dev-layout-editor-active .dev-layout-selection-overlay,
-    body.dev-layout-editor-active .dev-layout-hover-overlay {
+    body.dev-layout-editor-active .dev-layout-selection-layer {
       display: block;
     }
     .dev-layout-selection-overlay[hidden],
@@ -768,10 +835,9 @@ function createLayersPanel() {
 }
 
 function createSelectionBox() {
-  selectionBox = document.createElement("div");
-  selectionBox.className = "dev-layout-selection-overlay";
-  selectionBox.hidden = true;
-  document.body.appendChild(selectionBox);
+  selectionLayer = document.createElement("div");
+  selectionLayer.className = "dev-layout-selection-layer";
+  document.body.appendChild(selectionLayer);
 
   hoverBox = document.createElement("div");
   hoverBox.className = "dev-layout-hover-overlay";
