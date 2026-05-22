@@ -491,6 +491,19 @@ function getConfigCurrent(element, resolvedTarget) {
 
   if (targetType === "attackerSelect" || targetType === "defenderSelect") {
     return {
+      "--map-point-select-left": toCssPx(snapshot.x),
+      "--map-point-select-top": toCssPx(snapshot.y),
+      "--map-point-select-width": toCssPx(snapshot.width),
+      "--map-point-select-height": toCssPx(snapshot.height),
+      "--map-point-select-min-height": toCssPx(snapshot.height)
+    };
+  }
+
+  if (targetType === "select") {
+    return {
+      "--map-point-select-left": toCssPx(snapshot.x),
+      "--map-point-select-top": toCssPx(snapshot.y),
+      "--map-point-select-width": toCssPx(snapshot.width),
       "--map-point-select-height": toCssPx(snapshot.height),
       "--map-point-select-min-height": toCssPx(snapshot.height)
     };

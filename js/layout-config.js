@@ -29,8 +29,11 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-band-width": "100px",
     "--map-point-band-height": "24px",
     "--map-point-band-radius": "3px",
-    "--map-point-select-height": "auto",
-    "--map-point-select-min-height": "18px",
+    "--map-point-select-height": "17.99px",
+    "--map-point-select-left": "0px",
+    "--map-point-select-top": "3px",
+    "--map-point-select-width": "100px",
+    "--map-point-select-min-height": "17.99px",
     "--map-point-select-line-height": "normal",
     "--map-point-select-padding": "0",
     "--map-point-select-font-size": "0.85rem",
@@ -39,16 +42,30 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-sword-display": "block"
   },
   mobile: {
+    "--map-point-width": "130px",
+    "--map-point-min-height": "42px",
+    "--map-point-border-radius": "6px",
     "--map-point-label-font-size": "clamp(0.78rem, 0.9vw, 0.96rem)",
     "--map-point-label-transform-y": "-2px",
-    "--map-point-labels-top": "40%",
-    "--map-point-labels-width": "44%",
+    "--map-shield-left": "3.32px",
+    "--map-shield-top": "33.78px",
+    "--map-shield-size": "26px",
+    "--map-sword-left": "3.22px",
+    "--map-sword-top": "8.46px",
+    "--map-sword-size": "26px",
+    "--map-point-labels-left": "66px",
+    "--map-point-labels-top": "6.8px",
+    "--map-point-labels-width": "57.2px",
+    "--map-point-labels-height": "23px",
     "--map-point-labels-row-height": "11px",
     "--map-point-labels-gap": "1px",
     "--map-point-band-width": "108%",
     "--map-point-band-height": "11px",
     "--map-point-band-radius": "2px",
     "--map-point-select-height": "11px",
+    "--map-point-select-left": "-1px",
+    "--map-point-select-top": "27px",
+    "--map-point-select-width": "57.2px",
     "--map-point-select-min-height": "11px",
     "--map-point-select-line-height": "11px",
     "--map-point-select-padding": "0",
@@ -145,7 +162,7 @@ export const POINT_AURA_COORDINATES = {
   lapis: { x: 918, y: 877 },
   laven: { x: 311, y: 977 },
   marin: { x: 527, y: 991 },
-  larimal: { x: 752, y: 1127 },
+  larimal: { x: 752, y: 1126.8 },
   tiferet: { x: 491, y: 430 },
   yesod: { x: 812, y: 498 },
   keter: { x: 425, y: 717 },
@@ -282,14 +299,39 @@ export const LAYOUT_TARGET_UPDATE_RULES = {
     attackerSelect: {
       configKey: "MAP_LAYOUT_CSS_VARS",
       findBy: "viewport",
-      updateProperties: ["--map-point-select-height", "--map-point-select-min-height"],
+      updateProperties: [
+        "--map-point-select-left",
+        "--map-point-select-top",
+        "--map-point-select-width",
+        "--map-point-select-height",
+        "--map-point-select-min-height"
+      ],
       coordinateSpace: "cssPx",
       updateMode: "sharedByTargetType"
     },
     defenderSelect: {
       configKey: "MAP_LAYOUT_CSS_VARS",
       findBy: "viewport",
-      updateProperties: ["--map-point-select-height", "--map-point-select-min-height"],
+      updateProperties: [
+        "--map-point-select-left",
+        "--map-point-select-top",
+        "--map-point-select-width",
+        "--map-point-select-height",
+        "--map-point-select-min-height"
+      ],
+      coordinateSpace: "cssPx",
+      updateMode: "sharedByTargetType"
+    },
+    select: {
+      configKey: "MAP_LAYOUT_CSS_VARS",
+      findBy: "viewport",
+      updateProperties: [
+        "--map-point-select-left",
+        "--map-point-select-top",
+        "--map-point-select-width",
+        "--map-point-select-height",
+        "--map-point-select-min-height"
+      ],
       coordinateSpace: "cssPx",
       updateMode: "sharedByTargetType"
     }
@@ -300,7 +342,14 @@ function getLayoutTargetRule(layoutKey, targetType) {
   return LAYOUT_TARGET_UPDATE_RULES[layoutKey]?.[targetType] || null;
 }
 
-export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport = "desktop" }) {
+export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport }) {
+  if (!viewport) {
+    return {
+      resolved: false,
+      skipReason: "viewport is required"
+    };
+  }
+
   const rule = getLayoutTargetRule(layoutKey, targetType);
   if (!rule) {
     return {
@@ -357,10 +406,7 @@ export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport =
 
 export function getMapLayoutCssVars(width = window.innerWidth) {
   const mode = width <= MAP_LAYOUT_BREAKPOINT ? "mobile" : "desktop";
-  return {
-    ...MAP_LAYOUT_CSS_VARS.desktop,
-    ...MAP_LAYOUT_CSS_VARS[mode]
-  };
+  return { ...MAP_LAYOUT_CSS_VARS[mode] };
 }
 
 export function applyMapLayoutCssVars(target = document.documentElement, width = window.innerWidth) {

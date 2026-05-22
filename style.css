@@ -1149,7 +1149,10 @@ button:focus-visible {
 .point select {
   position: relative;
   z-index: 2;
-  width: 100%;
+  left: var(--map-point-select-left);
+  top: var(--map-point-select-top);
+  width: var(--map-point-select-width);
+  height: var(--map-point-select-height);
   min-height: var(--map-point-select-min-height);
   /* min-width: 50; */
   /* text-overflow: ellipsis; */
@@ -1503,6 +1506,7 @@ button:focus-visible {
 
   .point-labels {
       width: var(--map-point-labels-width);
+      height: var(--map-point-labels-height);
       top: var(--map-point-labels-top);
       grid-template-rows: repeat(2, var(--map-point-labels-row-height));
       gap: var(--map-point-labels-gap);
@@ -1521,37 +1525,35 @@ button:focus-visible {
   }
 
   .point-labels::before {
-    background:
-      linear-gradient(90deg,
+    background:rgba(70, 29, 33, 0.92);
+      /* linear-gradient(90deg,
         rgba(93, 38, 42, 0) 0%,
         rgba(70, 29, 33, 0.92) 15%,
         rgba(70, 29, 33, 0.92) 50%,
         rgba(70, 29, 33, 0.92) 85%,
-        rgba(93, 38, 42, 0) 100%);
+        rgba(93, 38, 42, 0) 100%); */
   }
 
   .point.has-self-attack .point-labels::before {
-    background:
-      linear-gradient(90deg,
+    background: rgba(54, 58, 60, 0.82);
+      /* linear-gradient(90deg,
         rgba(72, 76, 78, 0) 0%,
         rgba(54, 58, 60, 0.82) 15%,
         rgba(54, 58, 60, 0.82) 50%,
         rgba(54, 58, 60, 0.82) 85%,
-        rgba(72, 76, 78, 0) 100%);
+        rgba(72, 76, 78, 0) 100%); */
   }
 
   .point-labels::after {
-    background:
-      linear-gradient(90deg,
+    background: rgba(18, 37, 43, 0.9);
+      /* linear-gradient(90deg,
         rgba(22, 41, 47, 0) 0%,
         rgba(22, 41, 47, 0.58) 15%,
-        rgba(18, 37, 43, 0.9) 50%,
-        rgba(18, 37, 43, 0.9) 85%,
-        rgba(22, 41, 47, 0) 100%);
+        rgba(18, 37, 43, 0.9) 50%
+        ); */
   }
 
   .point select {
-    width: 100%;
     height: var(--map-point-select-height);
     min-height: var(--map-point-select-min-height);
     line-height: var(--map-point-select-line-height);
