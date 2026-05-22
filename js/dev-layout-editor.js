@@ -13,6 +13,7 @@ const TARGET_SELECTOR = "[data-dev-layout-id]";
 const EDITOR_UI_SELECTOR = ".dev-layout-toolbar, .dev-layout-layers-panel";
 const LAYER_PANEL_POSITION_KEY = "devLayoutLayerPanelPosition";
 const DRAG_THRESHOLD_PX = 4;
+const EDITOR_HISTORY_LIMIT = 10;
 const TARGET_TYPE_PRIORITY = {
   attackerSelect: 1,
   defenderSelect: 1,
@@ -46,6 +47,8 @@ let layerPanelPosition = "right";
 let activeDrag = null;
 
 const changes = new Map();
+const editorUndoStack = [];
+const editorRedoStack = [];
 const hiddenTargetIds = new Set();
 const hiddenLayerKeys = new Set();
 
@@ -279,6 +282,123 @@ function rememberChange(element) {
   });
 }
 
+function getTargetMeta(element) {
+  return {
+    targetId: element.dataset.devLayoutId,
+    layoutKey: element.dataset.devLayoutKey,
+    pointId: element.dataset.devLayoutPointId,
+    targetType: element.dataset.devLayoutTargetType
+  };
+}
+
+function getMoveSnapshot(element) {
+  const after = getElementAfter(element);
+  const x = after.localPx?.x ?? round(Number.parseFloat(after.x) || 0);
+  const y = after.localPx?.y ?? round(Number.parseFloat(after.y) || 0);
+  return {
+    x,
+    y,
+    width: after.width,
+    height: after.height
+  };
+}
+
+function getMoveSnapshots(targets) {
+  return new Map(
+    targets
+      .filter(isSelectableTarget)
+      .map(target => [target.dataset.devLayoutId, getMoveSnapshot(target)])
+  );
+}
+
+function isSameMoveSnapshot(before, after) {
+  return before &&
+    after &&
+    before.x === after.x &&
+    before.y === after.y &&
+    before.width === after.width &&
+    before.height === after.height;
+}
+
+function createMoveHistoryEntry(targets, beforeSnapshots) {
+  const historyChanges = targets
+    .filter(target => target?.matches?.(TARGET_SELECTOR))
+    .map(target => {
+      const before = beforeSnapshots.get(target.dataset.devLayoutId);
+      const after = getMoveSnapshot(target);
+      if (!before || isSameMoveSnapshot(before, after)) return null;
+
+      return {
+        ...getTargetMeta(target),
+        before,
+        after
+      };
+    })
+    .filter(Boolean);
+
+  return historyChanges.length ? { changes: historyChanges } : null;
+}
+
+function trimHistoryStack(stack) {
+  while (stack.length > EDITOR_HISTORY_LIMIT) {
+    stack.shift();
+  }
+}
+
+function updateEditorHistoryControls() {
+  if (!toolbar) return;
+
+  const undoButton = toolbar.querySelector(".dev-layout-undo");
+  const redoButton = toolbar.querySelector(".dev-layout-redo");
+  if (undoButton) undoButton.disabled = editorUndoStack.length === 0;
+  if (redoButton) redoButton.disabled = editorRedoStack.length === 0;
+}
+
+function pushEditorHistory(entry) {
+  if (!entry?.changes?.length) return;
+
+  editorUndoStack.push(entry);
+  trimHistoryStack(editorUndoStack);
+  editorRedoStack.length = 0;
+  updateEditorHistoryControls();
+}
+
+function applyMoveSnapshot(element, snapshot) {
+  element.style.left = `${snapshot.x}px`;
+  element.style.top = `${snapshot.y}px`;
+  rememberChange(element);
+}
+
+function applyEditorHistoryEntry(entry, snapshotKey) {
+  entry.changes.forEach(change => {
+    const target = document.querySelector(`[data-dev-layout-id="${CSS.escape(change.targetId)}"]`);
+    if (!target) return;
+    applyMoveSnapshot(target, change[snapshotKey]);
+  });
+  updateSelectionBox();
+  updateHoverBox();
+}
+
+function undoDevLayoutMove() {
+  const entry = editorUndoStack.pop();
+  if (!entry) return;
+
+  applyEditorHistoryEntry(entry, "before");
+  editorRedoStack.push(entry);
+  trimHistoryStack(editorRedoStack);
+  updateEditorHistoryControls();
+}
+
+function redoDevLayoutMove() {
+  const entry = editorRedoStack.pop();
+  if (!entry) return;
+
+  applyEditorHistoryEntry(entry, "after");
+  editorUndoStack.push(entry);
+  trimHistoryStack(editorUndoStack);
+  updateEditorHistoryControls();
+}
+
 function positionOverlay(overlay, element) {
   if (!overlay || !element) {
     if (overlay) overlay.hidden = true;
@@ -404,6 +524,10 @@ function moveSelectedTargets(deltaX, deltaY) {
   updateSelectionBox();
 }
 
+function isTextEditingTarget(element) {
+  return Boolean(element?.closest?.("input, textarea, select, [contenteditable='true']"));
+}
+
 function startDrag(event) {
   if (!isEditing) return;
   if (event.target.closest(EDITOR_UI_SELECTOR) || event.button !== 0) return;
@@ -420,7 +544,8 @@ function startDrag(event) {
     startY: event.clientY,
     hasMoved: false,
     targets: dragTargets,
-    startPositions: new Map(dragTargets.map(selectedTarget => [selectedTarget, getEditablePosition(selectedTarget)]))
+    startPositions: new Map(dragTargets.map(selectedTarget => [selectedTarget, getEditablePosition(selectedTarget)])),
+    beforeSnapshots: getMoveSnapshots(dragTargets)
   };
 
   target?.setPointerCapture?.(event.pointerId);
@@ -463,11 +588,29 @@ function endDrag(event) {
     } else {
       clearSelectedTargets();
     }
+  } else {
+    pushEditorHistory(createMoveHistoryEntry(activeDrag.targets, activeDrag.beforeSnapshots));
   }
   activeDrag = null;
 }
 
 function handleKeydown(event) {
+  const isCtrlLike = event.ctrlKey || event.metaKey;
+  if (isCtrlLike && event.key.toLowerCase() === "z" && !isTextEditingTarget(event.target)) {
+    event.preventDefault();
+    if (event.shiftKey) {
+      redoDevLayoutMove();
+    } else {
+      undoDevLayoutMove();
+    }
+    return;
+  }
+  if (isCtrlLike && event.key.toLowerCase() === "y" && !isTextEditingTarget(event.target)) {
+    event.preventDefault();
+    redoDevLayoutMove();
+    return;
+  }
+
   if (!isEditing || !selectedElement) return;
   const direction = {
     ArrowUp: [0, -1],
@@ -479,7 +622,10 @@ function handleKeydown(event) {
 
   event.preventDefault();
   const step = event.shiftKey ? 10 : 1;
+  const moveTargets = selectedTargets.filter(isSelectableTarget);
+  const beforeSnapshots = getMoveSnapshots(moveTargets);
   moveSelectedTargets(direction[0] * step, direction[1] * step);
+  pushEditorHistory(createMoveHistoryEntry(moveTargets, beforeSnapshots));
 }
 
 async function copyChanges() {
@@ -771,6 +917,15 @@ function injectStyles() {
       color: inherit;
       cursor: pointer;
     }
+    .dev-layout-toolbar button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+    .dev-layout-undo,
+    .dev-layout-redo {
+      min-width: 30px;
+      padding-inline: 8px;
+    }
     .dev-layout-status {
       min-width: 78px;
       color: rgba(216, 231, 255, 0.78);
@@ -830,13 +985,18 @@ function createToolbar() {
   toolbar.className = "dev-layout-toolbar";
   toolbar.innerHTML = `
     <button type="button" class="dev-layout-toggle">Layout Edit</button>
+    <button type="button" class="dev-layout-undo" aria-label="Dev Layoutの移動をUndo" title="Dev Layoutの移動をUndo">Undo</button>
+    <button type="button" class="dev-layout-redo" aria-label="Dev Layoutの移動をRedo" title="Dev Layoutの移動をRedo">Redo</button>
     <button type="button" class="dev-layout-copy">Copy JSON</button>
     <span class="dev-layout-status">devLayout=1</span>
   `;
   document.body.appendChild(toolbar);
 
   toolbar.querySelector(".dev-layout-toggle").addEventListener("click", () => setEditing(!isEditing));
+  toolbar.querySelector(".dev-layout-undo").addEventListener("click", undoDevLayoutMove);
+  toolbar.querySelector(".dev-layout-redo").addEventListener("click", redoDevLayoutMove);
   toolbar.querySelector(".dev-layout-copy").addEventListener("click", copyChanges);
+  updateEditorHistoryControls();
 }
 
 function createLayersPanel() {
