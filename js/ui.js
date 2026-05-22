@@ -1,4 +1,5 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, MAP_IMAGE_SIZE, SWORD_MARKER_ICON, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
+import { MAP_IMAGE_SIZE, MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT } from "./layout-config.js";
 import * as state from "./state.js";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js";
@@ -187,6 +188,16 @@ function createScoreGuildRadioCell(guildName) {
   return cell;
 }
 
+function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
+  element.dataset.devLayoutId = targetId;
+  element.dataset.devLayoutKey = layoutKey;
+  element.dataset.devLayoutPointId = pointId;
+  element.dataset.devLayoutTargetType = targetType || role || layoutKey;
+  if (role) {
+    element.dataset.devLayoutRole = role;
+  }
+}
+
 // Render Battle Points Map
 export function renderBattlePoints() {
   const fragment = document.createDocumentFragment();
@@ -197,6 +208,12 @@ export function renderBattlePoints() {
       const aura = document.createElement("span");
       aura.className = `point-aura point-aura-${point.type}`;
       aura.dataset.pointId = point.id;
+      setDevLayoutMetadata(aura, {
+        targetId: `aura:${point.id}`,
+        layoutKey: "POINT_AURA_COORDINATES",
+        pointId: point.id,
+        targetType: "aura"
+      });
       aura.style.left = `${(auraCoordinates.x / MAP_IMAGE_SIZE.width) * 100}%`;
       aura.style.top = `${(auraCoordinates.y / MAP_IMAGE_SIZE.height) * 100}%`;
       fragment.appendChild(aura);
@@ -214,26 +231,67 @@ export function renderBattlePoints() {
     wrapper.dataset.type = point.type;
     wrapper.dataset.id = point.id;
     wrapper.dataset.castleId = String(point.castleId);
+    setDevLayoutMetadata(wrapper, {
+      targetId: `point:${point.id}`,
+      layoutKey: "BATTLE_POINTS",
+      pointId: point.id,
+      targetType: "point"
+    });
 
     const frame = document.createElement("span");
     frame.className = "point-frame";
+    setDevLayoutMetadata(frame, {
+      targetId: `shield:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "shield",
+      targetType: "shield"
+    });
     wrapper.appendChild(frame);
 
     const swordFrame = document.createElement("span");
     swordFrame.className = "point-sword-frame";
+    setDevLayoutMetadata(swordFrame, {
+      targetId: `sword:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "sword",
+      targetType: "sword"
+    });
     wrapper.appendChild(swordFrame);
 
     const labels = document.createElement("div");
     labels.className = "point-labels";
+    setDevLayoutMetadata(labels, {
+      targetId: `labels:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "pointLabels",
+      targetType: "pointLabels"
+    });
 
     const attackerSelect = document.createElement("select");
     attackerSelect.className = "point-attacker-select";
     attackerSelect.setAttribute("aria-label", `${point.id} attacking guild`);
+    setDevLayoutMetadata(attackerSelect, {
+      targetId: `attackerSelect:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "attackerSelect",
+      targetType: "select"
+    });
     labels.appendChild(attackerSelect);
 
     const defenderSelect = document.createElement("select");
     defenderSelect.className = "point-defender-select";
     defenderSelect.setAttribute("aria-label", `${point.id} occupying guild`);
+    setDevLayoutMetadata(defenderSelect, {
+      targetId: `defenderSelect:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "defenderSelect",
+      targetType: "select"
+    });
     labels.appendChild(defenderSelect);
     wrapper.appendChild(labels);
 
@@ -269,6 +327,12 @@ function renderStructurePlacements(fragment) {
     structure.src = placement.src;
     structure.alt = "";
     structure.dataset.pointId = placement.pointId;
+    setDevLayoutMetadata(structure, {
+      targetId: `structure:${placement.pointId}`,
+      layoutKey: "MAP_STRUCTURE_PLACEMENTS",
+      pointId: placement.pointId,
+      targetType: "structure"
+    });
     structure.style.width = `${placement.scale}%`;
     setMapImagePosition(structure, placement.x, placement.y);
     fragment.appendChild(structure);
@@ -282,6 +346,13 @@ function renderBannerPlacements(fragment) {
     banner.src = "resource/banner.png?v=lowres-1";
     banner.alt = "";
     banner.dataset.pointId = placement.pointId;
+    setDevLayoutMetadata(banner, {
+      targetId: `banner:${placement.pointId}`,
+      layoutKey: "MAP_BANNER_PLACEMENTS",
+      pointId: placement.pointId,
+      role: "banner",
+      targetType: "banner"
+    });
     banner.style.width = `${placement.scale}%`;
     setMapImagePosition(banner, placement.x, placement.y);
     fragment.appendChild(banner);
@@ -290,8 +361,14 @@ function renderBannerPlacements(fragment) {
     label.className = "point-name-label";
     label.textContent = placement.name;
     label.dataset.pointId = placement.pointId;
-    //label.style.transform = `translate(-50%, calc(-50% - 2px)) scale(${placement.scale}%)`;
-    label.style.transform = `translate(-50%, calc(-50% - 1px)) scale(${placement.scale / 35})`;
+    setDevLayoutMetadata(label, {
+      targetId: `pointName:${placement.pointId}`,
+      layoutKey: "MAP_BANNER_PLACEMENTS",
+      pointId: placement.pointId,
+      role: "pointName",
+      targetType: "pointName"
+    });
+    label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
     setMapImagePosition(label, placement.x, placement.y);
     fragment.appendChild(label);

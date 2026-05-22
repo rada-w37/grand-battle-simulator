@@ -1,4 +1,5 @@
-import { API_BASE_URL, STORAGE_KEYS, BATTLE_POINTS } from "./constants.js";
+import { API_BASE_URL, STORAGE_KEYS } from "./constants.js";
+import { BATTLE_POINTS } from "./layout-config.js";
 import * as state from "./state.js";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js";
 

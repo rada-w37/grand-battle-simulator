@@ -2,6 +2,17 @@ import * as state from "./state.js";
 import * as api from "./api.js";
 import * as ui from "./ui.js";
 import { bindEvents } from "./events.js";
+import { applyMapLayoutCssVars } from "./layout-config.js";
+
+function bindMapLayoutConfigEvents() {
+  window.addEventListener("resize", () => {
+    applyMapLayoutCssVars();
+  });
+}
+
+function shouldEnableDevLayoutEditor() {
+  return new URLSearchParams(window.location.search).get("devLayout") === "1";
+}
 
 // Initialize Application
 async function initializeApp() {
@@ -18,6 +29,7 @@ async function initializeApp() {
   });
 
   state.initializeElements();
+  applyMapLayoutCssVars();
   ui.renderEmptyGuildGrid();
   ui.renderBattlePoints();
   ui.loadAppliedGuilds();
@@ -27,6 +39,12 @@ async function initializeApp() {
   ui.restoreSelectStates();
   ui.updateScores();
   bindEvents();
+  bindMapLayoutConfigEvents();
+
+  if (shouldEnableDevLayoutEditor()) {
+    const { initDevLayoutEditor } = await import("./dev-layout-editor.js");
+    initDevLayoutEditor();
+  }
 
   try {
     await api.loadGroups();
