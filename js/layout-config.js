@@ -199,16 +199,16 @@ export const LAYOUT_TARGET_UPDATE_RULES = {
     pointName: {
       configKey: "MAP_BANNER_PLACEMENTS",
       findBy: "pointId",
-      updateProperties: ["x", "y"],
-      coordinateSpace: "mapPx",
-      updateMode: "sharedWithBanner"
+      updateProperties: ["textOffsetX", "textOffsetY"],
+      coordinateSpace: "mapPxOffsetFromBanner",
+      updateMode: "textOffset"
     },
     pointNameLabel: {
       configKey: "MAP_BANNER_PLACEMENTS",
       findBy: "pointId",
-      updateProperties: ["x", "y"],
-      coordinateSpace: "mapPx",
-      updateMode: "sharedWithBanner"
+      updateProperties: ["textOffsetX", "textOffsetY"],
+      coordinateSpace: "mapPxOffsetFromBanner",
+      updateMode: "textOffset"
     }
   },
   MAP_LAYOUT_CSS_VARS: {

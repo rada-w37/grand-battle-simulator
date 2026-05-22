@@ -370,7 +370,11 @@ function renderBannerPlacements(fragment) {
     });
     label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
-    setMapImagePosition(label, placement.x, placement.y);
+    setMapImagePosition(
+      label,
+      placement.x + (placement.textOffsetX ?? 0),
+      placement.y + (placement.textOffsetY ?? 0)
+    );
     fragment.appendChild(label);
   });
 }

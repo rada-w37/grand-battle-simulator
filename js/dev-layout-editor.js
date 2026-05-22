@@ -213,6 +213,16 @@ function getConfigBefore(element) {
   }
   if (layoutKey === "MAP_BANNER_PLACEMENTS") {
     const placement = findPlacement(MAP_BANNER_PLACEMENTS, pointId);
+    if (role === "pointName" || role === "pointNameLabel") {
+      return placement
+        ? {
+          textOffsetX: placement.textOffsetX ?? 0,
+          textOffsetY: placement.textOffsetY ?? 0,
+          unit: "mapPxOffsetFromBanner",
+          role
+        }
+        : {};
+    }
     return placement ? { x: placement.x, y: placement.y, width: placement.scale, height: null, unit: "mapPx/%scale", role } : {};
   }
   if (layoutKey === "MAP_LAYOUT_CSS_VARS") {
@@ -341,6 +351,17 @@ function getWidthPercent(element) {
   return round((element.getBoundingClientRect().width / parent.getBoundingClientRect().width) * 100);
 }
 
+function getPointNameTextOffset(element) {
+  const placement = findPlacement(MAP_BANNER_PLACEMENTS, element.dataset.devLayoutPointId);
+  const position = getMapPxPosition(element);
+  if (!placement) return position;
+
+  return {
+    textOffsetX: round(position.x - placement.x),
+    textOffsetY: round(position.y - placement.y)
+  };
+}
+
 function getResolvedLayoutPayload(resolvedTarget) {
   const {
     resolved,
@@ -388,7 +409,7 @@ function getConfigCurrent(element, resolvedTarget) {
   }
 
   if (targetType === "pointName" || targetType === "pointNameLabel") {
-    return getMapPxPosition(element);
+    return getPointNameTextOffset(element);
   }
 
   if (targetType === "shield") {
