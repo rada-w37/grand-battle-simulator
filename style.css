@@ -1483,7 +1483,7 @@ button:focus-visible {
     min-width: 0;
     color: #e8d3a8;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS Mincho", serif;
-    font-size: calc(clamp(0.7rem, 0.8vw, 0.9rem) * var(--map-label-font-scale, 1));
+    font-size: calc(clamp(0.78rem, 0.9vw, 0.96rem) * var(--map-label-font-scale, 1));
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -1498,9 +1498,9 @@ button:focus-visible {
   }
 
   .point-labels {
-      width: 30%;
+      width: 44%;
       top: 40%;
-      grid-template-rows: repeat(2, 6px);
+      grid-template-rows: repeat(2, 11px);
       gap: 1px;
       align-items: center;
     }
@@ -1510,9 +1510,9 @@ button:focus-visible {
     content: "";
     position: absolute;
     z-index: -1;
-    width:100%;
-    height: 6px;
-    border-radius: 0px;
+    width: 108%;
+    height: 11px;
+    border-radius: 2px;
     pointer-events: none;
   }
 
@@ -1547,12 +1547,12 @@ button:focus-visible {
   }
 
   .point select {
-    width : 100%;
-    height: 6px;
-    min-height: 6px;
-    line-height: 6px;
+    width: 100%;
+    height: 11px;
+    min-height: 11px;
+    line-height: 11px;
     padding: 0;
-    font-size: calc(0.2rem * var(--map-label-font-scale, 1));
+    font-size: calc(0.38rem * var(--map-label-font-scale, 1));
   }
 
   .point-attacker-select {    
