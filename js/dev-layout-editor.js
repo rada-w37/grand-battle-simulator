@@ -300,6 +300,16 @@ function updateHoverBox() {
   positionOverlay(hoverBox, hoverTarget);
 }
 
+function showHoverOverlay(target) {
+  hoverTarget = target && !selectedTargets.includes(target) && !isTargetHidden(target) ? target : null;
+  updateHoverBox();
+}
+
+function hideHoverOverlay() {
+  hoverTarget = null;
+  updateHoverBox();
+}
+
 function clearSelectedTargets() {
   selectedTargets.forEach(target => target.classList.remove("dev-layout-selected"));
   selectedTargets = [];
@@ -326,14 +336,12 @@ function getTargetFromEvent(event) {
 function updateHoverTarget(event) {
   if (!isEditing || activeDrag) return;
   if (event.target.closest(EDITOR_UI_SELECTOR)) {
-    hoverTarget = null;
-    updateHoverBox();
+    hideHoverOverlay();
     return;
   }
 
   const target = getTargetFromEvent(event);
-  hoverTarget = target && !selectedTargets.includes(target) ? target : null;
-  updateHoverBox();
+  showHoverOverlay(target);
 }
 
 function clearHoverTarget(event) {
@@ -342,8 +350,7 @@ function clearHoverTarget(event) {
   const nextTarget = event.relatedTarget?.closest?.(TARGET_SELECTOR);
   if (nextTarget === hoverTarget) return;
 
-  hoverTarget = null;
-  updateHoverBox();
+  hideHoverOverlay();
 }
 
 function getEditablePosition(element) {
@@ -509,7 +516,7 @@ function renderLayersPanel() {
       const targetId = element.dataset.devLayoutId;
       const checked = !hiddenTargetIds.has(targetId) && layerChecked;
       return `
-        <label class="dev-layout-layer-item">
+        <label class="dev-layout-layer-item" data-dev-layer-target-id="${targetId}">
           <input type="checkbox" data-dev-layer-target="${targetId}" ${checked ? "checked" : ""}>
           <span>${getLayerLabelText(element)}</span>
         </label>
@@ -584,6 +591,23 @@ function handleLayerPanelClick(event) {
 
   event.preventDefault();
   toggleLayerPanelPosition();
+}
+
+function handleLayerPanelPointerOver(event) {
+  const row = event.target.closest("[data-dev-layer-target-id]");
+  if (!row) return;
+
+  const target = document.querySelector(`[data-dev-layout-id="${CSS.escape(row.dataset.devLayerTargetId)}"]`);
+  showHoverOverlay(target);
+}
+
+function handleLayerPanelPointerOut(event) {
+  const row = event.target.closest("[data-dev-layer-target-id]");
+  if (!row) return;
+  const nextRow = event.relatedTarget?.closest?.("[data-dev-layer-target-id]");
+  if (nextRow === row) return;
+
+  hideHoverOverlay();
 }
 
 function injectStyles() {
@@ -738,6 +762,8 @@ function createLayersPanel() {
     });
   });
   layersPanel.addEventListener("click", handleLayerPanelClick);
+  layersPanel.addEventListener("pointerover", handleLayerPanelPointerOver);
+  layersPanel.addEventListener("pointerout", handleLayerPanelPointerOut);
   layersPanel.addEventListener("change", handleLayerPanelChange);
   document.body.appendChild(layersPanel);
   renderLayersPanel();
