@@ -10,6 +10,25 @@ import {
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
+const TARGET_TYPE_PRIORITY = {
+  attackerSelect: 1,
+  defenderSelect: 1,
+  select: 1,
+  sword: 2,
+  shield: 2,
+  swordMarker: 2,
+  shieldMarker: 2,
+  pointName: 3,
+  pointNameLabel: 3,
+  banner: 4,
+  pointBanner: 4,
+  structure: 5,
+  pointStructure: 5,
+  aura: 6,
+  pointAura: 6,
+  pointLabels: 7,
+  point: 8
+};
 
 let isEditing = false;
 let selectedElement = null;
@@ -55,9 +74,55 @@ function isTargetHidden(element) {
   return hiddenTargetIds.has(element.dataset.devLayoutId) || isLayerHidden(element);
 }
 
+function isSelectableTarget(element) {
+  if (!element?.matches?.(TARGET_SELECTOR) || isTargetHidden(element)) return false;
+
+  const style = window.getComputedStyle(element);
+  return style.visibility !== "hidden";
+}
+
+function getTargetPriority(element) {
+  return TARGET_TYPE_PRIORITY[element.dataset.devLayoutRole] ??
+    TARGET_TYPE_PRIORITY[element.dataset.devLayoutTargetType] ??
+    99;
+}
+
+function getTargetArea(element) {
+  const rect = element.getBoundingClientRect();
+  return rect.width * rect.height;
+}
+
+function isPointInsideRect(clientX, clientY, element) {
+  const rect = element.getBoundingClientRect();
+  return rect.width > 0 &&
+    rect.height > 0 &&
+    clientX >= rect.left &&
+    clientX <= rect.right &&
+    clientY >= rect.top &&
+    clientY <= rect.bottom;
+}
+
+function getVisibleTargetFromPoint(clientX, clientY) {
+  const elementStackTargets = document.elementsFromPoint(clientX, clientY)
+    .flatMap(element => {
+      const target = element.closest?.(TARGET_SELECTOR);
+      return target ? [target] : [];
+    });
+  const rectHitTargets = getDevLayoutTargets()
+    .filter(element => isPointInsideRect(clientX, clientY, element));
+  const candidates = [...elementStackTargets, ...rectHitTargets]
+    .filter((target, index, list) => list.indexOf(target) === index)
+    .filter(isSelectableTarget)
+    .sort((a, b) => {
+      const priorityDiff = getTargetPriority(a) - getTargetPriority(b);
+      return priorityDiff || getTargetArea(a) - getTargetArea(b);
+    });
+
+  return candidates[0] || null;
+}
+
 function getVisibleTargetFromEvent(event) {
-  const target = event.target.closest(TARGET_SELECTOR);
-  return target && !isTargetHidden(target) ? target : null;
+  return getVisibleTargetFromPoint(event.clientX, event.clientY);
 }
 
 function getElementScale(element) {
