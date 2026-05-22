@@ -629,21 +629,16 @@ function handleKeydown(event) {
 }
 
 async function copyChanges() {
-  const visibleChanges = Array.from(changes.values()).filter(change => {
-    const target = document.querySelector(`[data-dev-layout-id="${CSS.escape(change.targetId)}"]`);
-    return target && !isTargetHidden(target);
-  });
+  const currentChanges = Array.from(changes.keys())
+    .map(targetId => document.querySelector(`[data-dev-layout-id="${CSS.escape(targetId)}"]`))
+    .filter(Boolean)
+    .map(target => ({
+      viewport: getViewportName(),
+      ...getTargetMeta(target),
+      current: getMoveSnapshot(target)
+    }));
   const payload = JSON.stringify({
-    selectionMode,
-    selectedTargets: selectedTargets
-      .filter(target => !isTargetHidden(target))
-      .map(target => ({
-        targetId: target.dataset.devLayoutId,
-        layoutKey: target.dataset.devLayoutKey,
-        pointId: target.dataset.devLayoutPointId,
-        targetType: target.dataset.devLayoutTargetType
-      })),
-    changes: visibleChanges
+    changes: currentChanges
   }, null, 2);
   try {
     if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
@@ -658,7 +653,7 @@ async function copyChanges() {
     document.execCommand("copy");
     textarea.remove();
   }
-  toolbar.querySelector(".dev-layout-status").textContent = `${changes.size}件コピーしました`;
+  toolbar.querySelector(".dev-layout-status").textContent = `${currentChanges.length}件コピーしました`;
 }
 
 function setEditing(nextValue) {
