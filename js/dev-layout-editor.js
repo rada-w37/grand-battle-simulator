@@ -13,7 +13,11 @@ const TARGET_SELECTOR = "[data-dev-layout-id]";
 
 let isEditing = false;
 let selectedElement = null;
+let selectionMode = "single";
+let selectedTargets = [];
+let hoverTarget = null;
 let selectionBox = null;
+let hoverBox = null;
 let toolbar = null;
 let activeDrag = null;
 
@@ -75,6 +79,15 @@ function getCssVarBefore(role) {
       y: vars["--map-sword-top"],
       width: vars["--map-sword-size"],
       height: vars["--map-sword-size"]
+    };
+  }
+  if (role === "attackerSelect" || role === "defenderSelect") {
+    return {
+      width: vars["--map-point-labels-width"],
+      height: vars["--map-point-select-height"],
+      minHeight: vars["--map-point-select-min-height"],
+      fontSize: vars["--map-point-select-font-size"],
+      parent: "pointLabels"
     };
   }
   return {};
@@ -154,6 +167,8 @@ function getChangePayload(element) {
   return {
     targetId: element.dataset.devLayoutId,
     layoutKey: element.dataset.devLayoutKey,
+    pointId: element.dataset.devLayoutPointId,
+    targetType: element.dataset.devLayoutTargetType,
     viewport: getViewportName(),
     before: getConfigBefore(element),
     after: getElementAfter(element)
@@ -169,25 +184,67 @@ function rememberChange(element) {
   });
 }
 
-function updateSelectionBox() {
-  if (!selectionBox || !selectedElement) return;
+function positionOverlay(overlay, element) {
+  if (!overlay || !element) {
+    if (overlay) overlay.hidden = true;
+    return;
+  }
 
-  const rect = selectedElement.getBoundingClientRect();
-  selectionBox.style.left = `${rect.left + window.scrollX}px`;
-  selectionBox.style.top = `${rect.top + window.scrollY}px`;
-  selectionBox.style.width = `${rect.width}px`;
-  selectionBox.style.height = `${rect.height}px`;
+  const rect = element.getBoundingClientRect();
+  overlay.hidden = false;
+  overlay.style.left = `${rect.left}px`;
+  overlay.style.top = `${rect.top}px`;
+  overlay.style.width = `${rect.width}px`;
+  overlay.style.height = `${rect.height}px`;
+}
+
+function updateSelectionBox() {
+  positionOverlay(selectionBox, selectedElement);
+}
+
+function updateHoverBox() {
+  positionOverlay(hoverBox, hoverTarget);
+}
+
+function clearSelectedTargets() {
+  selectedTargets.forEach(target => target.classList.remove("dev-layout-selected"));
+  selectedTargets = [];
+  selectedElement = null;
 }
 
 function selectElement(element) {
-  selectedElement?.classList.remove("dev-layout-selected");
+  clearSelectedTargets();
+  selectionMode = "single";
+  selectedTargets = [element];
   selectedElement = element;
   selectedElement.classList.add("dev-layout-selected");
+  if (hoverTarget === element) {
+    hoverTarget = null;
+    updateHoverBox();
+  }
   updateSelectionBox();
 }
 
 function getTargetFromEvent(event) {
   return event.target.closest(TARGET_SELECTOR);
+}
+
+function updateHoverTarget(event) {
+  if (!isEditing || activeDrag) return;
+
+  const target = getTargetFromEvent(event);
+  hoverTarget = target && !selectedTargets.includes(target) ? target : null;
+  updateHoverBox();
+}
+
+function clearHoverTarget(event) {
+  if (!hoverTarget) return;
+
+  const nextTarget = event.relatedTarget?.closest?.(TARGET_SELECTOR);
+  if (nextTarget === hoverTarget) return;
+
+  hoverTarget = null;
+  updateHoverBox();
 }
 
 function getEditablePosition(element) {
@@ -264,7 +321,16 @@ function handleKeydown(event) {
 }
 
 async function copyChanges() {
-  const payload = JSON.stringify(Array.from(changes.values()), null, 2);
+  const payload = JSON.stringify({
+    selectionMode,
+    selectedTargets: selectedTargets.map(target => ({
+      targetId: target.dataset.devLayoutId,
+      layoutKey: target.dataset.devLayoutKey,
+      pointId: target.dataset.devLayoutPointId,
+      targetType: target.dataset.devLayoutTargetType
+    })),
+    changes: Array.from(changes.values())
+  }, null, 2);
   try {
     if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
     await navigator.clipboard.writeText(payload);
@@ -286,10 +352,11 @@ function setEditing(nextValue) {
   document.body.classList.toggle(EDITOR_CLASS, isEditing);
   toolbar.querySelector(".dev-layout-toggle").textContent = isEditing ? "Layout Edit: ON" : "Layout Edit";
   if (!isEditing) {
-    selectedElement?.classList.remove("dev-layout-selected");
-    selectedElement = null;
+    clearSelectedTargets();
+    hoverTarget = null;
     activeDrag = null;
     updateSelectionBox();
+    updateHoverBox();
   }
 }
 
@@ -324,16 +391,28 @@ function injectStyles() {
       color: rgba(216, 231, 255, 0.78);
       white-space: nowrap;
     }
-    .dev-layout-selection-box {
-      position: absolute;
+    .dev-layout-selection-overlay,
+    .dev-layout-hover-overlay {
+      position: fixed;
       z-index: 9999;
       display: none;
-      border: 1px solid #153a75;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
       pointer-events: none;
     }
-    body.dev-layout-editor-active .dev-layout-selection-box {
+    .dev-layout-selection-overlay {
+      border: 1px solid #153a75;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+    }
+    .dev-layout-hover-overlay {
+      border: 1px solid rgba(45, 120, 255, 0.45);
+      background: rgba(45, 120, 255, 0.16);
+    }
+    body.dev-layout-editor-active .dev-layout-selection-overlay,
+    body.dev-layout-editor-active .dev-layout-hover-overlay {
       display: block;
+    }
+    .dev-layout-selection-overlay[hidden],
+    .dev-layout-hover-overlay[hidden] {
+      display: none !important;
     }
     body.dev-layout-editor-active ${TARGET_SELECTOR} {
       cursor: move;
@@ -358,8 +437,14 @@ function createToolbar() {
 
 function createSelectionBox() {
   selectionBox = document.createElement("div");
-  selectionBox.className = "dev-layout-selection-box";
+  selectionBox.className = "dev-layout-selection-overlay";
+  selectionBox.hidden = true;
   document.body.appendChild(selectionBox);
+
+  hoverBox = document.createElement("div");
+  hoverBox.className = "dev-layout-hover-overlay";
+  hoverBox.hidden = true;
+  document.body.appendChild(hoverBox);
 }
 
 export function initDevLayoutEditor() {
@@ -373,7 +458,15 @@ export function initDevLayoutEditor() {
   document.addEventListener("pointerdown", startDrag, true);
   document.addEventListener("pointermove", updateDrag, true);
   document.addEventListener("pointerup", endDrag, true);
+  document.addEventListener("pointerover", updateHoverTarget, true);
+  document.addEventListener("pointerout", clearHoverTarget, true);
   document.addEventListener("keydown", handleKeydown);
-  window.addEventListener("scroll", updateSelectionBox, true);
-  window.addEventListener("resize", updateSelectionBox);
+  window.addEventListener("scroll", () => {
+    updateSelectionBox();
+    updateHoverBox();
+  }, true);
+  window.addEventListener("resize", () => {
+    updateSelectionBox();
+    updateHoverBox();
+  });
 }

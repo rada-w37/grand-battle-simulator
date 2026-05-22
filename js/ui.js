@@ -188,10 +188,11 @@ function createScoreGuildRadioCell(guildName) {
   return cell;
 }
 
-function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "" }) {
+function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
   element.dataset.devLayoutId = targetId;
   element.dataset.devLayoutKey = layoutKey;
   element.dataset.devLayoutPointId = pointId;
+  element.dataset.devLayoutTargetType = targetType || role || layoutKey;
   if (role) {
     element.dataset.devLayoutRole = role;
   }
@@ -210,7 +211,8 @@ export function renderBattlePoints() {
       setDevLayoutMetadata(aura, {
         targetId: `aura:${point.id}`,
         layoutKey: "POINT_AURA_COORDINATES",
-        pointId: point.id
+        pointId: point.id,
+        targetType: "aura"
       });
       aura.style.left = `${(auraCoordinates.x / MAP_IMAGE_SIZE.width) * 100}%`;
       aura.style.top = `${(auraCoordinates.y / MAP_IMAGE_SIZE.height) * 100}%`;
@@ -232,7 +234,8 @@ export function renderBattlePoints() {
     setDevLayoutMetadata(wrapper, {
       targetId: `point:${point.id}`,
       layoutKey: "BATTLE_POINTS",
-      pointId: point.id
+      pointId: point.id,
+      targetType: "point"
     });
 
     const frame = document.createElement("span");
@@ -241,7 +244,8 @@ export function renderBattlePoints() {
       targetId: `shield:${point.id}`,
       layoutKey: "MAP_LAYOUT_CSS_VARS",
       pointId: point.id,
-      role: "shield"
+      role: "shield",
+      targetType: "shield"
     });
     wrapper.appendChild(frame);
 
@@ -251,7 +255,8 @@ export function renderBattlePoints() {
       targetId: `sword:${point.id}`,
       layoutKey: "MAP_LAYOUT_CSS_VARS",
       pointId: point.id,
-      role: "sword"
+      role: "sword",
+      targetType: "sword"
     });
     wrapper.appendChild(swordFrame);
 
@@ -261,17 +266,32 @@ export function renderBattlePoints() {
       targetId: `labels:${point.id}`,
       layoutKey: "MAP_LAYOUT_CSS_VARS",
       pointId: point.id,
-      role: "pointLabels"
+      role: "pointLabels",
+      targetType: "pointLabels"
     });
 
     const attackerSelect = document.createElement("select");
     attackerSelect.className = "point-attacker-select";
     attackerSelect.setAttribute("aria-label", `${point.id} attacking guild`);
+    setDevLayoutMetadata(attackerSelect, {
+      targetId: `attackerSelect:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "attackerSelect",
+      targetType: "select"
+    });
     labels.appendChild(attackerSelect);
 
     const defenderSelect = document.createElement("select");
     defenderSelect.className = "point-defender-select";
     defenderSelect.setAttribute("aria-label", `${point.id} occupying guild`);
+    setDevLayoutMetadata(defenderSelect, {
+      targetId: `defenderSelect:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "defenderSelect",
+      targetType: "select"
+    });
     labels.appendChild(defenderSelect);
     wrapper.appendChild(labels);
 
@@ -310,7 +330,8 @@ function renderStructurePlacements(fragment) {
     setDevLayoutMetadata(structure, {
       targetId: `structure:${placement.pointId}`,
       layoutKey: "MAP_STRUCTURE_PLACEMENTS",
-      pointId: placement.pointId
+      pointId: placement.pointId,
+      targetType: "structure"
     });
     structure.style.width = `${placement.scale}%`;
     setMapImagePosition(structure, placement.x, placement.y);
@@ -329,7 +350,8 @@ function renderBannerPlacements(fragment) {
       targetId: `banner:${placement.pointId}`,
       layoutKey: "MAP_BANNER_PLACEMENTS",
       pointId: placement.pointId,
-      role: "banner"
+      role: "banner",
+      targetType: "banner"
     });
     banner.style.width = `${placement.scale}%`;
     setMapImagePosition(banner, placement.x, placement.y);
@@ -343,7 +365,8 @@ function renderBannerPlacements(fragment) {
       targetId: `pointName:${placement.pointId}`,
       layoutKey: "MAP_BANNER_PLACEMENTS",
       pointId: placement.pointId,
-      role: "pointName"
+      role: "pointName",
+      targetType: "pointName"
     });
     label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
