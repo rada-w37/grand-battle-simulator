@@ -188,6 +188,15 @@ function createScoreGuildRadioCell(guildName) {
   return cell;
 }
 
+function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "" }) {
+  element.dataset.devLayoutId = targetId;
+  element.dataset.devLayoutKey = layoutKey;
+  element.dataset.devLayoutPointId = pointId;
+  if (role) {
+    element.dataset.devLayoutRole = role;
+  }
+}
+
 // Render Battle Points Map
 export function renderBattlePoints() {
   const fragment = document.createDocumentFragment();
@@ -198,6 +207,11 @@ export function renderBattlePoints() {
       const aura = document.createElement("span");
       aura.className = `point-aura point-aura-${point.type}`;
       aura.dataset.pointId = point.id;
+      setDevLayoutMetadata(aura, {
+        targetId: `aura:${point.id}`,
+        layoutKey: "POINT_AURA_COORDINATES",
+        pointId: point.id
+      });
       aura.style.left = `${(auraCoordinates.x / MAP_IMAGE_SIZE.width) * 100}%`;
       aura.style.top = `${(auraCoordinates.y / MAP_IMAGE_SIZE.height) * 100}%`;
       fragment.appendChild(aura);
@@ -215,17 +229,40 @@ export function renderBattlePoints() {
     wrapper.dataset.type = point.type;
     wrapper.dataset.id = point.id;
     wrapper.dataset.castleId = String(point.castleId);
+    setDevLayoutMetadata(wrapper, {
+      targetId: `point:${point.id}`,
+      layoutKey: "BATTLE_POINTS",
+      pointId: point.id
+    });
 
     const frame = document.createElement("span");
     frame.className = "point-frame";
+    setDevLayoutMetadata(frame, {
+      targetId: `shield:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "shield"
+    });
     wrapper.appendChild(frame);
 
     const swordFrame = document.createElement("span");
     swordFrame.className = "point-sword-frame";
+    setDevLayoutMetadata(swordFrame, {
+      targetId: `sword:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "sword"
+    });
     wrapper.appendChild(swordFrame);
 
     const labels = document.createElement("div");
     labels.className = "point-labels";
+    setDevLayoutMetadata(labels, {
+      targetId: `labels:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "pointLabels"
+    });
 
     const attackerSelect = document.createElement("select");
     attackerSelect.className = "point-attacker-select";
@@ -270,6 +307,11 @@ function renderStructurePlacements(fragment) {
     structure.src = placement.src;
     structure.alt = "";
     structure.dataset.pointId = placement.pointId;
+    setDevLayoutMetadata(structure, {
+      targetId: `structure:${placement.pointId}`,
+      layoutKey: "MAP_STRUCTURE_PLACEMENTS",
+      pointId: placement.pointId
+    });
     structure.style.width = `${placement.scale}%`;
     setMapImagePosition(structure, placement.x, placement.y);
     fragment.appendChild(structure);
@@ -283,6 +325,12 @@ function renderBannerPlacements(fragment) {
     banner.src = "resource/banner.png?v=lowres-1";
     banner.alt = "";
     banner.dataset.pointId = placement.pointId;
+    setDevLayoutMetadata(banner, {
+      targetId: `banner:${placement.pointId}`,
+      layoutKey: "MAP_BANNER_PLACEMENTS",
+      pointId: placement.pointId,
+      role: "banner"
+    });
     banner.style.width = `${placement.scale}%`;
     setMapImagePosition(banner, placement.x, placement.y);
     fragment.appendChild(banner);
@@ -291,6 +339,12 @@ function renderBannerPlacements(fragment) {
     label.className = "point-name-label";
     label.textContent = placement.name;
     label.dataset.pointId = placement.pointId;
+    setDevLayoutMetadata(label, {
+      targetId: `pointName:${placement.pointId}`,
+      layoutKey: "MAP_BANNER_PLACEMENTS",
+      pointId: placement.pointId,
+      role: "pointName"
+    });
     label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
     setMapImagePosition(label, placement.x, placement.y);

@@ -10,6 +10,10 @@ function bindMapLayoutConfigEvents() {
   });
 }
 
+function shouldEnableDevLayoutEditor() {
+  return new URLSearchParams(window.location.search).get("devLayout") === "1";
+}
+
 // Initialize Application
 async function initializeApp() {
   // Set up circular dependency bridges
@@ -36,6 +40,11 @@ async function initializeApp() {
   ui.updateScores();
   bindEvents();
   bindMapLayoutConfigEvents();
+
+  if (shouldEnableDevLayoutEditor()) {
+    const { initDevLayoutEditor } = await import("./dev-layout-editor.js");
+    initDevLayoutEditor();
+  }
 
   try {
     await api.loadGroups();
