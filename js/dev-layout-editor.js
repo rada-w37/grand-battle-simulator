@@ -12,6 +12,7 @@ const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
 const EDITOR_UI_SELECTOR = ".dev-layout-toolbar, .dev-layout-layers-panel";
 const LAYER_PANEL_POSITION_KEY = "devLayoutLayerPanelPosition";
+const DRAG_THRESHOLD_PX = 4;
 const TARGET_TYPE_PRIORITY = {
   attackerSelect: 1,
   defenderSelect: 1,
@@ -322,6 +323,7 @@ function clearSelectedTargets() {
   selectedTargets.forEach(target => target.classList.remove("dev-layout-selected"));
   selectedTargets = [];
   selectedElement = null;
+  selectionMode = "none";
   updateSelectionBox();
 }
 
@@ -404,27 +406,39 @@ function moveSelectedTargets(deltaX, deltaY) {
 
 function startDrag(event) {
   if (!isEditing) return;
+  if (event.target.closest(EDITOR_UI_SELECTOR) || event.button !== 0) return;
 
   const target = getTargetFromEvent(event);
-  if (!target || event.button !== 0) return;
-
-  event.preventDefault();
   event.stopPropagation();
-  selectElement(target);
+
+  const dragTargets = target && selectedTargets.includes(target) ? [...selectedTargets] : (target ? [target] : []);
 
   activeDrag = {
+    target,
     pointerId: event.pointerId,
     startX: event.clientX,
     startY: event.clientY,
-    targets: [...selectedTargets],
-    startPositions: new Map(selectedTargets.map(selectedTarget => [selectedTarget, getEditablePosition(selectedTarget)]))
+    hasMoved: false,
+    targets: dragTargets,
+    startPositions: new Map(dragTargets.map(selectedTarget => [selectedTarget, getEditablePosition(selectedTarget)]))
   };
 
-  target.setPointerCapture?.(event.pointerId);
+  target?.setPointerCapture?.(event.pointerId);
 }
 
 function updateDrag(event) {
-  if (!activeDrag) return;
+  if (!activeDrag || activeDrag.targets.length === 0) return;
+
+  const deltaX = event.clientX - activeDrag.startX;
+  const deltaY = event.clientY - activeDrag.startY;
+  if (!activeDrag.hasMoved && Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD_PX) return;
+
+  if (!activeDrag.hasMoved) {
+    activeDrag.hasMoved = true;
+    if (activeDrag.target && !selectedTargets.includes(activeDrag.target)) {
+      applySelectedTargets([activeDrag.target], "single", activeDrag.target);
+    }
+  }
 
   event.preventDefault();
   event.stopPropagation();
@@ -432,8 +446,8 @@ function updateDrag(event) {
   activeDrag.targets.filter(isSelectableTarget).forEach(target => {
     const parentScale = getPointerScale(target);
     const startPosition = activeDrag.startPositions.get(target);
-    target.style.left = `${startPosition.left + (event.clientX - activeDrag.startX) / parentScale}px`;
-    target.style.top = `${startPosition.top + (event.clientY - activeDrag.startY) / parentScale}px`;
+    target.style.left = `${startPosition.left + deltaX / parentScale}px`;
+    target.style.top = `${startPosition.top + deltaY / parentScale}px`;
     rememberChange(target);
   });
   updateSelectionBox();
@@ -442,7 +456,14 @@ function updateDrag(event) {
 function endDrag(event) {
   if (!activeDrag) return;
   event.stopPropagation();
-  selectedElement?.releasePointerCapture?.(activeDrag.pointerId);
+  activeDrag.target?.releasePointerCapture?.(activeDrag.pointerId);
+  if (!activeDrag.hasMoved) {
+    if (activeDrag.target) {
+      selectElement(activeDrag.target);
+    } else {
+      clearSelectedTargets();
+    }
+  }
   activeDrag = null;
 }
 
@@ -771,7 +792,7 @@ function injectStyles() {
     }
     .dev-layout-selection-overlay {
       position: fixed;
-      border: 1px solid #153a75;
+      border: 2px solid #153a75;
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
     }
     .dev-layout-selection-overlay-group {
