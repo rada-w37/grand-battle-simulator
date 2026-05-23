@@ -1,8 +1,9 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-step7";
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260524-step7";
-import * as state from "./state.js?v=20260524-step7";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-step7";
-import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-step7";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-select-debug";
+import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260524-select-debug";
+import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-select-debug";
+import * as state from "./state.js?v=20260524-select-debug";
+import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-select-debug";
+import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-select-debug";
 
 // Status Message
 export function setStatus(message, type = "") {
@@ -278,18 +279,44 @@ function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
   Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
     const targetVars = POINT_UI_OFFSET_VARS[targetType];
     if (!targetVars) return;
+    const targetElement = targetType === "select"
+      ? element.querySelector(".point-selects") || element
+      : element;
 
     Object.entries(targetOffsets).forEach(([property, offset]) => {
       const variableName = targetVars[property];
       const baseValue = getCssPxNumber(baseVars[variableName]);
       if (!variableName || baseValue === null) return;
       const finalValue = formatCssPx(baseValue + offset);
-      element.style.setProperty(variableName, finalValue);
+      targetElement.style.setProperty(variableName, finalValue);
       if (targetType === "select" && property === "height") {
-        element.style.setProperty("--map-point-select-min-height", finalValue);
+        targetElement.style.setProperty("--map-point-select-min-height", finalValue);
       }
     });
   });
+}
+
+function logSelectOffsetDebug() {
+  const width = window.innerWidth;
+  const viewport = getLayoutViewport(width);
+  const rows = Array.from(document.querySelectorAll(".point")).map(point => {
+    const pointId = point.dataset.id;
+    const pointSelects = point.querySelector(".point-selects");
+    const computed = pointSelects ? window.getComputedStyle(pointSelects) : null;
+    return {
+      windowInnerWidth: width,
+      viewport,
+      pointId,
+      selectOffset: getMapPointUiOffsets(pointId, width)?.select || null,
+      style: pointSelects?.getAttribute("style") || "",
+      computedLeft: computed?.left || "",
+      computedTop: computed?.top || ""
+    };
+  });
+
+  console.groupCollapsed("[layout-debug] point select offsets");
+  console.table(rows);
+  console.groupEnd();
 }
 
 // Render Battle Points Map
@@ -324,7 +351,6 @@ export function renderBattlePoints() {
     wrapper.dataset.type = point.type;
     wrapper.dataset.id = point.id;
     wrapper.dataset.castleId = String(point.castleId);
-    applyPointUiOffsets(wrapper, point.id);
     setDevLayoutMetadata(wrapper, {
       targetId: `point:${point.id}`,
       layoutKey: "BATTLE_POINTS",
@@ -385,6 +411,7 @@ export function renderBattlePoints() {
     selectGroup.appendChild(defenderSelect);
     wrapper.appendChild(labels);
     wrapper.appendChild(selectGroup);
+    applyPointUiOffsets(wrapper, point.id);
 
     // const mobileIcons = document.createElement("div");
     // mobileIcons.className = "point-mobile-icons";
@@ -409,6 +436,7 @@ export function renderBattlePoints() {
   });
 
   state.elements.battlePoints.replaceChildren(fragment);
+  requestAnimationFrame(logSelectOffsetDebug);
 }
 
 function renderStructurePlacements(fragment) {

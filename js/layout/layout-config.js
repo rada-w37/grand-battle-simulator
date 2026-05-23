@@ -1,7 +1,7 @@
 // Map layout configuration
 // Phase 0: Keep current visual behavior while centralizing tunable map UI values.
 
-import { MAP_LAYOUT_BREAKPOINT, getLayoutViewport } from "./layout-coordinate.js?v=20260524-step7";
+import { MAP_LAYOUT_BREAKPOINT, getLayoutViewport } from "./layout-coordinate.js?v=20260524-select-debug";
 
 export const MAP_IMAGE_SIZE = {
   width: 1293,

@@ -1,7 +1,7 @@
-import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-step7";
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-step7";
-import * as state from "./state.js?v=20260524-step7";
-import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-step7";
+import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-select-debug";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-select-debug";
+import * as state from "./state.js?v=20260524-select-debug";
+import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-select-debug";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
 

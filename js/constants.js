@@ -39,4 +39,4 @@ export {
   POINT_AURA_COORDINATES,
   MAP_STRUCTURE_PLACEMENTS,
   MAP_BANNER_PLACEMENTS
-} from "./layout/layout-config.js?v=20260524-step7";
+} from "./layout/layout-config.js?v=20260524-select-debug";

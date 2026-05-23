@@ -6,8 +6,8 @@ import {
   getBannerTextOffset,
   getMapLayoutCssVars,
   resolveLayoutTarget
-} from "../layout/layout-config.js?v=20260524-step7";
-import { getLayoutViewport, renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260524-step7";
+} from "../layout/layout-config.js?v=20260524-select-debug";
+import { getLayoutViewport, renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260524-select-debug";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
