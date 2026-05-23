@@ -1,13 +1,13 @@
 import {
   BATTLE_POINTS,
   MAP_BANNER_PLACEMENTS,
-  MAP_IMAGE_SIZE,
   MAP_LAYOUT_BREAKPOINT,
   MAP_STRUCTURE_PLACEMENTS,
   POINT_AURA_COORDINATES,
   getMapLayoutCssVars,
   resolveLayoutTarget
 } from "../layout/layout-config.js";
+import { renderedPxToBasePx } from "../layout/layout-coordinate.js";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
@@ -63,6 +63,10 @@ function round(value) {
 
 function getMapInner() {
   return document.getElementById("map-inner");
+}
+
+function getMapImage() {
+  return document.querySelector("#map-inner .map-image");
 }
 
 function getDevLayoutTargets() {
@@ -253,9 +257,10 @@ function getElementAfter(element) {
     };
 
     if (parent.id === "map-inner") {
+      const mapPosition = getMapPxPosition(element);
       result.map = {
-        x: round((leftPx / parent.offsetWidth) * MAP_IMAGE_SIZE.width),
-        y: round((topPx / parent.offsetHeight) * MAP_IMAGE_SIZE.height)
+        x: mapPosition.x,
+        y: mapPosition.y
       };
     } else {
       result.parentPercent = {
@@ -407,13 +412,19 @@ function getParentPercentPosition(element) {
 }
 
 function getMapPxPosition(element) {
-  const parent = element.offsetParent;
-  if (!parent) return {};
+  const mapImage = getMapImage();
+  if (!mapImage) return {};
 
-  const position = getEditablePosition(element);
+  const elementRect = element.getBoundingClientRect();
+  const mapRect = mapImage.getBoundingClientRect();
+  if (mapRect.width <= 0 || mapRect.height <= 0) return {};
+
+  const displayX = elementRect.left + elementRect.width / 2 - mapRect.left;
+  const displayY = elementRect.top + elementRect.height / 2 - mapRect.top;
+  const { baseX, baseY } = renderedPxToBasePx(displayX, displayY, mapRect);
   return {
-    x: round((position.left / parent.offsetWidth) * MAP_IMAGE_SIZE.width),
-    y: round((position.top / parent.offsetHeight) * MAP_IMAGE_SIZE.height)
+    x: round(baseX),
+    y: round(baseY)
   };
 }
 
