@@ -1,5 +1,6 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
-import { BATTLE_POINTS, MAP_IMAGE_SIZE } from "./layout/layout-config.js";
+import { BATTLE_POINTS } from "./layout/layout-config.js";
+import { basePxToPercent } from "./layout/layout-coordinate.js";
 import * as state from "./state.js";
 
 // Storage Utilities
@@ -103,8 +104,9 @@ export function normalizeWorldName(value) {
 
 // Map Utilities
 export function setMapImagePosition(element, x, y) {
-  element.style.left = `${(x / MAP_IMAGE_SIZE.width) * 100}%`;
-  element.style.top = `${(y / MAP_IMAGE_SIZE.height) * 100}%`;
+  const { leftPercent, topPercent } = basePxToPercent(x, y);
+  element.style.left = `${leftPercent}%`;
+  element.style.top = `${topPercent}%`;
 }
 
 // Score Utilities
