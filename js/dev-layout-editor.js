@@ -318,6 +318,18 @@ function toCssPx(value) {
   return `${round(value)}px`;
 }
 
+function setEditablePosition(element, leftPx, topPx) {
+  const parent = element.offsetParent;
+  if (parent?.id === "map-inner" && parent.offsetWidth > 0 && parent.offsetHeight > 0) {
+    element.style.left = `${round((leftPx / parent.offsetWidth) * 100)}%`;
+    element.style.top = `${round((topPx / parent.offsetHeight) * 100)}%`;
+    return;
+  }
+
+  element.style.left = `${round(leftPx)}px`;
+  element.style.top = `${round(topPx)}px`;
+}
+
 const POINT_UI_OFFSET_OUTPUT = {
   pointLabels: {
     section: "pointLabels",
@@ -573,8 +585,7 @@ function pushEditorHistory(entry) {
 }
 
 function applyMoveSnapshot(element, snapshot) {
-  element.style.left = `${snapshot.x}px`;
-  element.style.top = `${snapshot.y}px`;
+  setEditablePosition(element, snapshot.x, snapshot.y);
   rememberChange(element);
 }
 
@@ -721,8 +732,11 @@ function getEditablePosition(element) {
 function moveElement(element, deltaX, deltaY) {
   const parentScale = getPointerScale(element);
   const position = getEditablePosition(element);
-  element.style.left = `${position.left + deltaX / parentScale}px`;
-  element.style.top = `${position.top + deltaY / parentScale}px`;
+  setEditablePosition(
+    element,
+    position.left + deltaX / parentScale,
+    position.top + deltaY / parentScale
+  );
   rememberChange(element);
 }
 
@@ -780,8 +794,11 @@ function updateDrag(event) {
   activeDrag.targets.filter(isSelectableTarget).forEach(target => {
     const parentScale = getPointerScale(target);
     const startPosition = activeDrag.startPositions.get(target);
-    target.style.left = `${startPosition.left + deltaX / parentScale}px`;
-    target.style.top = `${startPosition.top + deltaY / parentScale}px`;
+    setEditablePosition(
+      target,
+      startPosition.left + deltaX / parentScale,
+      startPosition.top + deltaY / parentScale
+    );
     rememberChange(target);
   });
   updateSelectionBox();
