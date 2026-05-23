@@ -1,12 +1,14 @@
 // Map layout configuration
 // Phase 0: Keep current visual behavior while centralizing tunable map UI values.
 
+import { MAP_LAYOUT_BREAKPOINT, getLayoutViewport } from "./layout-coordinate.js?v=20260523-layout-cache";
+
 export const MAP_IMAGE_SIZE = {
   width: 1293,
   height: 1217
 };
 
-export const MAP_LAYOUT_BREAKPOINT = 720;
+export { MAP_LAYOUT_BREAKPOINT };
 
 export const MAP_LAYOUT_CSS_VARS = {
   desktop: {
@@ -427,8 +429,13 @@ export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport }
 }
 
 export function getMapLayoutCssVars(width = window.innerWidth) {
-  const mode = width <= MAP_LAYOUT_BREAKPOINT ? "mobile" : "desktop";
+  const mode = getLayoutViewport(width);
   return { ...MAP_LAYOUT_CSS_VARS[mode] };
+}
+
+export function getMapPointUiOffsets(pointId, width = window.innerWidth) {
+  const viewport = getLayoutViewport(width);
+  return MAP_POINT_UI_OFFSETS[viewport]?.[pointId] || null;
 }
 
 export function applyMapLayoutCssVars(target = document.documentElement, width = window.innerWidth) {

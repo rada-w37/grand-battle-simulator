@@ -1,5 +1,5 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260523-layout-cache";
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, MAP_POINT_UI_OFFSETS, getMapLayoutCssVars } from "./layout/layout-config.js?v=20260523-layout-cache";
+import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260523-layout-cache";
 import * as state from "./state.js?v=20260523-layout-cache";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260523-layout-cache";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260523-layout-cache";
@@ -227,8 +227,7 @@ function formatCssPx(value) {
 }
 
 function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
-  const viewport = width <= 720 ? "mobile" : "desktop";
-  const offsets = MAP_POINT_UI_OFFSETS[viewport]?.[pointId];
+  const offsets = getMapPointUiOffsets(pointId, width);
   if (!offsets) return;
 
   const baseVars = getMapLayoutCssVars(width);

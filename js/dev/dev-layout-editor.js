@@ -1,13 +1,12 @@
 import {
   BATTLE_POINTS,
   MAP_BANNER_PLACEMENTS,
-  MAP_LAYOUT_BREAKPOINT,
   MAP_STRUCTURE_PLACEMENTS,
   POINT_AURA_COORDINATES,
   getMapLayoutCssVars,
   resolveLayoutTarget
 } from "../layout/layout-config.js?v=20260523-layout-cache";
-import { renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260523-layout-cache";
+import { getLayoutViewport, renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260523-layout-cache";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
@@ -54,7 +53,7 @@ const hiddenTargetIds = new Set();
 const hiddenLayerKeys = new Set();
 
 function getViewportName() {
-  return window.innerWidth <= MAP_LAYOUT_BREAKPOINT ? "mobile" : "desktop";
+  return getLayoutViewport();
 }
 
 function round(value) {
