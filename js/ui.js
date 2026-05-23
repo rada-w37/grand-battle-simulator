@@ -1,9 +1,8 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-select-offset-v2";
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260524-select-offset-v2";
-import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-select-offset-v2";
-import * as state from "./state.js?v=20260524-select-offset-v2";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-select-offset-v2";
-import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-select-offset-v2";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
+import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260524-visibility-toggles";
+import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
+import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 
 // Status Message
 export function setStatus(message, type = "") {
@@ -296,29 +295,6 @@ function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
   });
 }
 
-function logSelectOffsetDebug() {
-  const width = window.innerWidth;
-  const viewport = getLayoutViewport(width);
-  const rows = Array.from(document.querySelectorAll(".point")).map(point => {
-    const pointId = point.dataset.id;
-    const pointSelects = point.querySelector(".point-selects");
-    const computed = pointSelects ? window.getComputedStyle(pointSelects) : null;
-    return {
-      windowInnerWidth: width,
-      viewport,
-      pointId,
-      selectOffset: getMapPointUiOffsets(pointId, width)?.select || null,
-      style: pointSelects?.getAttribute("style") || "",
-      computedLeft: computed?.left || "",
-      computedTop: computed?.top || ""
-    };
-  });
-
-  console.groupCollapsed("[layout-debug] point select offsets");
-  console.table(rows);
-  console.groupEnd();
-}
-
 // Render Battle Points Map
 export function renderBattlePoints() {
   const fragment = document.createDocumentFragment();
@@ -436,7 +412,6 @@ export function renderBattlePoints() {
   });
 
   state.elements.battlePoints.replaceChildren(fragment);
-  requestAnimationFrame(logSelectOffsetDebug);
 }
 
 function renderStructurePlacements(fragment) {

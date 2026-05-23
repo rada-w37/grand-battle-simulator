@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260524-select-offset-v2";
-import * as api from "./api.js?v=20260524-select-offset-v2";
-import * as ui from "./ui.js?v=20260524-select-offset-v2";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-select-offset-v2";
+import * as state from "./state.js?v=20260524-visibility-toggles";
+import * as api from "./api.js?v=20260524-visibility-toggles";
+import * as ui from "./ui.js?v=20260524-visibility-toggles";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
 
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
@@ -77,6 +77,23 @@ function createSvgIcon(paths) {
 
 const MAP_ZOOM_OPEN_ICON = '<path d="M11.5 5l-6 7 6 7" /><path d="M18 5l-6 7 6 7" />';
 const MAP_ZOOM_CLOSE_ICON = '<path d="M5 6l6 6-6 6" />';
+const VISIBILITY_TOGGLES = [
+  {
+    id: "attacker",
+    icon: "resource/sword-marker.png",
+    label: "侵攻側表示切替"
+  },
+  {
+    id: "defender",
+    icon: "resource/shield-marker.png",
+    label: "防衛側表示切替"
+  }
+];
+
+const visibilityState = VISIBILITY_TOGGLES.reduce((stateById, toggle) => {
+  stateById[toggle.id] = true;
+  return stateById;
+}, {});
 
 function setupMapActionButtons() {
   state.elements.deleteTabButton.classList.add("danger-icon-button");
@@ -100,6 +117,7 @@ function ensureMapZoomToggleButton() {
   const { zoomControls } = getMapElements();
   if (!zoomControls) return;
 
+  const zoomActions = zoomControls.querySelector(".map-zoom-actions") || zoomControls;
   let toggleButton = document.getElementById("map-zoom-toggle-button");
   if (!toggleButton) {
     toggleButton = document.createElement("button");
@@ -110,7 +128,7 @@ function ensureMapZoomToggleButton() {
     toggleButton.title = "ズーム操作を表示";
     toggleButton.setAttribute("aria-expanded", "false");
     toggleButton.innerHTML = createSvgIcon(MAP_ZOOM_OPEN_ICON);
-    zoomControls.prepend(toggleButton);
+    zoomActions.prepend(toggleButton);
   }
 
   if (document.getElementById("map-zoom-close-button")) return;
@@ -123,6 +141,48 @@ function ensureMapZoomToggleButton() {
   closeButton.title = "ズーム操作を閉じる";
   closeButton.innerHTML = createSvgIcon(MAP_ZOOM_CLOSE_ICON);
   toggleButton.insertAdjacentElement("afterend", closeButton);
+}
+
+function applyVisibilityToggleState() {
+  const { viewport } = getMapElements();
+  if (!viewport) return;
+
+  VISIBILITY_TOGGLES.forEach(toggle => {
+    const isVisible = visibilityState[toggle.id] !== false;
+    viewport.dataset[`show${toggle.id[0].toUpperCase()}${toggle.id.slice(1)}`] = String(isVisible);
+
+    const button = document.getElementById(`map-visibility-${toggle.id}-button`);
+    if (!button) return;
+    button.setAttribute("aria-pressed", String(isVisible));
+    button.classList.toggle("is-off", !isVisible);
+  });
+}
+
+function ensureMapVisibilityToggleButtons() {
+  const container = document.getElementById("map-visibility-controls");
+  if (!container) return;
+
+  VISIBILITY_TOGGLES.forEach(toggle => {
+    const buttonId = `map-visibility-${toggle.id}-button`;
+    if (document.getElementById(buttonId)) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.id = buttonId;
+    button.className = "map-visibility-toggle-button";
+    button.setAttribute("aria-label", toggle.label);
+    button.setAttribute("aria-pressed", String(visibilityState[toggle.id]));
+    button.title = toggle.label;
+    button.innerHTML = `<img src="${toggle.icon}" alt="" aria-hidden="true">`;
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      visibilityState[toggle.id] = !visibilityState[toggle.id];
+      applyVisibilityToggleState();
+    });
+    container.appendChild(button);
+  });
+
+  applyVisibilityToggleState();
 }
 
 function setMapZoomControlsOpen(isOpen) {
@@ -269,6 +329,7 @@ function updateTouchMapGesture(touches, viewport) {
 
 function bindMapViewEvents() {
   ensureMapZoomToggleButton();
+  ensureMapVisibilityToggleButtons();
   const { viewport, resetButton, zoomToggleButton, zoomCloseButton, zoomInButton, zoomOutButton } = getMapElements();
   if (!viewport) return;
 

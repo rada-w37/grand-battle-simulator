@@ -1,8 +1,8 @@
-import * as state from "./state.js?v=20260524-select-offset-v2";
-import * as api from "./api.js?v=20260524-select-offset-v2";
-import * as ui from "./ui.js?v=20260524-select-offset-v2";
-import { bindEvents } from "./events.js?v=20260524-select-offset-v2";
-import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-select-offset-v2";
+import * as state from "./state.js?v=20260524-visibility-toggles";
+import * as api from "./api.js?v=20260524-visibility-toggles";
+import * as ui from "./ui.js?v=20260524-visibility-toggles";
+import { bindEvents } from "./events.js?v=20260524-visibility-toggles";
+import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 
 function bindMapLayoutConfigEvents() {
   window.addEventListener("resize", () => {
@@ -43,7 +43,7 @@ async function initializeApp() {
   bindMapLayoutConfigEvents();
 
   if (shouldEnableDevLayoutEditor()) {
-    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260524-select-offset-v2");
+    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260524-visibility-toggles");
     initDevLayoutEditor();
   }
 

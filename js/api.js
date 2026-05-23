@@ -1,7 +1,7 @@
-import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-select-offset-v2";
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-select-offset-v2";
-import * as state from "./state.js?v=20260524-select-offset-v2";
-import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-select-offset-v2";
+import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260524-visibility-toggles";
+import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
 

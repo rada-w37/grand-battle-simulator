@@ -822,6 +822,7 @@ button:focus-visible {
   top: 10px;
   right: 10px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
   padding: 4px;
@@ -829,6 +830,18 @@ button:focus-visible {
   border-radius: 7px;
   background: rgba(7, 9, 15, 0.78);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.map-zoom-actions,
+.map-visibility-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-visibility-controls {
+  align-self: flex-end;
+  flex-direction: column;
 }
 
 .map-zoom-value {
@@ -851,6 +864,29 @@ button:focus-visible {
   font-size: 1rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.map-visibility-toggle-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 5px;
+}
+
+.map-visibility-toggle-button img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  transition: filter 0.16s ease, opacity 0.16s ease;
+}
+
+.map-visibility-toggle-button.is-off img {
+  filter: grayscale(1);
+  opacity: 0.35;
 }
 
 .map-zoom-button svg {
@@ -885,6 +921,30 @@ button:focus-visible {
 }
 
 .map-zoom-close-button {
+  display: none;
+}
+
+.map-container[data-show-attacker="false"] .point-sword-frame {
+  display: none;
+}
+
+.map-container[data-show-attacker="false"] .point-attacker-select {
+  visibility: hidden;
+}
+
+.map-container[data-show-attacker="false"] .point-labels::before {
+  display: none;
+}
+
+.map-container[data-show-defender="false"] .point-frame {
+  display: none;
+}
+
+.map-container[data-show-defender="false"] .point-defender-select {
+  visibility: hidden;
+}
+
+.map-container[data-show-defender="false"] .point-labels::after {
   display: none;
 }
 
@@ -1373,6 +1433,11 @@ button:focus-visible {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
   }
 
+  .map-zoom-actions,
+  .map-visibility-controls {
+    gap: 3px;
+  }
+
   .map-zoom-toggle-button {
     display: grid;
     border-color: rgba(226, 196, 126, 0.34);
@@ -1415,9 +1480,15 @@ button:focus-visible {
   }
 
   .map-zoom-button,
-  .map-zoom-toggle-button {
+  .map-zoom-toggle-button,
+  .map-visibility-toggle-button {
     width: 24px;
     height: 24px;
+  }
+
+  .map-visibility-toggle-button img {
+    width: 16px;
+    height: 16px;
   }
 
   .map-zoom-close-button {
