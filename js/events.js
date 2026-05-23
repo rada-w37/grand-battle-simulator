@@ -1,7 +1,7 @@
-import * as state from "./state.js";
-import * as api from "./api.js";
-import * as ui from "./ui.js";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js";
+import * as state from "./state.js?v=20260523-layout-cache";
+import * as api from "./api.js?v=20260523-layout-cache";
+import * as ui from "./ui.js?v=20260523-layout-cache";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260523-layout-cache";
 
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;

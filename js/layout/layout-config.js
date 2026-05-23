@@ -128,7 +128,7 @@ export const MAP_POINT_UI_OFFSETS = {
     zircon: { pointLabels: { x: -18, y: 20 } },
     amest: { pointLabels: { x: 3, y: 21 } },
     lapis: { pointLabels: { x: 4, y: 18 } },
-    laven: { pointLabels: { x: -17, y: 18 } },
+    laven: { pointLabels: { x: 2, y: 7 } },
     marin: { pointLabels: { x: 2, y: 18 } },
     larimal: { pointLabels: { x: 4, y: 17 } },
     tiferet: { pointLabels: { x: 5, y: 18 } },

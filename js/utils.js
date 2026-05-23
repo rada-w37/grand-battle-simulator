@@ -1,7 +1,7 @@
-import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
-import { BATTLE_POINTS } from "./layout/layout-config.js";
-import { basePxToPercent } from "./layout/layout-coordinate.js";
-import * as state from "./state.js";
+import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260523-layout-cache";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260523-layout-cache";
+import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260523-layout-cache";
+import * as state from "./state.js?v=20260523-layout-cache";
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
