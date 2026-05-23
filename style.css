@@ -1105,34 +1105,18 @@ button:focus-visible {
   width: var(--map-point-band-width);
   height: var(--map-point-band-height);
   border-radius: var(--map-point-band-radius);
-  background:
-    linear-gradient(90deg,
-      rgba(22, 41, 47, 0) 0%,
-      rgba(22, 41, 47, 0.78) 16%,
-      rgba(18, 37, 43, 0.9) 50%,
-      rgba(22, 41, 47, 0.78) 84%,
-      rgba(22, 41, 47, 0) 100%);
   pointer-events: none;
 }
 
 .point-labels::before {
   top: 0;
-  left: 0px;
+  left: 0;
   background:
     linear-gradient(90deg,
-      rgba(93, 38, 42, 0.9) 0%,
-      rgba(70, 29, 33, 0.92) 62%,
-      rgba(93, 38, 42, 0.58) 84%,
-      rgba(93, 38, 42, 0) 100%);
-}
-
-.point.has-self-attack .point-labels::before {
-  background:
-    linear-gradient(90deg,
-      rgba(72, 76, 78, 0.82) 0%,
-      rgba(54, 58, 60, 0.88) 62%,
-      rgba(72, 76, 78, 0.5) 84%,
-      rgba(72, 76, 78, 0) 100%);
+      rgba(93, 38, 42, 0.2) 0%,
+      rgba(70, 29, 33, 0.7) 10%,
+      rgba(70, 29, 33, 0.7) 90%,
+      rgba(93, 38, 42, 0.2) 100%);
 }
 
 .point-labels::after {
@@ -1140,10 +1124,19 @@ button:focus-visible {
   right: 0;
   background:
     linear-gradient(90deg,
-      rgba(22, 41, 47, 0) 0%,
-      rgba(22, 41, 47, 0.58) 16%,
-      rgba(18, 37, 43, 0.9) 38%,
-      rgba(22, 41, 47, 0.9) 100%);
+      rgba(22, 41, 47, 0.2) 0%,
+      rgba(18, 37, 43, 0.7) 10%,
+      rgba(18, 37, 43, 0.7) 90%,
+      rgba(22, 41, 47, 0.2) 100%);
+}
+
+.point.has-self-attack .point-labels::before {
+  background:
+    linear-gradient(90deg,
+      rgba(72, 76, 78, 0.2) 0%,
+      rgba(72, 76, 78, 0.5) 10%,
+      rgba(72, 76, 78, 0.5) 90%,
+      rgba(72, 76, 78, 0.2) 100%);
 }
 
 .point select {
@@ -1454,8 +1447,8 @@ button:focus-visible {
   }
 
   .point-aura {
-    width: 20%;
-    height: 20%;
+    width: 30%;
+    height: 25%;
   } 
 
   /* 盾 */
@@ -1515,42 +1508,14 @@ button:focus-visible {
 
   .point-labels::before,
   .point-labels::after {
-    content: "";
+    display: none;
+    /* content: "";
     position: absolute;
     z-index: -1;
     width: var(--map-point-band-width);
     height: var(--map-point-band-height);
     border-radius: var(--map-point-band-radius);
-    pointer-events: none;
-  }
-
-  .point-labels::before {
-    background:rgba(70, 29, 33, 0.92);
-      /* linear-gradient(90deg,
-        rgba(93, 38, 42, 0) 0%,
-        rgba(70, 29, 33, 0.92) 15%,
-        rgba(70, 29, 33, 0.92) 50%,
-        rgba(70, 29, 33, 0.92) 85%,
-        rgba(93, 38, 42, 0) 100%); */
-  }
-
-  .point.has-self-attack .point-labels::before {
-    background: rgba(54, 58, 60, 0.82);
-      /* linear-gradient(90deg,
-        rgba(72, 76, 78, 0) 0%,
-        rgba(54, 58, 60, 0.82) 15%,
-        rgba(54, 58, 60, 0.82) 50%,
-        rgba(54, 58, 60, 0.82) 85%,
-        rgba(72, 76, 78, 0) 100%); */
-  }
-
-  .point-labels::after {
-    background: rgba(18, 37, 43, 0.9);
-      /* linear-gradient(90deg,
-        rgba(22, 41, 47, 0) 0%,
-        rgba(22, 41, 47, 0.58) 15%,
-        rgba(18, 37, 43, 0.9) 50%
-        ); */
+    pointer-events: none; */
   }
 
   .point select {

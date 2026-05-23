@@ -2,3 +2,5 @@ org/
 placement-tool/
 backup/
 rollback-*/
+run.bat
+.gitignore
