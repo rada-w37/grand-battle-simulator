@@ -6,8 +6,8 @@ import {
   getBannerTextOffset,
   getMapLayoutCssVars,
   resolveLayoutTarget
-} from "../layout/layout-config.js?v=20260523-layout-cache";
-import { getLayoutViewport, renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260523-layout-cache";
+} from "../layout/layout-config.js?v=20260524-step7";
+import { getLayoutViewport, renderedPxToBasePx } from "../layout/layout-coordinate.js?v=20260524-step7";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";
@@ -52,6 +52,8 @@ const editorUndoStack = [];
 const editorRedoStack = [];
 const hiddenTargetIds = new Set();
 const hiddenLayerKeys = new Set();
+const layerGroupOpenStates = new Map();
+let layersRootOpen = false;
 
 function getViewportName() {
   return getLayoutViewport();
@@ -975,6 +977,7 @@ function renderLayersPanel() {
   layersPanel.dataset.position = layerPanelPosition;
   const details = getLayerGroups().map(([layerKey, elements]) => {
     const layerChecked = !hiddenLayerKeys.has(layerKey);
+    const isOpen = layerGroupOpenStates.get(layerKey) ?? true;
     const items = elements.map(element => {
       const targetId = element.dataset.devLayoutId;
       const checked = !hiddenTargetIds.has(targetId) && layerChecked;
@@ -987,7 +990,7 @@ function renderLayersPanel() {
     }).join("");
 
     return `
-      <details class="dev-layout-layer-group" open>
+      <details class="dev-layout-layer-group" data-dev-layer-group="${layerKey}" ${isOpen ? "open" : ""}>
         <summary>
           <label>
             <input type="checkbox" data-dev-layer-key="${layerKey}" ${layerChecked ? "checked" : ""}>
@@ -1000,7 +1003,7 @@ function renderLayersPanel() {
   }).join("");
 
   layersPanel.innerHTML = `
-    <details class="dev-layout-layers-root" open>
+    <details class="dev-layout-layers-root" ${layersRootOpen ? "open" : ""}>
       <summary>
         <span>Layers</span>
         <button type="button" class="dev-layout-layer-position-button" aria-label="Layer Panelの左右位置を切り替え" title="Layer Panelの左右位置を切り替え">
@@ -1012,17 +1015,32 @@ function renderLayersPanel() {
   `;
 }
 
+function rememberLayerOpenStates() {
+  if (!layersPanel) return;
+
+  const root = layersPanel.querySelector(".dev-layout-layers-root");
+  if (root) {
+    layersRootOpen = root.open;
+  }
+
+  layersPanel.querySelectorAll(".dev-layout-layer-group").forEach(group => {
+    layerGroupOpenStates.set(group.dataset.devLayerGroup, group.open);
+  });
+}
+
 function restoreLayerPanelPosition() {
   layerPanelPosition = localStorage.getItem(LAYER_PANEL_POSITION_KEY) === "left" ? "left" : "right";
 }
 
 function toggleLayerPanelPosition() {
+  rememberLayerOpenStates();
   layerPanelPosition = layerPanelPosition === "right" ? "left" : "right";
   localStorage.setItem(LAYER_PANEL_POSITION_KEY, layerPanelPosition);
   renderLayersPanel();
 }
 
 function handleLayerPanelChange(event) {
+  rememberLayerOpenStates();
   const layerInput = event.target.closest("[data-dev-layer-key]");
   if (layerInput) {
     const layerKey = layerInput.dataset.devLayerKey;
@@ -1050,10 +1068,22 @@ function handleLayerPanelChange(event) {
 }
 
 function handleLayerPanelClick(event) {
-  if (!event.target.closest(".dev-layout-layer-position-button")) return;
+  if (event.target.closest(".dev-layout-layer-position-button")) {
+    event.preventDefault();
+    toggleLayerPanelPosition();
+    return;
+  }
 
-  event.preventDefault();
-  toggleLayerPanelPosition();
+  const rootSummary = event.target.closest(".dev-layout-layers-root > summary");
+  if (rootSummary) {
+    window.setTimeout(rememberLayerOpenStates, 0);
+    return;
+  }
+
+  const groupSummary = event.target.closest(".dev-layout-layer-group > summary");
+  if (groupSummary) {
+    window.setTimeout(rememberLayerOpenStates, 0);
+  }
 }
 
 function handleLayerPanelPointerOver(event) {
@@ -1098,7 +1128,7 @@ function injectStyles() {
       width: min(360px, calc(100vw - 24px));
       max-height: min(460px, calc(100vh - 96px));
       overflow: auto;
-      padding: 8px;
+      padding: 0 8px 8px;
       border: 1px solid rgba(29, 63, 108, 0.9);
       border-radius: 6px;
       background: rgba(8, 14, 24, 0.9);
@@ -1126,6 +1156,13 @@ function injectStyles() {
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      margin-inline: -8px;
+      padding: 8px;
+      background: rgba(8, 14, 24, 0.96);
+      border-bottom: 1px solid rgba(70, 112, 170, 0.24);
     }
     .dev-layout-layer-position-button {
       min-width: 28px;
@@ -1157,6 +1194,11 @@ function injectStyles() {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    @media (max-width: 720px) {
+      .dev-layout-layers-panel {
+        max-height: 50vh;
+      }
     }
     .dev-layout-toolbar button {
       min-height: 28px;

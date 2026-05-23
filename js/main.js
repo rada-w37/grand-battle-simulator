@@ -1,8 +1,8 @@
-import * as state from "./state.js?v=20260523-layout-cache";
-import * as api from "./api.js?v=20260523-layout-cache";
-import * as ui from "./ui.js?v=20260523-layout-cache";
-import { bindEvents } from "./events.js?v=20260523-layout-cache";
-import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260523-layout-cache";
+import * as state from "./state.js?v=20260524-step7";
+import * as api from "./api.js?v=20260524-step7";
+import * as ui from "./ui.js?v=20260524-step7";
+import { bindEvents } from "./events.js?v=20260524-step7";
+import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-step7";
 
 function bindMapLayoutConfigEvents() {
   window.addEventListener("resize", () => {
@@ -33,6 +33,7 @@ async function initializeApp() {
   ui.renderEmptyGuildGrid();
   ui.renderBattlePoints();
   ui.loadAppliedGuilds();
+  ui.loadHighlightedGuildName();
   ui.loadOccupationTabs();
   ui.renderOccupationTabs();
   ui.updateGuildOptions();
@@ -42,7 +43,7 @@ async function initializeApp() {
   bindMapLayoutConfigEvents();
 
   if (shouldEnableDevLayoutEditor()) {
-    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260523-layout-cache");
+    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260524-step7");
     initDevLayoutEditor();
   }
 

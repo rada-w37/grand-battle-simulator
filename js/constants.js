@@ -6,7 +6,8 @@ export const STORAGE_KEYS = {
   selectStates: "selectStates",
   battleSelection: "battleSelection",
   occupationTabs: "occupationTabs",
-  appliedGuilds: "appliedGuilds"
+  appliedGuilds: "appliedGuilds",
+  highlightedGuildName: "highlightedGuildName"
 };
 
 // Guild Colors
@@ -38,4 +39,4 @@ export {
   POINT_AURA_COORDINATES,
   MAP_STRUCTURE_PLACEMENTS,
   MAP_BANNER_PLACEMENTS
-} from "./layout/layout-config.js?v=20260523-layout-cache";
+} from "./layout/layout-config.js?v=20260524-step7";
