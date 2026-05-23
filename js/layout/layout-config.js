@@ -1,7 +1,7 @@
 // Map layout configuration
 // Phase 0: Keep current visual behavior while centralizing tunable map UI values.
 
-import { MAP_LAYOUT_BREAKPOINT, getLayoutViewport } from "./layout-coordinate.js?v=20260524-select-debug";
+import { MAP_LAYOUT_BREAKPOINT, getLayoutViewport } from "./layout-coordinate.js?v=20260524-select-offset-v2";
 
 export const MAP_IMAGE_SIZE = {
   width: 1293,
@@ -121,11 +121,20 @@ export const MAP_POINT_UI_OFFSETS = {
     rula: { pointLabels: { y: 11.6, width: 28.59, height: 11.5 } },
     cushel: { pointLabels: { x: 0.8, y: 10, width: 28.59, height: 11.5 } },
     pharia: { pointLabels: { x: 0.8, y: 11.2, width: 28.59, height: 11.5 } },
-    citri: { pointLabels: { y: 16.6, width: 28.59, height: 11.5 } },
+    citri: {
+      pointLabels: { y: 16.6, width: 28.59, height: 11.5 },
+      select: { x: 1, y: 2 }
+    },
     floryte: { pointLabels: { x: 0.67, y: 12.06, width: 28.59, height: 11.5 } },
-    toppaz: { pointLabels: { y: 12, width: 28.59, height: 11.5 } },
+    toppaz: {
+      pointLabels: { y: 12, width: 28.59, height: 11.5 },
+      select: { x: 1 }
+    },
     perido: { pointLabels: { x: -2.4, y: 17.4, width: 28.59, height: 11.5 } },
-    meral: { pointLabels: { x: 0.4, y: 11.8, width: 28.59, height: 11.5 } },
+    meral: {
+      pointLabels: { x: 0.4, y: 11.8, width: 28.59, height: 11.5 },
+      select: { x: 1 }
+    },
     onyx: { pointLabels: { x: -1.33, y: 11, width: 28.59, height: 11.5 } },
     zircon: { pointLabels: { x: -3.01, y: 15.87, width: 28.59, height: 11.5 } },
     amest: { pointLabels: { y: 9.2, width: 28.59, height: 11.5 } },
@@ -133,8 +142,14 @@ export const MAP_POINT_UI_OFFSETS = {
     laven: { pointLabels: { x: 4, y: 9.6, width: 28.59, height: 11.5 } },
     marin: { pointLabels: { x: 0.4, y: 12.4, width: 28.59, height: 11.5 } },
     larimal: { pointLabels: { x: -0.6, y: 10.6, width: 28.59, height: 11.5 } },
-    tiferet: { pointLabels: { y: 11.39, width: 28.59, height: 11.5 } },
-    yesod: { pointLabels: { x: 6.68, y: 10.2, width: 28.59, height: 11.5 } },
+    tiferet: {
+      pointLabels: { y: 11.39, width: 28.59, height: 11.5 },
+      select: { x: 0, y: -3 }
+    },
+    yesod: {
+      pointLabels: { x: 6.68, y: 10.2, width: 28.59, height: 11.5 },
+      select: { y: -4 }
+    },
     keter: { pointLabels: { x: 6.68, y: 5.36, width: 28.59, height: 11.5 } },
     malkuth: { pointLabels: { y: 9.6, width: 28.59, height: 11.5 } },
     ein: { pointLabels: { x: 1, y: 7.2, width: 28.59, height: 11.5 } }
@@ -448,7 +463,21 @@ export function getMapLayoutCssVars(width = window.innerWidth) {
 
 export function getMapPointUiOffsets(pointId, width = window.innerWidth) {
   const viewport = getLayoutViewport(width);
-  return MAP_POINT_UI_OFFSETS[viewport]?.[pointId] || null;
+  const offsets = MAP_POINT_UI_OFFSETS[viewport]?.[pointId];
+  if (!offsets) return null;
+
+  return {
+    ...offsets,
+    ...(offsets.select
+      ? {
+        select: {
+          ...offsets.select,
+          x: offsets.select.x ?? 0,
+          y: offsets.select.y ?? 0
+        }
+      }
+      : {})
+  };
 }
 
 export function getBannerTextOffset(placement, viewport = getLayoutViewport()) {

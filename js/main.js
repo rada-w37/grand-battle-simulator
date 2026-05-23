@@ -1,8 +1,8 @@
-import * as state from "./state.js?v=20260524-select-debug";
-import * as api from "./api.js?v=20260524-select-debug";
-import * as ui from "./ui.js?v=20260524-select-debug";
-import { bindEvents } from "./events.js?v=20260524-select-debug";
-import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-select-debug";
+import * as state from "./state.js?v=20260524-select-offset-v2";
+import * as api from "./api.js?v=20260524-select-offset-v2";
+import * as ui from "./ui.js?v=20260524-select-offset-v2";
+import { bindEvents } from "./events.js?v=20260524-select-offset-v2";
+import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-select-offset-v2";
 
 function bindMapLayoutConfigEvents() {
   window.addEventListener("resize", () => {
@@ -43,7 +43,7 @@ async function initializeApp() {
   bindMapLayoutConfigEvents();
 
   if (shouldEnableDevLayoutEditor()) {
-    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260524-select-debug");
+    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js?v=20260524-select-offset-v2");
     initDevLayoutEditor();
   }
 

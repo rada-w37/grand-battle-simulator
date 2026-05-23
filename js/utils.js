@@ -1,7 +1,7 @@
-import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-select-debug";
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-select-debug";
-import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-select-debug";
-import * as state from "./state.js?v=20260524-select-debug";
+import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-select-offset-v2";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-select-offset-v2";
+import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-select-offset-v2";
+import * as state from "./state.js?v=20260524-select-offset-v2";
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {

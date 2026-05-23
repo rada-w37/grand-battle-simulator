@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260524-select-debug";
-import * as api from "./api.js?v=20260524-select-debug";
-import * as ui from "./ui.js?v=20260524-select-debug";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-select-debug";
+import * as state from "./state.js?v=20260524-select-offset-v2";
+import * as api from "./api.js?v=20260524-select-offset-v2";
+import * as ui from "./ui.js?v=20260524-select-offset-v2";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-select-offset-v2";
 
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
