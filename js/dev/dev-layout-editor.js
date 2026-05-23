@@ -3,6 +3,7 @@ import {
   MAP_BANNER_PLACEMENTS,
   MAP_STRUCTURE_PLACEMENTS,
   POINT_AURA_COORDINATES,
+  getBannerTextOffset,
   getMapLayoutCssVars,
   resolveLayoutTarget
 } from "../layout/layout-config.js?v=20260523-layout-cache";
@@ -201,6 +202,7 @@ function findPlacement(list, pointId) {
 
 function getConfigBefore(element) {
   const { devLayoutKey: layoutKey, devLayoutPointId: pointId, devLayoutRole: role = "" } = element.dataset;
+  const viewport = getViewportName();
 
   if (layoutKey === "BATTLE_POINTS") {
     const point = BATTLE_POINTS.find(item => item.id === pointId);
@@ -217,10 +219,15 @@ function getConfigBefore(element) {
   if (layoutKey === "MAP_BANNER_PLACEMENTS") {
     const placement = findPlacement(MAP_BANNER_PLACEMENTS, pointId);
     if (role === "pointName" || role === "pointNameLabel") {
+      const textOffset = placement ? getBannerTextOffset(placement, viewport) : null;
       return placement
         ? {
-          textOffsetX: placement.textOffsetX ?? 0,
-          textOffsetY: placement.textOffsetY ?? 0,
+          textOffsets: {
+            [viewport]: {
+              x: textOffset.x,
+              y: textOffset.y
+            }
+          },
           unit: "mapPxOffsetFromBanner",
           role
         }
@@ -444,8 +451,12 @@ function getPointNameTextOffset(element) {
   if (!placement) return position;
 
   return {
-    textOffsetX: round(position.x - placement.x),
-    textOffsetY: round(position.y - placement.y)
+    textOffsets: {
+      [getViewportName()]: {
+        x: round(position.x - placement.x),
+        y: round(position.y - placement.y)
+      }
+    }
   };
 }
 

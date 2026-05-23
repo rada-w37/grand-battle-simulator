@@ -1,5 +1,5 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260523-layout-cache";
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260523-layout-cache";
+import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260523-layout-cache";
 import * as state from "./state.js?v=20260523-layout-cache";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260523-layout-cache";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260523-layout-cache";
@@ -416,10 +416,11 @@ function renderBannerPlacements(fragment) {
     });
     label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
+    const textOffset = getBannerTextOffset(placement);
     setMapImagePosition(
       label,
-      placement.x + (placement.textOffsetX ?? 0),
-      placement.y + (placement.textOffsetY ?? 0)
+      placement.x + textOffset.x,
+      placement.y + textOffset.y
     );
     fragment.appendChild(label);
   });

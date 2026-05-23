@@ -281,14 +281,14 @@ export const LAYOUT_TARGET_UPDATE_RULES = {
     pointName: {
       configKey: "MAP_BANNER_PLACEMENTS",
       findBy: "pointId",
-      updateProperties: ["textOffsetX", "textOffsetY"],
+      updateProperties: ["textOffsets.{viewport}.x", "textOffsets.{viewport}.y"],
       coordinateSpace: "mapPxOffsetFromBanner",
       updateMode: "textOffset"
     },
     pointNameLabel: {
       configKey: "MAP_BANNER_PLACEMENTS",
       findBy: "pointId",
-      updateProperties: ["textOffsetX", "textOffsetY"],
+      updateProperties: ["textOffsets.{viewport}.x", "textOffsets.{viewport}.y"],
       coordinateSpace: "mapPxOffsetFromBanner",
       updateMode: "textOffset"
     }
@@ -404,9 +404,22 @@ export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport }
 
   if (layoutKey === "MAP_BANNER_PLACEMENTS") {
     const index = MAP_BANNER_PLACEMENTS.findIndex(placement => placement.pointId === pointId);
+    const resolvedRule = rule.updateMode === "textOffset"
+      ? {
+        ...rule,
+        updateProperties: [`textOffsets.${viewport}.x`, `textOffsets.${viewport}.y`]
+      }
+      : rule;
     return index >= 0
-      ? { resolved: true, ...rule, configPath: `MAP_BANNER_PLACEMENTS[${index}]`, index }
-      : { resolved: false, ...rule, skipReason: `MAP_BANNER_PLACEMENTS entry not found for pointId=${pointId}` };
+      ? {
+        resolved: true,
+        ...resolvedRule,
+        configPath: rule.updateMode === "textOffset"
+          ? `MAP_BANNER_PLACEMENTS[${index}].textOffsets.${viewport}`
+          : `MAP_BANNER_PLACEMENTS[${index}]`,
+        index
+      }
+      : { resolved: false, ...resolvedRule, skipReason: `MAP_BANNER_PLACEMENTS entry not found for pointId=${pointId}` };
   }
 
   if (layoutKey === "MAP_LAYOUT_CSS_VARS") {
@@ -436,6 +449,21 @@ export function getMapLayoutCssVars(width = window.innerWidth) {
 export function getMapPointUiOffsets(pointId, width = window.innerWidth) {
   const viewport = getLayoutViewport(width);
   return MAP_POINT_UI_OFFSETS[viewport]?.[pointId] || null;
+}
+
+export function getBannerTextOffset(placement, viewport = getLayoutViewport()) {
+  const viewportOffset = placement.textOffsets?.[viewport];
+  if (viewportOffset) {
+    return {
+      x: viewportOffset.x ?? placement.textOffsetX ?? 0,
+      y: viewportOffset.y ?? placement.textOffsetY ?? 0
+    };
+  }
+
+  return {
+    x: placement.textOffsetX ?? 0,
+    y: placement.textOffsetY ?? 0
+  };
 }
 
 export function applyMapLayoutCssVars(target = document.documentElement, width = window.innerWidth) {
