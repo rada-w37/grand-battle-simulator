@@ -188,11 +188,24 @@ function getCssVarBefore(role) {
   }
   if (role === "attackerSelect" || role === "defenderSelect") {
     return {
-      width: vars["--map-point-labels-width"],
+      x: vars["--map-point-select-left"],
+      y: vars["--map-point-select-top"],
+      width: vars["--map-point-select-width"],
       height: vars["--map-point-select-height"],
       minHeight: vars["--map-point-select-min-height"],
       fontSize: vars["--map-point-select-font-size"],
-      parent: "pointLabels"
+      parent: "point"
+    };
+  }
+  if (role === "select") {
+    return {
+      x: vars["--map-point-select-left"],
+      y: vars["--map-point-select-top"],
+      width: vars["--map-point-select-width"],
+      height: vars["--map-point-select-height"],
+      minHeight: vars["--map-point-select-min-height"],
+      fontSize: vars["--map-point-select-font-size"],
+      parent: "point"
     };
   }
   return {};
@@ -368,6 +381,15 @@ const POINT_UI_OFFSET_OUTPUT = {
       y: "--map-shield-top",
       size: "--map-shield-size"
     }
+  },
+  select: {
+    section: "select",
+    properties: {
+      x: "--map-point-select-left",
+      y: "--map-point-select-top",
+      width: "--map-point-select-width",
+      height: "--map-point-select-height"
+    }
   }
 };
 
@@ -406,6 +428,21 @@ function getPointUiOffsetCurrent(targetType, snapshot) {
   return {
     [output.section]: offsetValues
   };
+}
+
+function getSelectOffsetCurrent(element, snapshot) {
+  const parent = element.offsetParent;
+  if (!parent) return getPointUiOffsetCurrent("select", snapshot);
+
+  const selectRect = element.querySelector("select")?.getBoundingClientRect();
+  const centeredSnapshot = {
+    ...snapshot,
+    x: snapshot.x - parent.offsetWidth / 2,
+    y: snapshot.y - parent.offsetHeight / 2,
+    width: selectRect ? round(selectRect.width) : snapshot.width,
+    height: selectRect ? round(selectRect.height) : snapshot.height
+  };
+  return getPointUiOffsetCurrent("select", centeredSnapshot);
 }
 
 function getParentPercentPosition(element) {
@@ -525,23 +562,11 @@ function getConfigCurrent(element, resolvedTarget) {
   }
 
   if (targetType === "attackerSelect" || targetType === "defenderSelect") {
-    return {
-      "--map-point-select-left": toCssPx(snapshot.x),
-      "--map-point-select-top": toCssPx(snapshot.y),
-      "--map-point-select-width": toCssPx(snapshot.width),
-      "--map-point-select-height": toCssPx(snapshot.height),
-      "--map-point-select-min-height": toCssPx(snapshot.height)
-    };
+    return getSelectOffsetCurrent(element, snapshot);
   }
 
   if (targetType === "select") {
-    return {
-      "--map-point-select-left": toCssPx(snapshot.x),
-      "--map-point-select-top": toCssPx(snapshot.y),
-      "--map-point-select-width": toCssPx(snapshot.width),
-      "--map-point-select-height": toCssPx(snapshot.height),
-      "--map-point-select-min-height": toCssPx(snapshot.height)
-    };
+    return getSelectOffsetCurrent(element, snapshot);
   }
 
   return snapshot;

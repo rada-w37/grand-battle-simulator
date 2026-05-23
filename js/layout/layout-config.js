@@ -117,27 +117,27 @@ export const MAP_POINT_UI_OFFSETS = {
     }
   },
   mobile: {
-    ganette: { pointLabels: { x: -2, y: 18 } },
-    rula: { pointLabels: { x: -1, y: 14 } },
-    cushel: { pointLabels: { y: 19 } },
-    pharia: { pointLabels: { x: 9, y: 14 } },
-    citri: { pointLabels: { x: 4, y: 20 } },
-    floryte: { pointLabels: { x: -8, y: 18 } },
-    toppaz: { pointLabels: { x: 1, y: 20 } },
-    perido: { pointLabels: { x: -8, y: 20 } },
-    meral: { pointLabels: { y: 10 } },
-    onyx: { pointLabels: { y: 10 } },
-    zircon: { pointLabels: { x: -18, y: 20 } },
-    amest: { pointLabels: { x: 3, y: 21 } },
-    lapis: { pointLabels: { x: 4, y: 18 } },
-    laven: { pointLabels: { x: 2, y: 7 } },
-    marin: { pointLabels: { x: 2, y: 18 } },
-    larimal: { pointLabels: { x: 4, y: 17 } },
-    tiferet: { pointLabels: { x: 5, y: 18 } },
-    yesod: { pointLabels: { y: 10 } },
-    keter: { pointLabels: { x: 7, y: 16 } },
-    malkuth: { pointLabels: { x: 1, y: 22 } },
-    ein: { pointLabels: { y: 23 } }
+    ganette: { pointLabels: { y: 9.2, width: 28.59, height: 11.5 } },
+    rula: { pointLabels: { y: 11.6, width: 28.59, height: 11.5 } },
+    cushel: { pointLabels: { x: 0.8, y: 10, width: 28.59, height: 11.5 } },
+    pharia: { pointLabels: { x: 0.8, y: 11.2, width: 28.59, height: 11.5 } },
+    citri: { pointLabels: { y: 16.6, width: 28.59, height: 11.5 } },
+    floryte: { pointLabels: { x: 0.67, y: 12.06, width: 28.59, height: 11.5 } },
+    toppaz: { pointLabels: { y: 12, width: 28.59, height: 11.5 } },
+    perido: { pointLabels: { x: -2.4, y: 17.4, width: 28.59, height: 11.5 } },
+    meral: { pointLabels: { x: 0.4, y: 11.8, width: 28.59, height: 11.5 } },
+    onyx: { pointLabels: { x: -1.33, y: 11, width: 28.59, height: 11.5 } },
+    zircon: { pointLabels: { x: -3.01, y: 15.87, width: 28.59, height: 11.5 } },
+    amest: { pointLabels: { y: 9.2, width: 28.59, height: 11.5 } },
+    lapis: { pointLabels: { x: -0.8, y: 10.8, width: 28.59, height: 11.5 } },
+    laven: { pointLabels: { x: 4, y: 9.6, width: 28.59, height: 11.5 } },
+    marin: { pointLabels: { x: 0.4, y: 12.4, width: 28.59, height: 11.5 } },
+    larimal: { pointLabels: { x: -0.6, y: 10.6, width: 28.59, height: 11.5 } },
+    tiferet: { pointLabels: { y: 11.39, width: 28.59, height: 11.5 } },
+    yesod: { pointLabels: { x: 6.68, y: 10.2, width: 28.59, height: 11.5 } },
+    keter: { pointLabels: { x: 6.68, y: 5.36, width: 28.59, height: 11.5 } },
+    malkuth: { pointLabels: { y: 9.6, width: 28.59, height: 11.5 } },
+    ein: { pointLabels: { x: 1, y: 7.2, width: 28.59, height: 11.5 } }
   }
 };
 
@@ -321,43 +321,40 @@ export const LAYOUT_TARGET_UPDATE_RULES = {
       updateMode: "pointOffset"
     },
     attackerSelect: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
       updateProperties: [
-        "--map-point-select-left",
-        "--map-point-select-top",
-        "--map-point-select-width",
-        "--map-point-select-height",
-        "--map-point-select-min-height"
+        "select.x",
+        "select.y",
+        "select.width",
+        "select.height"
       ],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      coordinateSpace: "cssPxOffsetFromPointCenter",
+      updateMode: "pointOffset"
     },
     defenderSelect: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
       updateProperties: [
-        "--map-point-select-left",
-        "--map-point-select-top",
-        "--map-point-select-width",
-        "--map-point-select-height",
-        "--map-point-select-min-height"
+        "select.x",
+        "select.y",
+        "select.width",
+        "select.height"
       ],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      coordinateSpace: "cssPxOffsetFromPointCenter",
+      updateMode: "pointOffset"
     },
     select: {
-      configKey: "MAP_LAYOUT_CSS_VARS",
-      findBy: "viewport",
+      configKey: "MAP_POINT_UI_OFFSETS",
+      findBy: "pointId",
       updateProperties: [
-        "--map-point-select-left",
-        "--map-point-select-top",
-        "--map-point-select-width",
-        "--map-point-select-height",
-        "--map-point-select-min-height"
+        "select.x",
+        "select.y",
+        "select.width",
+        "select.height"
       ],
-      coordinateSpace: "cssPx",
-      updateMode: "sharedByTargetType"
+      coordinateSpace: "cssPxOffsetFromPointCenter",
+      updateMode: "pointOffset"
     }
   }
 };
@@ -424,8 +421,11 @@ export function resolveLayoutTarget({ layoutKey, pointId, targetType, viewport }
 
   if (layoutKey === "MAP_LAYOUT_CSS_VARS") {
     if (rule.configKey === "MAP_POINT_UI_OFFSETS") {
+      const section = ["select", "attackerSelect", "defenderSelect"].includes(targetType)
+        ? ".select"
+        : "";
       return MAP_POINT_UI_OFFSETS[viewport]
-        ? { resolved: true, ...rule, configPath: `MAP_POINT_UI_OFFSETS.${viewport}.${pointId}` }
+        ? { resolved: true, ...rule, configPath: `MAP_POINT_UI_OFFSETS.${viewport}.${pointId}${section}` }
         : { resolved: false, ...rule, skipReason: `MAP_POINT_UI_OFFSETS viewport not found: ${viewport}` };
     }
 

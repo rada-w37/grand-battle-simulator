@@ -252,6 +252,12 @@ const POINT_UI_OFFSET_VARS = {
     x: "--map-shield-left",
     y: "--map-shield-top",
     size: "--map-shield-size"
+  },
+  select: {
+    x: "--map-point-select-left",
+    y: "--map-point-select-top",
+    width: "--map-point-select-width",
+    height: "--map-point-select-height"
   }
 };
 
@@ -277,7 +283,11 @@ function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
       const variableName = targetVars[property];
       const baseValue = getCssPxNumber(baseVars[variableName]);
       if (!variableName || baseValue === null) return;
-      element.style.setProperty(variableName, formatCssPx(baseValue + offset));
+      const finalValue = formatCssPx(baseValue + offset);
+      element.style.setProperty(variableName, finalValue);
+      if (targetType === "select" && property === "height") {
+        element.style.setProperty("--map-point-select-min-height", finalValue);
+      }
     });
   });
 }
@@ -354,30 +364,27 @@ export function renderBattlePoints() {
       targetType: "pointLabels"
     });
 
+    const selectGroup = document.createElement("div");
+    selectGroup.className = "point-selects";
+    setDevLayoutMetadata(selectGroup, {
+      targetId: `select:${point.id}`,
+      layoutKey: "MAP_LAYOUT_CSS_VARS",
+      pointId: point.id,
+      role: "select",
+      targetType: "select"
+    });
+
     const attackerSelect = document.createElement("select");
     attackerSelect.className = "point-attacker-select";
     attackerSelect.setAttribute("aria-label", `${point.id} attacking guild`);
-    setDevLayoutMetadata(attackerSelect, {
-      targetId: `attackerSelect:${point.id}`,
-      layoutKey: "MAP_LAYOUT_CSS_VARS",
-      pointId: point.id,
-      role: "attackerSelect",
-      targetType: "select"
-    });
-    labels.appendChild(attackerSelect);
+    selectGroup.appendChild(attackerSelect);
 
     const defenderSelect = document.createElement("select");
     defenderSelect.className = "point-defender-select";
     defenderSelect.setAttribute("aria-label", `${point.id} occupying guild`);
-    setDevLayoutMetadata(defenderSelect, {
-      targetId: `defenderSelect:${point.id}`,
-      layoutKey: "MAP_LAYOUT_CSS_VARS",
-      pointId: point.id,
-      role: "defenderSelect",
-      targetType: "select"
-    });
-    labels.appendChild(defenderSelect);
+    selectGroup.appendChild(defenderSelect);
     wrapper.appendChild(labels);
+    wrapper.appendChild(selectGroup);
 
     // const mobileIcons = document.createElement("div");
     // mobileIcons.className = "point-mobile-icons";
