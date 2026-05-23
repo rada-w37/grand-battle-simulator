@@ -7,7 +7,7 @@ import {
   POINT_AURA_COORDINATES,
   getMapLayoutCssVars,
   resolveLayoutTarget
-} from "./layout-config.js";
+} from "../layout/layout-config.js";
 
 const EDITOR_CLASS = "dev-layout-editor-active";
 const TARGET_SELECTOR = "[data-dev-layout-id]";

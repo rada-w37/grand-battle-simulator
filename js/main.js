@@ -2,7 +2,7 @@ import * as state from "./state.js";
 import * as api from "./api.js";
 import * as ui from "./ui.js";
 import { bindEvents } from "./events.js";
-import { applyMapLayoutCssVars } from "./layout-config.js";
+import { applyMapLayoutCssVars } from "./layout/layout-config.js";
 
 function bindMapLayoutConfigEvents() {
   window.addEventListener("resize", () => {
@@ -42,7 +42,7 @@ async function initializeApp() {
   bindMapLayoutConfigEvents();
 
   if (shouldEnableDevLayoutEditor()) {
-    const { initDevLayoutEditor } = await import("./dev-layout-editor.js");
+    const { initDevLayoutEditor } = await import("./dev/dev-layout-editor.js");
     initDevLayoutEditor();
   }
 

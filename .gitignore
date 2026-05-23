@@ -1,5 +1,5 @@
 org/
-placement-tool/
+/tools/placement-tool/
 backup/
 rollback-*/
 run.bat

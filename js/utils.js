@@ -1,5 +1,5 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js";
-import { BATTLE_POINTS, MAP_IMAGE_SIZE } from "./layout-config.js";
+import { BATTLE_POINTS, MAP_IMAGE_SIZE } from "./layout/layout-config.js";
 import * as state from "./state.js";
 
 // Storage Utilities
