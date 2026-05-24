@@ -3,11 +3,27 @@ import * as api from "./api.js?v=20260524-visibility-toggles";
 import * as ui from "./ui.js?v=20260524-visibility-toggles";
 import { bindEvents } from "./events.js?v=20260524-visibility-toggles";
 import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
+
+let currentLayoutViewport = getLayoutViewport(window.innerWidth);
+let layoutViewportTimer = 0;
+
+function refreshLayoutForViewportChange() {
+  window.clearTimeout(layoutViewportTimer);
+  layoutViewportTimer = window.setTimeout(() => {
+    const nextLayoutViewport = getLayoutViewport(window.innerWidth);
+    applyMapLayoutCssVars();
+
+    if (nextLayoutViewport === currentLayoutViewport) return;
+
+    currentLayoutViewport = nextLayoutViewport;
+    ui.refreshMapLayout();
+  }, 150);
+}
 
 function bindMapLayoutConfigEvents() {
-  window.addEventListener("resize", () => {
-    applyMapLayoutCssVars();
-  });
+  window.addEventListener("resize", refreshLayoutForViewportChange);
+  window.addEventListener("orientationchange", refreshLayoutForViewportChange);
 }
 
 function shouldEnableDevLayoutEditor() {

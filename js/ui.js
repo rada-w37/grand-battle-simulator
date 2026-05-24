@@ -309,6 +309,41 @@ function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
   });
 }
 
+function clearPointUiOffsets(element) {
+  Object.values(POINT_UI_OFFSET_VARS).forEach(targetVars => {
+    Object.values(targetVars).forEach(variableName => {
+      element.style.removeProperty(variableName);
+    });
+  });
+
+  const selectGroup = element.querySelector(".point-selects");
+  if (selectGroup) {
+    Object.values(POINT_UI_OFFSET_VARS.select).forEach(variableName => {
+      selectGroup.style.removeProperty(variableName);
+    });
+    selectGroup.style.removeProperty("--map-point-select-min-height");
+  }
+}
+
+export function refreshMapLayout(width = window.innerWidth) {
+  document.querySelectorAll(".point").forEach(point => {
+    clearPointUiOffsets(point);
+    applyPointUiOffsets(point, point.dataset.id, width);
+  });
+
+  MAP_BANNER_PLACEMENTS.forEach(placement => {
+    const label = document.querySelector(`.point-name-label[data-point-id="${placement.pointId}"]`);
+    if (!label) return;
+
+    const textOffset = getBannerTextOffset(placement);
+    setMapImagePosition(
+      label,
+      placement.x + textOffset.x,
+      placement.y + textOffset.y
+    );
+  });
+}
+
 // Render Battle Points Map
 export function renderBattlePoints() {
   const battlePoints = getRequiredElement("battlePoints", "battle-points");
