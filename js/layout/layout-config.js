@@ -103,7 +103,8 @@ export const MAP_POINT_UI_OFFSETS = {
     yesod: {
       pointLabels: { x: 4, y: -4 },
       sword: { x: 4, y: -4 },
-      shield: { x: 4, y: -4 }
+      shield: { x: 4, y: -4 },
+      select: { x: 4, y: -7, height: -0.01 }
     },
     keter: {
       pointLabels: { x: 4 },
