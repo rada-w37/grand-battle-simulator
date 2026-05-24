@@ -16,6 +16,8 @@ function shouldEnableDevLayoutEditor() {
 
 // Initialize Application
 async function initializeApp() {
+  state.initializeElements();
+
   // Set up circular dependency bridges
   ui._setFetchBattleDataFn(api.fetchBattleDataIfReady);
   ui._setSetPendingStateFn(api.setPendingState);
@@ -28,7 +30,6 @@ async function initializeApp() {
     updateWorldOptions: ui.updateWorldOptions
   });
 
-  state.initializeElements();
   applyMapLayoutCssVars();
   ui.renderEmptyGuildGrid();
   ui.renderBattlePoints();

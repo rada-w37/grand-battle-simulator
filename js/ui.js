@@ -4,6 +4,17 @@ import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
 import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 
+function getRequiredElement(elementKey, id) {
+  const element = state.elements[elementKey] || document.getElementById(id);
+  if (element) {
+    state.elements[elementKey] = element;
+    return element;
+  }
+
+  console.warn(`Missing DOM element: #${id}`);
+  return null;
+}
+
 // Status Message
 export function setStatus(message, type = "") {
   window.clearTimeout(state.statusTimer);
@@ -24,6 +35,9 @@ export function renderEmptyGuildGrid() {
 }
 
 export function renderGuildGrid(guildNames) {
+  const guildGrid = getRequiredElement("guildGrid", "guild-grid");
+  if (!guildGrid) return;
+
   const cells = Array.from({ length: 4 }, (_, index) => {
     const cell = document.createElement("div");
     cell.className = `guild-cell guild-cell${index + 1}`;
@@ -31,7 +45,7 @@ export function renderGuildGrid(guildNames) {
     return cell;
   });
 
-  state.elements.guildGrid.replaceChildren(...cells);
+  guildGrid.replaceChildren(...cells);
 }
 
 // Guild Storage
@@ -297,6 +311,9 @@ function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
 
 // Render Battle Points Map
 export function renderBattlePoints() {
+  const battlePoints = getRequiredElement("battlePoints", "battle-points");
+  if (!battlePoints) return;
+
   const fragment = document.createDocumentFragment();
 
   BATTLE_POINTS.forEach(point => {
@@ -411,7 +428,7 @@ export function renderBattlePoints() {
     fragment.appendChild(wrapper);
   });
 
-  state.elements.battlePoints.replaceChildren(fragment);
+  battlePoints.replaceChildren(fragment);
 }
 
 function renderStructurePlacements(fragment) {
@@ -597,7 +614,10 @@ export function updateScores() {
     return row;
   });
 
-  state.elements.scoreBody.replaceChildren(...rows);
+  const scoreBody = getRequiredElement("scoreBody", "score-body");
+  if (!scoreBody) return;
+
+  scoreBody.replaceChildren(...rows);
   updateHighlightedGuildSelects();
 }
 
@@ -906,7 +926,10 @@ export function renderOccupationTabs() {
     return button;
   });
 
-  state.elements.occupationTabs.replaceChildren(...buttons);
+  const occupationTabs = getRequiredElement("occupationTabs", "occupation-tabs");
+  if (!occupationTabs) return;
+
+  occupationTabs.replaceChildren(...buttons);
   state.elements.deleteTabButton.disabled = state.occupationTabs.length <= 1;
   updateTabScrollState();
 }
@@ -1002,13 +1025,16 @@ export function _setFetchBattleDataFn(fn) {
 }
 
 export function renderWorldSuggestions() {
+  const worldSuggestions = getRequiredElement("worldSuggestions", "world-suggestions");
+  if (!worldSuggestions) return;
+
   const groups = getGroupedWorldOptions();
 
   if (groups.length === 0) {
     const empty = document.createElement("div");
     empty.className = "combo-empty";
     empty.textContent = "候補がありません";
-    state.elements.worldSuggestions.replaceChildren(empty);
+    worldSuggestions.replaceChildren(empty);
     return;
   }
 
@@ -1044,7 +1070,7 @@ export function renderWorldSuggestions() {
     });
   });
 
-  state.elements.worldSuggestions.replaceChildren(fragment);
+  worldSuggestions.replaceChildren(fragment);
 }
 
 export function updateWorldOptions() {
@@ -1057,7 +1083,10 @@ export function updateWorldOptions() {
     options.push(option);
   });
 
-  state.elements.worldOptions.replaceChildren(...options);
+  const worldOptions = getRequiredElement("worldOptions", "world-options");
+  if (!worldOptions) return;
+
+  worldOptions.replaceChildren(...options);
   renderWorldSuggestions();
 
   if (currentWorld) {
@@ -1069,7 +1098,10 @@ export function updateWorldOptions() {
 export function closeMobilePointPicker() {
   state.setActiveMobilePoint(null);
   state.elements.mobilePointPicker.hidden = true;
-  state.elements.mobilePointPickerOptions.replaceChildren();
+  const mobilePointPickerOptions = getRequiredElement("mobilePointPickerOptions", "mobile-point-picker-options");
+  if (!mobilePointPickerOptions) return;
+
+  mobilePointPickerOptions.replaceChildren();
 }
 
 export function setPointGuild(point, role, guildName) {
@@ -1130,7 +1162,10 @@ export function openMobilePointPicker(point) {
     return group;
   };
 
-  state.elements.mobilePointPickerOptions.replaceChildren(
+  const mobilePointPickerOptions = getRequiredElement("mobilePointPickerOptions", "mobile-point-picker-options");
+  if (!mobilePointPickerOptions) return;
+
+  mobilePointPickerOptions.replaceChildren(
     createGroup("防衛側", "defender", defenderSelect, "未選択"),
     createGroup("布告側", "attacker", attackerSelect, "布告なし")
   );
