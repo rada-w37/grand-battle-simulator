@@ -872,6 +872,7 @@ button:focus-visible {
 }
 
 .map-visibility-toggle-button {
+  position: relative;
   display: grid;
   place-items: center;
   width: 28px;
@@ -879,21 +880,91 @@ button:focus-visible {
   min-height: 0;
   padding: 0;
   border: 0;
+  color: #eef6fb;
+  background: transparent;
+  box-shadow: none;
+  isolation: isolate;
+  overflow: visible;
+  transition: transform 0.16s ease;
+}
+
+.map-visibility-toggle-button::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -9px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 52% 44%, rgba(244, 250, 255, 0.34) 0 12%, transparent 34%),
+    radial-gradient(ellipse at 35% 38%, rgba(158, 187, 207, 0.34) 0 24%, transparent 58%),
+    radial-gradient(ellipse at 65% 62%, rgba(117, 145, 165, 0.24) 0 18%, transparent 52%),
+    radial-gradient(circle at 45% 70%, rgba(221, 231, 236, 0.18) 0 16%, transparent 48%);
+  filter: blur(5px);
+  opacity: 0.68;
+  transform: scale(0.96) rotate(-5deg);
+  transition: opacity 0.16s ease, filter 0.16s ease, transform 0.16s ease;
+  pointer-events: none;
+}
+
+.map-visibility-toggle-button:hover,
+.map-visibility-toggle-button:focus-visible {
+  border: 0;
   background: transparent;
   box-shadow: none;
 }
 
+.map-visibility-toggle-button:hover {
+  transform: scale(1.03);
+}
+
+.map-visibility-toggle-button:hover::before,
+.map-visibility-toggle-button:focus-visible::before {
+  filter: blur(4px);
+  opacity: 0.92;
+  transform: scale(1.03) rotate(-4deg);
+}
+
 .map-visibility-toggle-button img {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 18px;
   height: 18px;
   object-fit: contain;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(88%)
+    sepia(8%)
+    saturate(260%)
+    hue-rotate(174deg)
+    brightness(96%)
+    contrast(96%)
+    drop-shadow(0 1px 2px rgba(4, 8, 14, 0.56));
   transition: filter 0.16s ease, opacity 0.16s ease;
 }
 
+.map-visibility-toggle-button.is-off::before {
+  background:
+    radial-gradient(circle at 52% 44%, rgba(223, 226, 224, 0.22) 0 12%, transparent 34%),
+    radial-gradient(ellipse at 35% 38%, rgba(143, 151, 150, 0.22) 0 24%, transparent 58%),
+    radial-gradient(ellipse at 65% 62%, rgba(96, 104, 108, 0.18) 0 18%, transparent 52%),
+    radial-gradient(circle at 45% 70%, rgba(187, 190, 186, 0.12) 0 16%, transparent 48%);
+  opacity: 0.48;
+}
+
 .map-visibility-toggle-button.is-off img {
-  filter: grayscale(1);
-  opacity: 0.35;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(76%)
+    sepia(7%)
+    saturate(188%)
+    hue-rotate(174deg)
+    brightness(88%)
+    contrast(86%)
+    drop-shadow(0 1px 2px rgba(4, 8, 14, 0.48));
+  opacity: 0.72;
 }
 
 .map-zoom-button svg {
