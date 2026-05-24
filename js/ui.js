@@ -619,6 +619,7 @@ export function updateScores() {
     const cumulativeScore = cumulativeScores[guild.name]?.total || 0;
     const row = document.createElement("tr");
     const nameCell = document.createElement("td");
+    nameCell.className = `score-guild-name-cell guild-cell${index + 1}`;
 
     if (state.isEditingGuildNames) {
       const input = document.createElement("input");
@@ -635,7 +636,6 @@ export function updateScores() {
     } else {
       nameCell.textContent = guild.name;
     }
-    nameCell.style.backgroundColor = guild.color;
     row.append(
       createScoreGuildRadioCell(guild.name),
       nameCell,

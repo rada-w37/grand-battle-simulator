@@ -7,6 +7,10 @@
   --guild-2-rgb: 51, 56, 77;
   --guild-3-rgb: 52, 72, 58;
   --guild-4-rgb: 76, 71, 48;
+  --guild-1-ink: 112, 55, 58;
+  --guild-2-ink: 65, 79, 106;
+  --guild-3-ink: 62, 94, 72;
+  --guild-4-ink: 112, 101, 58;
   --empty-point: rgba(255, 255, 255, 0.86);
   --border: rgba(170, 139, 82, 0.36);
   --surface: rgba(12, 14, 23, 0.82);
@@ -234,40 +238,38 @@ button:focus-visible {
 }
 
 .guild-cell {
+  --guild-ink-rgb: 120, 108, 72;
   min-height: 34px;
   padding: 6px 8px;
-  border: 1px solid rgba(245, 231, 189, 0.22);
+  border: 1px solid rgba(245, 231, 189, 0.18);
   border-radius: 4px;
   color: #e7dcc4;
   font-weight: 700;
   overflow-wrap: anywhere;
+  background:
+    radial-gradient(ellipse at 46% 48%, rgba(var(--guild-ink-rgb), 0.5) 0 28%, transparent 72%),
+    radial-gradient(ellipse at 18% 18%, rgba(231, 220, 196, 0.12) 0 18%, transparent 58%),
+    linear-gradient(135deg, rgba(var(--guild-ink-rgb), 0.34), rgba(var(--guild-ink-rgb), 0.18)),
+    rgba(6, 9, 16, 0.32);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -10px 18px rgba(9, 21, 30, 0.12);
+    inset 0 1px 0 rgba(255, 244, 215, 0.08),
+    inset 0 -12px 20px rgba(4, 8, 14, 0.12);
 }
 
 .guild-cell1 {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(9, 21, 30, 0.12)),
-    rgba(var(--guild-1-rgb), 0.84);
+  --guild-ink-rgb: var(--guild-1-ink);
 }
 
 .guild-cell2 {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(9, 21, 30, 0.12)),
-    rgba(var(--guild-2-rgb), 0.84);
+  --guild-ink-rgb: var(--guild-2-ink);
 }
 
 .guild-cell3 {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(9, 21, 30, 0.12)),
-    rgba(var(--guild-3-rgb), 0.84);
+  --guild-ink-rgb: var(--guild-3-ink);
 }
 
 .guild-cell4 {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(9, 21, 30, 0.12)),
-    rgba(var(--guild-4-rgb), 0.84);
+  --guild-ink-rgb: var(--guild-4-ink);
 }
 
 .apply-data-button {
@@ -414,8 +416,8 @@ button:focus-visible {
 }
 
 .score-edit-pen-icon {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   background: currentColor;
   -webkit-mask: url("resource/pen.svg") center / contain no-repeat;
   mask: url("resource/pen.svg") center / contain no-repeat;
@@ -458,9 +460,34 @@ button:focus-visible {
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.score-guild-name-cell {
+  --guild-ink-rgb: 120, 108, 72;
+  background:
+    radial-gradient(ellipse at 48% 52%, rgba(var(--guild-ink-rgb), 0.48) 0 30%, transparent 74%),
+    radial-gradient(ellipse at 16% 20%, rgba(231, 220, 196, 0.1) 0 16%, transparent 58%),
+    linear-gradient(135deg, rgba(var(--guild-ink-rgb), 0.32), rgba(var(--guild-ink-rgb), 0.18)),
+    rgba(6, 9, 16, 0.34);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.13),
-    inset 0 -12px 18px rgba(9, 21, 30, 0.13);
+    inset 0 1px 0 rgba(255, 244, 215, 0.07),
+    inset 0 -12px 18px rgba(4, 8, 14, 0.1);
+}
+
+.score-guild-name-cell.guild-cell1 {
+  --guild-ink-rgb: var(--guild-1-ink);
+}
+
+.score-guild-name-cell.guild-cell2 {
+  --guild-ink-rgb: var(--guild-2-ink);
+}
+
+.score-guild-name-cell.guild-cell3 {
+  --guild-ink-rgb: var(--guild-3-ink);
+}
+
+.score-guild-name-cell.guild-cell4 {
+  --guild-ink-rgb: var(--guild-4-ink);
 }
 
 .score-table td:nth-child(2):has(.score-guild-name-input) {
@@ -475,9 +502,9 @@ button:focus-visible {
   content: "";
   position: absolute;
   top: 50%;
-  right: 11px;
-  width: 15px;
-  height: 15px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
   background: rgba(226, 196, 126, 0.74);
   pointer-events: none;
   transform: translateY(-50%);
