@@ -26,8 +26,8 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-labels-left": "66px",
     "--map-point-labels-top": "21px",
     "--map-point-labels-width": "100px",
-    "--map-point-labels-height": "50px",
-    "--map-point-labels-gap": "2px",
+    "--map-point-labels-height": "52px",
+    "--map-point-labels-gap": "9px",
     "--map-point-band-width": "100px",
     "--map-point-band-height": "24px",
     "--map-point-band-radius": "3px",
@@ -80,41 +80,89 @@ export const MAP_LAYOUT_CSS_VARS = {
 
 export const MAP_POINT_UI_OFFSETS = {
   desktop: {
+    ganette: {
+      select: { y: -3, height: -0.01 }
+    },
+    rula: {
+      select: { y: -3, height: -0.01 }
+    },
+    cushel: {
+      select: { y: -3, height: -0.01 }
+    },
+    pharia: {
+      select: { y: -4, height: -0.01 }
+    },
     citri: {
       pointLabels: { x: 4, y: 6 },
       sword: { x: 4, y: 6 },
-      shield: { x: 4, y: 6 }
+      shield: { x: 4, y: 6 },
+      select: { x: 2, y: 3, height: -0.01 }
+    },
+    floryte: {
+      select: { y: -3, height: -0.01 }
+    },
+    toppaz: {
+      select: { y: -3, height: -0.01 }
     },
     perido: {
       pointLabels: { y: 4 },
       sword: { y: 4 },
-      shield: { y: 4 }
+      shield: { y: 4 },
+      select: { height: -0.01 }
     },
     meral: {
       pointLabels: { x: 6, y: -4 },
       sword: { x: 6, y: -4 },
-      shield: { x: 6, y: -4 }
+      shield: { x: 6, y: -4 },
+      select: { x: 7, y: -7, height: -0.01 }
+    },
+    onyx: {
+      select: { y: -3, height: -0.01 }
     },
     zircon: {
       pointLabels: { x: -4, y: 2 },
       sword: { x: -3, y: 2 },
-      shield: { x: -3, y: 2 }
+      shield: { x: -3, y: 2 },
+      select: { y: -3, height: -0.01 }
+    },
+    amest: {
+      select: { y: -3, height: -0.01 }
+    },
+    lapis: {
+      select: { y: -3, height: -0.01 }
+    },
+    laven: {
+      select: { y: -3, height: -0.01 }
+    },
+    marin: {
+      select: { y: -3, height: -0.01 }
+    },
+    larimal: {
+      select: { y: -3, height: -0.01 }
+    },
+    tiferet: {
+      select: { y: -3, height: -0.01 }
     },
     yesod: {
       pointLabels: { x: 4, y: -4 },
       sword: { x: 4, y: -4 },
       shield: { x: 4, y: -4 },
-      select: { x: 4, y: -7, height: -0.01 }
+      select: { x: 4, y: -10, height: -0.01 }
     },
     keter: {
       pointLabels: { x: 4 },
       sword: { x: 4 },
-      shield: { x: 4 }
+      shield: { x: 4 },
+      select: { y: -3, height: -0.01 }
+    },
+    malkuth: {
+      select: { y: -3, height: -0.01 }
     },
     ein: {
-      pointLabels: { y: 6 },
-      sword: { y: 6 },
-      shield: { y: 6 }
+      pointLabels: { y: -1 },
+      sword: { y: -2 },
+      shield: { y: 1 },
+      select: { y: -3, height: -0.01 }
     }
   },
   mobile: {
