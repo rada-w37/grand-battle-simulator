@@ -832,16 +832,21 @@ button:focus-visible {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
 }
 
-.map-zoom-actions,
-.map-visibility-controls {
+.map-zoom-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .map-visibility-controls {
-  align-self: flex-end;
+  position: absolute;
+  z-index: 20;
+  top: 54px;
+  right: 10px;
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .map-zoom-value {
@@ -1433,8 +1438,13 @@ button:focus-visible {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
   }
 
-  .map-zoom-actions,
+  .map-zoom-actions {
+    gap: 3px;
+  }
+
   .map-visibility-controls {
+    top: 35px;
+    right: 3px;
     gap: 3px;
   }
 
