@@ -24,6 +24,8 @@ const mapView = {
   pinchStartWorldY: 0
 };
 
+let isComposingWorldInput = false;
+
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
@@ -44,6 +46,12 @@ function getMapElements() {
     zoomOutButton: document.getElementById("map-zoom-out-button"),
     zoomValue: document.getElementById("map-zoom-value")
   };
+}
+
+function commitWorldInput({ hideSuggestions = true } = {}) {
+  state.elements.world.value = normalizeWorldName(state.elements.world.value);
+  if (hideSuggestions) ui.hideWorldSuggestions();
+  api.fetchBattleDataIfReady();
 }
 
 function isAtMinScale() {
@@ -443,11 +451,18 @@ export function bindEvents() {
   });
 
   state.elements.world.addEventListener("change", () => {
-    state.elements.world.value = normalizeWorldName(state.elements.world.value);
-    api.fetchBattleDataIfReady();
+    commitWorldInput();
   });
 
   state.elements.world.addEventListener("input", ui.renderWorldSuggestions);
+
+  state.elements.world.addEventListener("compositionstart", () => {
+    isComposingWorldInput = true;
+  });
+
+  state.elements.world.addEventListener("compositionend", () => {
+    isComposingWorldInput = false;
+  });
 
   state.elements.world.addEventListener("focus", () => {
     ui.showWorldSuggestions();
@@ -470,17 +485,14 @@ export function bindEvents() {
       return;
     }
 
-    state.elements.world.value = normalizeWorldName(state.elements.world.value);
-    api.fetchBattleDataIfReady();
+    commitWorldInput();
   });
 
   state.elements.world.addEventListener("keydown", event => {
-    if (event.key !== "Enter") return;
+    if (event.key !== "Enter" || event.isComposing || isComposingWorldInput) return;
 
     event.preventDefault();
-    state.elements.world.value = normalizeWorldName(state.elements.world.value);
-    ui.hideWorldSuggestions();
-    api.fetchBattleDataIfReady();
+    commitWorldInput();
   });
 
   state.elements.worldSuggestions.addEventListener("pointerdown", () => {
