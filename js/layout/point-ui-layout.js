@@ -2,11 +2,9 @@
 // Keep point component CSS custom property mapping centralized for map layout tuning.
 
 import {
-  MAP_BANNER_PLACEMENTS,
-  getBannerTextOffset
+  MAP_BANNER_PLACEMENTS
 } from "./decorations.js?v=20260524-visibility-toggles";
-import { getMapPointUiOffsets } from "./point-offsets.js?v=20260524-visibility-toggles";
-import { getMapLayoutCssVars } from "./viewport.js?v=20260524-visibility-toggles";
+import { getPointLayout } from "./layout-engine.js?v=20260524-visibility-toggles";
 import { setMapImagePosition } from "../utils.js?v=20260524-visibility-toggles";
 
 export const POINT_UI_OFFSET_VARS = {
@@ -44,10 +42,9 @@ export function formatCssPx(value) {
 }
 
 export function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
-  const offsets = getMapPointUiOffsets(pointId, width);
+  const { cssVars: baseVars, pointOffsets: offsets } = getPointLayout(pointId, undefined, width);
   if (!offsets) return;
 
-  const baseVars = getMapLayoutCssVars(width);
   Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
     const targetVars = POINT_UI_OFFSET_VARS[targetType];
     if (!targetVars) return;
@@ -94,7 +91,7 @@ export function refreshMapLayout(width = window.innerWidth) {
     const label = document.querySelector(`.point-name-label[data-point-id="${placement.pointId}"]`);
     if (!label) return;
 
-    const textOffset = getBannerTextOffset(placement);
+    const { bannerTextOffset: textOffset } = getPointLayout(placement.pointId);
     setMapImagePosition(
       label,
       placement.x + textOffset.x,

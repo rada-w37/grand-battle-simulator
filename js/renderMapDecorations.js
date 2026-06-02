@@ -1,4 +1,5 @@
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, MAP_LABEL_LAYOUT, getBannerTextOffset } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, MAP_LABEL_LAYOUT } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import { getPointLayout } from "./layout/layout-engine.js?v=20260524-visibility-toggles";
 import { setMapImagePosition } from "./utils.js?v=20260524-visibility-toggles";
 
 function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
@@ -61,7 +62,7 @@ export function renderBannerPlacements(fragment) {
     });
     label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
     label.style.transformOrigin = "center";
-    const textOffset = getBannerTextOffset(placement);
+    const { bannerTextOffset: textOffset } = getPointLayout(placement.pointId);
     setMapImagePosition(
       label,
       placement.x + textOffset.x,
