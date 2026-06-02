@@ -32,6 +32,88 @@ export const POINT_UI_OFFSET_VARS = {
   }
 };
 
+const POINT_UI_OFFSET_TARGETS = {
+  point: "point",
+  select: "select"
+};
+
+const POINT_UI_COMPAT_OFFSET_VARS = {
+  pointLabels: {
+    x: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-left"] },
+    y: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-top"] },
+    width: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-width"] },
+    height: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-height"] },
+    stackHeight: { isNewOffset: true, target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-height"] }
+  },
+  pointBands: {
+    height: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-band-height"] },
+    gap: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-band-gap"] }
+  },
+  select: {
+    x: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-left"] },
+    y: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-top"] },
+    width: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-width"] },
+    height: {
+      sourceVariable: "--map-point-select-height",
+      target: POINT_UI_OFFSET_TARGETS.select,
+      variables: [
+        "--map-point-select-height",
+        "--map-point-select-row-height",
+        "--map-point-select-min-height"
+      ]
+    }
+  },
+  selectRows: {
+    x: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-left"] },
+    y: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-top"] },
+    width: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-width"] },
+    rowHeight: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-row-height"] },
+    gap: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-gap"] }
+  },
+  selectControl: {
+    height: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-height"] },
+    minHeight: { target: POINT_UI_OFFSET_TARGETS.select, variables: ["--map-point-select-min-height"] }
+  }
+};
+
+const NEW_OFFSET_SECTIONS = new Set(["pointBands", "selectRows", "selectControl"]);
+
+function getOffsetTargetElement(element, target) {
+  return target === POINT_UI_OFFSET_TARGETS.select
+    ? element.querySelector(".point-selects") || element
+    : element;
+}
+
+function collectPointUiOffsetRules(offsets = {}) {
+  const rulesByVariable = new Map();
+
+  Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
+    const targetVars = POINT_UI_COMPAT_OFFSET_VARS[targetType];
+    if (!targetVars || !targetOffsets) return;
+
+    Object.entries(targetOffsets).forEach(([property, offset]) => {
+      const rule = targetVars[property];
+      if (!rule) return;
+      const isNewOffset = rule.isNewOffset || NEW_OFFSET_SECTIONS.has(targetType);
+
+      rule.variables.forEach(variableName => {
+        const existingRule = rulesByVariable.get(variableName);
+        if (existingRule?.isNewOffset && !isNewOffset) return;
+
+        rulesByVariable.set(variableName, {
+          isNewOffset,
+          offset,
+          sourceVariable: rule.sourceVariable || variableName,
+          target: rule.target,
+          variableName
+        });
+      });
+    });
+  });
+
+  return Array.from(rulesByVariable.values());
+}
+
 export function getCssPxNumber(value) {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -45,25 +127,12 @@ export function applyPointUiOffsets(element, pointId, width = window.innerWidth)
   const { cssVars: baseVars, pointOffsets: offsets } = getPointLayout(pointId, undefined, width);
   if (!offsets) return;
 
-  Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
-    const targetVars = POINT_UI_OFFSET_VARS[targetType];
-    if (!targetVars) return;
-    const targetElement = targetType === "select"
-      ? element.querySelector(".point-selects") || element
-      : element;
-
-    Object.entries(targetOffsets).forEach(([property, offset]) => {
-      const variableName = targetVars[property];
-      const baseValue = getCssPxNumber(baseVars[variableName]);
-      if (!variableName || baseValue === null) return;
-      // Offsets are additive deltas from the base CSS custom property.
-      const finalValue = formatCssPx(baseValue + offset);
-      targetElement.style.setProperty(variableName, finalValue);
-      if (targetType === "select" && property === "height") {
-        targetElement.style.setProperty("--map-point-select-row-height", finalValue);
-        targetElement.style.setProperty("--map-point-select-min-height", finalValue);
-      }
-    });
+  collectPointUiOffsetRules(offsets).forEach(({ target, variableName, sourceVariable, offset }) => {
+    const baseValue = getCssPxNumber(baseVars[sourceVariable]);
+    if (baseValue === null) return;
+    // Offsets are additive deltas from the base CSS custom property.
+    const finalValue = formatCssPx(baseValue + offset);
+    getOffsetTargetElement(element, target).style.setProperty(variableName, finalValue);
   });
 }
 
@@ -73,6 +142,8 @@ export function clearPointUiOffsets(element) {
       element.style.removeProperty(variableName);
     });
   });
+  element.style.removeProperty("--map-point-band-height");
+  element.style.removeProperty("--map-point-band-gap");
 
   const selectGroup = element.querySelector(".point-selects");
   if (selectGroup) {
@@ -81,6 +152,7 @@ export function clearPointUiOffsets(element) {
     });
     selectGroup.style.removeProperty("--map-point-select-row-height");
     selectGroup.style.removeProperty("--map-point-select-min-height");
+    selectGroup.style.removeProperty("--map-point-select-gap");
   }
 }
 
