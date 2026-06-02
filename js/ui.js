@@ -8,6 +8,7 @@ import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameE
 import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
+import { POINT_UI_OFFSET_VARS, getCssPxNumber, formatCssPx } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 
 export {
   _setFetchBattleDataFn,
@@ -205,40 +206,6 @@ function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = ""
   if (role) {
     element.dataset.devLayoutRole = role;
   }
-}
-
-const POINT_UI_OFFSET_VARS = {
-  pointLabels: {
-    x: "--map-point-labels-left",
-    y: "--map-point-labels-top",
-    width: "--map-point-labels-width",
-    height: "--map-point-labels-height"
-  },
-  sword: {
-    x: "--map-sword-left",
-    y: "--map-sword-top",
-    size: "--map-sword-size"
-  },
-  shield: {
-    x: "--map-shield-left",
-    y: "--map-shield-top",
-    size: "--map-shield-size"
-  },
-  select: {
-    x: "--map-point-select-left",
-    y: "--map-point-select-top",
-    width: "--map-point-select-width",
-    height: "--map-point-select-height"
-  }
-};
-
-function getCssPxNumber(value) {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function formatCssPx(value) {
-  return `${Math.round(value * 100) / 100}px`;
 }
 
 function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
