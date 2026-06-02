@@ -8,6 +8,15 @@ const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
 const MAP_ZOOM_STEP = 0.0015;
 const MAP_BUTTON_ZOOM_STEP = 0.25;
+const DESKTOP_SELECT_SCALE_FACTORS = [
+  [1, 1],
+  [1.25, 0.98],
+  [1.5, 0.95],
+  [1.75, 0.92],
+  [2, 0.9],
+  [2.25, 0.84],
+  [2.5, 0.78]
+];
 
 const mapView = {
   scale: 1,
@@ -29,6 +38,24 @@ let isComposingWorldInput = false;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function getDesktopSelectScaleFactor(scale) {
+  const first = DESKTOP_SELECT_SCALE_FACTORS[0];
+  const last = DESKTOP_SELECT_SCALE_FACTORS[DESKTOP_SELECT_SCALE_FACTORS.length - 1];
+  if (scale <= first[0]) return first[1];
+  if (scale >= last[0]) return last[1];
+
+  for (let index = 1; index < DESKTOP_SELECT_SCALE_FACTORS.length; index += 1) {
+    const previous = DESKTOP_SELECT_SCALE_FACTORS[index - 1];
+    const current = DESKTOP_SELECT_SCALE_FACTORS[index];
+    if (scale > current[0]) continue;
+
+    const progress = (scale - previous[0]) / (current[0] - previous[0]);
+    return previous[1] + (current[1] - previous[1]) * progress;
+  }
+
+  return last[1];
 }
 
 function isMapControlTarget(target) {
@@ -245,7 +272,7 @@ function applyMapView() {
   if (getLayoutViewport() === "mobile") {
     inner.style.removeProperty("--map-select-font-scale");
   } else {
-    inner.style.setProperty("--map-select-font-scale", String(labelScale * 0.95));
+    inner.style.setProperty("--map-select-font-scale", String(labelScale * getDesktopSelectScaleFactor(mapView.scale)));
   }
   viewport?.classList.toggle("is-zoomed", mapView.scale > 1);
   updateMapZoomControls();
