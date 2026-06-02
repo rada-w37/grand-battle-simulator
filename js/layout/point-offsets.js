@@ -39,7 +39,9 @@ export const MAP_POINT_UI_OFFSETS = {
       select: { y: -3, height: -0.01 }
     },
     pharia: {
-      select: { y: -4, height: -0.01 }
+      select: { y: -4 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     citri: {
       pointLabels: { x: 4, y: 6 },
@@ -77,7 +79,9 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { x: -4, y: 2 },
       sword: { x: -3, y: 2 },
       shield: { x: -3, y: 2 },
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     amest: {
       select: { y: -3, height: -0.01 }
@@ -109,7 +113,9 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { x: 4 },
       sword: { x: 4 },
       shield: { x: 4 },
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     malkuth: {
       select: { y: -3, height: -0.01 }
@@ -118,7 +124,9 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { y: -1 },
       sword: { y: -2 },
       shield: { y: 1 },
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     }
   },
   mobile: {
