@@ -30,13 +30,19 @@ import { getLayoutViewport } from "./layout-coordinate.js?v=20260524-visibility-
 export const MAP_POINT_UI_OFFSETS = {
   desktop: {
     ganette: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     rula: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     cushel: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     pharia: {
       select: { y: -4 },
@@ -52,10 +58,14 @@ export const MAP_POINT_UI_OFFSETS = {
       selectControl: { height: -0.01, minHeight: -0.01 }
     },
     floryte: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     toppaz: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     perido: {
       pointLabels: { y: 4 },
@@ -73,7 +83,9 @@ export const MAP_POINT_UI_OFFSETS = {
       selectControl: { height: -0.01, minHeight: -0.01 }
     },
     onyx: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     zircon: {
       pointLabels: { x: -4, y: 2 },
@@ -84,22 +96,34 @@ export const MAP_POINT_UI_OFFSETS = {
       selectControl: { height: -0.01, minHeight: -0.01 }
     },
     amest: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     lapis: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     laven: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     marin: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     larimal: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     tiferet: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     yesod: {
       pointLabels: { x: 4, y: -4 },
@@ -118,7 +142,9 @@ export const MAP_POINT_UI_OFFSETS = {
       selectControl: { height: -0.01, minHeight: -0.01 }
     },
     malkuth: {
-      select: { y: -3, height: -0.01 }
+      select: { y: -3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     ein: {
       pointLabels: { y: -1 },
