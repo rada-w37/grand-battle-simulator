@@ -4,3 +4,4 @@ backup/
 rollback-*/
 run.bat
 .gitignore
+.codegraph/
