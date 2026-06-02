@@ -1334,7 +1334,7 @@ button:focus-visible {
   border: 0;
   border-radius: 0;
   color: #eef4f8;
-  font-size: calc(var(--map-point-select-font-size) * var(--map-label-font-scale, 1));
+  font-size: calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));
   font-weight: 700;
   line-height: var(--map-point-select-line-height);
   /* text-align: center;
@@ -1730,7 +1730,7 @@ button:focus-visible {
     min-height: 24px;
     line-height: var(--map-point-select-line-height);
     padding: 4px 6px;
-    font-size: calc(var(--map-point-select-font-size) * var(--map-label-font-scale, 1));
+    font-size: calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));
     touch-action: manipulation;
     pointer-events: auto;
   }
