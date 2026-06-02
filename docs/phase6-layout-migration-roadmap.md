@@ -127,6 +127,22 @@ Commit granularity:
 
 ### Phase6-C: Dev Editor Alignment
 
+Status:
+
+- Deferred.
+
+Decision:
+
+- The dev layout editor currently depends strongly on the existing offset, DOM,
+  and layout structure.
+- Aligning it immediately after Phase6-B with small patches risks creating a
+  half-migrated editor whose output no longer clearly matches either the legacy
+  model or the final responsibility split.
+- Keep the existing editor behavior intact for now.
+- Revisit the editor after the Phase6-D/E responsibility split is decided.
+- When offsets formally move to the new vocabulary, review and redesign the
+  editor specification at the same time.
+
 Purpose:
 
 - Make the dev layout editor understand the same split used by runtime layout.
