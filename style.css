@@ -1328,7 +1328,9 @@ button:focus-visible {
   height: var(--map-point-select-height);
   min-height: var(--map-point-select-min-height);
   /* min-width: 50; */
-  /* text-overflow: ellipsis; */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border: 0;
   border-radius: 0;
   color: #eef4f8;
