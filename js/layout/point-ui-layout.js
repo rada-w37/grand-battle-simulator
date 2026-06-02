@@ -60,6 +60,7 @@ export function applyPointUiOffsets(element, pointId, width = window.innerWidth)
       const finalValue = formatCssPx(baseValue + offset);
       targetElement.style.setProperty(variableName, finalValue);
       if (targetType === "select" && property === "height") {
+        targetElement.style.setProperty("--map-point-select-row-height", finalValue);
         targetElement.style.setProperty("--map-point-select-min-height", finalValue);
       }
     });
@@ -78,6 +79,7 @@ export function clearPointUiOffsets(element) {
     Object.values(POINT_UI_OFFSET_VARS.select).forEach(variableName => {
       selectGroup.style.removeProperty(variableName);
     });
+    selectGroup.style.removeProperty("--map-point-select-row-height");
     selectGroup.style.removeProperty("--map-point-select-min-height");
   }
 }
