@@ -57,7 +57,8 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { y: 4 },
       sword: { y: 4 },
       shield: { y: 4 },
-      select: { height: -0.01 }
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     meral: {
       pointLabels: { x: 6, y: -4 },
