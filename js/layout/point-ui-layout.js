@@ -56,6 +56,7 @@ export function applyPointUiOffsets(element, pointId, width = window.innerWidth)
       const variableName = targetVars[property];
       const baseValue = getCssPxNumber(baseVars[variableName]);
       if (!variableName || baseValue === null) return;
+      // Offsets are additive deltas from the base CSS custom property.
       const finalValue = formatCssPx(baseValue + offset);
       targetElement.style.setProperty(variableName, finalValue);
       if (targetType === "select" && property === "height") {
