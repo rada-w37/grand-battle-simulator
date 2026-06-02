@@ -2,6 +2,7 @@ import * as state from "./state.js?v=20260524-visibility-toggles";
 import * as api from "./api.js?v=20260524-visibility-toggles";
 import * as ui from "./ui.js?v=20260524-visibility-toggles";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
+import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 2.5;
@@ -239,7 +240,13 @@ function applyMapView() {
 
   constrainMapView();
   inner.style.transform = `matrix(${mapView.scale}, 0, 0, ${mapView.scale}, ${mapView.x}, ${mapView.y})`;
-  inner.style.setProperty("--map-label-font-scale", String(Math.min(1.45, 1 + (mapView.scale - 1) * 0.3)));
+  const labelScale = Math.min(1.45, 1 + (mapView.scale - 1) * 0.3);
+  inner.style.setProperty("--map-label-font-scale", String(labelScale));
+  if (getLayoutViewport() === "mobile") {
+    inner.style.removeProperty("--map-select-font-scale");
+  } else {
+    inner.style.setProperty("--map-select-font-scale", String(labelScale * 0.95));
+  }
   viewport?.classList.toggle("is-zoomed", mapView.scale > 1);
   updateMapZoomControls();
 }
