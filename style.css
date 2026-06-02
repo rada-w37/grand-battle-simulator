@@ -1303,7 +1303,7 @@ button:focus-visible {
   left: calc(50% + var(--map-point-select-left));
   top: calc(50% + var(--map-point-select-top));
   display: grid;
-  grid-template-rows: repeat(2, var(--map-point-select-height));
+  grid-template-rows: repeat(2, var(--map-point-select-row-height));
   gap: var(--map-point-select-gap);
   width: var(--map-point-select-width);
   transform: translate(-50%, -50%);
