@@ -99,7 +99,9 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { x: 4, y: -4 },
       sword: { x: 4, y: -4 },
       shield: { x: 4, y: -4 },
-      select: { x: 4, y: -10, height: -0.01 }
+      select: { x: 4, y: -10 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     keter: {
       pointLabels: { x: 4 },
