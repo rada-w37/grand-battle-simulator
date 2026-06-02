@@ -184,17 +184,29 @@ Current status:
 
 - Phase6-D-1 is complete.
 - Runtime layout can now read both legacy offsets and the new offset vocabulary.
-- `point-offsets.js` is still legacy-only and has not been migrated.
 - Legacy `select.height` still maps to all current select height outputs:
   - `--map-point-select-height`
   - `--map-point-select-row-height`
   - `--map-point-select-min-height`
 - If a legacy offset and a new offset target the same CSS custom property, the
   new offset wins.
+- Phase6-D-2 is complete for desktop `select.height` offsets.
+- Desktop `select.height` legacy offsets have been migrated to:
+  - `selectRows.rowHeight`
+  - `selectControl.height`
+  - `selectControl.minHeight`
+- The desktop migration was verified in this order:
+  - `perido` as the representative point
+  - `citri` as an intermediate point
+  - `yesod` and `meral` as extreme points
+  - the intermediate point group
+  - the remaining majority points in one batch
+- Desktop browser checks showed no visual differences after the migration.
+- `select.x` and `select.y` remain legacy offsets.
+- Mobile `pointLabels.height` and related band-stack offsets have not been
+  migrated.
 - The dev layout editor still assumes the legacy offset model. Phase6-C remains
   deferred until the formal responsibility split is decided.
-- The next new-vocabulary trial should start with a small number of desktop
-  points, not a full table migration.
 
 Expected files:
 
