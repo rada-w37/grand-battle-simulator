@@ -1336,6 +1336,7 @@ button:focus-visible {
   color: #eef4f8;
   font-size: calc(var(--map-point-select-font-size) * var(--map-label-font-scale, 1));
   font-weight: 700;
+  line-height: var(--map-point-select-line-height);
   /* text-align: center;
   text-align-last: center; */
   appearance: none;
