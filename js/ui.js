@@ -5,6 +5,7 @@ import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmpt
 import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
+import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 
 export {
   _setFetchBattleDataFn,
@@ -22,6 +23,11 @@ export {
   getEditableGuildNames,
   updateGuildNameEditControls
 } from "./guildNameEditor.js?v=20260524-visibility-toggles";
+
+export {
+  renderEmptyGuildGrid,
+  renderGuildGrid
+} from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -46,25 +52,6 @@ export function setStatus(message, type = "") {
       state.elements.statusMessage.dataset.type = "";
     }, 3000));
   }
-}
-
-// Guild Grid Display
-export function renderEmptyGuildGrid() {
-  renderGuildGrid(["", "", "", ""]);
-}
-
-export function renderGuildGrid(guildNames) {
-  const guildGrid = getRequiredElement("guildGrid", "guild-grid");
-  if (!guildGrid) return;
-
-  const cells = Array.from({ length: 4 }, (_, index) => {
-    const cell = document.createElement("div");
-    cell.className = `guild-cell guild-cell${index + 1}`;
-    cell.textContent = guildNames[index] || "";
-    return cell;
-  });
-
-  guildGrid.replaceChildren(...cells);
 }
 
 // Guild Storage
