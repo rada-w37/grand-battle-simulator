@@ -1245,6 +1245,7 @@ button:focus-visible {
   opacity: 0.45;
 }
 
+/* Band and select rows are sibling layers for now; do not share top/height adjustments without rechecking point offsets. */
 .point-labels {
   position: absolute;
   z-index: 2;

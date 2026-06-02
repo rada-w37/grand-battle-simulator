@@ -18,6 +18,9 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-sword-left": "3.22px",
     "--map-sword-top": "8.46px",
     "--map-sword-size": "26px",
+    // Band and select rows still use separate positioning anchors.
+    // Desktop visual alignment depends heavily on per-point select offsets,
+    // so keep top, height, and gap values unchanged at this stage.
     "--map-point-labels-left": "66px",
     "--map-point-labels-top": "21px",
     "--map-point-labels-width": "100px",
@@ -25,6 +28,7 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-labels-gap": "9px",
     "--map-point-band-width": "100px",
     "--map-point-band-height": "24px",
+    "--map-point-band-gap": "4px",
     "--map-point-band-radius": "3px",
     "--map-point-select-row-height": "17.99px",
     "--map-point-select-gap": "9px",
@@ -52,6 +56,8 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-sword-left": "3.22px",
     "--map-sword-top": "8.46px",
     "--map-sword-size": "26px",
+    // Mobile keeps pointLabels offsets as the primary visual adjustment path.
+    // Select row vocabulary is named here without changing existing values.
     "--map-point-labels-left": "66px",
     "--map-point-labels-top": "6.8px",
     "--map-point-labels-width": "57.2px",
@@ -60,6 +66,7 @@ export const MAP_LAYOUT_CSS_VARS = {
     "--map-point-labels-gap": "1px",
     "--map-point-band-width": "108%",
     "--map-point-band-height": "11px",
+    "--map-point-band-gap": "1px",
     "--map-point-band-radius": "2px",
     "--map-point-select-row-height": "11px",
     "--map-point-select-gap": "1px",
