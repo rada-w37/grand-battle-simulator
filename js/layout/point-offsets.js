@@ -45,7 +45,9 @@ export const MAP_POINT_UI_OFFSETS = {
       pointLabels: { x: 4, y: 6 },
       sword: { x: 4, y: 6 },
       shield: { x: 4, y: 6 },
-      select: { x: 2, y: 3, height: -0.01 }
+      select: { x: 2, y: 3 },
+      selectRows: { rowHeight: -0.01 },
+      selectControl: { height: -0.01, minHeight: -0.01 }
     },
     floryte: {
       select: { y: -3, height: -0.01 }
