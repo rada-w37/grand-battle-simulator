@@ -1251,8 +1251,8 @@ button:focus-visible {
   left: var(--map-point-labels-left);
   top: var(--map-point-labels-top);
   display: grid;
-  grid-template-rows: repeat(2, var(--map-point-row-height));
-  gap: var(--map-point-row-gap);
+  /* grid-template-rows: repeat(2, 18px); */
+  gap: var(--map-point-labels-gap);
   width: var(--map-point-labels-width);
   height: var(--map-point-labels-height);
   backface-visibility: hidden;
@@ -1303,7 +1303,7 @@ button:focus-visible {
   top: calc(50% + var(--map-point-select-top));
   display: grid;
   grid-template-rows: repeat(2, var(--map-point-select-height));
-  gap: var(--map-point-row-gap);
+  gap: var(--map-point-labels-gap);
   width: var(--map-point-select-width);
   transform: translate(-50%, -50%);
   transform-origin: center;
@@ -1321,8 +1321,6 @@ button:focus-visible {
 
 .point select {
   position: static;
-  display: block;
-  box-sizing: border-box;
   z-index: 2;
   left: auto;
   top: auto;
@@ -1339,7 +1337,6 @@ button:focus-visible {
   font-size: calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));
   font-weight: 700;
   line-height: var(--map-point-select-line-height);
-  padding: var(--map-point-select-padding);
   /* text-align: center;
   text-align-last: center; */
   appearance: none;
@@ -1710,8 +1707,8 @@ button:focus-visible {
       width: var(--map-point-labels-width);
       height: var(--map-point-labels-height);
       top: var(--map-point-labels-top);
-      grid-template-rows: repeat(2, var(--map-point-row-height));
-      gap: var(--map-point-row-gap);
+      grid-template-rows: repeat(2, var(--map-point-labels-row-height));
+      gap: var(--map-point-labels-gap);
       align-items: center;
     }
 
