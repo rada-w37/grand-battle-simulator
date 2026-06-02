@@ -180,6 +180,22 @@ Purpose:
 - Stop using one `select.height` concept for multiple layout responsibilities.
 - Separate offsets for select row stack, select control, and band stack.
 
+Current status:
+
+- Phase6-D-1 is complete.
+- Runtime layout can now read both legacy offsets and the new offset vocabulary.
+- `point-offsets.js` is still legacy-only and has not been migrated.
+- Legacy `select.height` still maps to all current select height outputs:
+  - `--map-point-select-height`
+  - `--map-point-select-row-height`
+  - `--map-point-select-min-height`
+- If a legacy offset and a new offset target the same CSS custom property, the
+  new offset wins.
+- The dev layout editor still assumes the legacy offset model. Phase6-C remains
+  deferred until the formal responsibility split is decided.
+- The next new-vocabulary trial should start with a small number of desktop
+  points, not a full table migration.
+
 Expected files:
 
 - `js/layout/point-ui-layout.js`
