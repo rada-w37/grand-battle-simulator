@@ -1,7 +1,11 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
+export {
+  cloneOccupationStates,
+  createEmptyOccupationStates,
+  normalizePointState
+} from "./domain/occupation-state.js?v=20260524-visibility-toggles";
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
@@ -27,30 +31,6 @@ export function getPointSelects() {
 
 export function getAllPointSelects() {
   return Array.from(document.querySelectorAll(".point select"));
-}
-
-// State Normalization
-export function normalizePointState(state) {
-  if (typeof state === "string") {
-    return { defender: state, attacker: "" };
-  }
-
-  if (!state || typeof state !== "object") {
-    return { defender: "", attacker: "" };
-  }
-
-  return {
-    defender: state.defender || state.guildName || state.defender || "",
-    attacker: state.attacker || state.attackerGuildName || ""
-  };
-}
-
-export function cloneOccupationStates(states = createEmptyOccupationStates()) {
-  return BATTLE_POINTS.map((_, index) => ({ ...normalizePointState(states[index]) }));
-}
-
-export function createEmptyOccupationStates() {
-  return BATTLE_POINTS.map(() => ({ defender: "", attacker: "" }));
 }
 
 // Guild Utilities
