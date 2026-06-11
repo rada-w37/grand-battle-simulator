@@ -1,8 +1,12 @@
-import { API_BASE_URL } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
 import { STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
+import {
+  fetchJson,
+  fetchLatestBattleData,
+  fetchWorldGroups
+} from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 import {
   getGroupedWorldOptions as groupWorldOptions,
   getWorldOptionsForServer as createWorldOptionsForServer,
@@ -13,6 +17,9 @@ export {
   getAttackingGuild,
   getOccupyingGuild
 } from "./domain/battle-snapshot.js?v=20260524-visibility-toggles";
+export {
+  fetchJson
+} from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
 
@@ -33,21 +40,10 @@ export function _setUiFunctions(fns) {
   _updateWorldOptions = fns.updateWorldOptions;
 }
 
-// API Fetch
-export async function fetchJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
-
-  const json = await response.json();
-  if (json.status !== 200) throw new Error(`APIエラー: status ${json.status}`);
-
-  return json.data;
-}
-
 // Load World Groups
 export async function loadGroups() {
   if (_setStatus) _setStatus("ワールド情報を読み込み中...");
-  state.setWorldGroupData(await fetchJson(`${API_BASE_URL}/wgroups`));
+  state.setWorldGroupData(await fetchWorldGroups());
   if (_updateWorldOptions) _updateWorldOptions();
   if (_setStatus) _setStatus("");
 }
@@ -147,9 +143,12 @@ export async function fetchBattleDataIfReady() {
     state.elements.world.value = selectedWorld.id;
     const worldNumeric = selectedWorld.numeric;
     const groupId = getSelectedGroupId(worldNumeric);
-    const url = `${API_BASE_URL}/wg/${groupId}/globalgvg/${state.elements.battleClass.value}/${state.elements.block.value}/latest`;
 
-    state.setCurrentBattleData(await fetchJson(url));
+    state.setCurrentBattleData(await fetchLatestBattleData({
+      groupId,
+      battleClass: state.elements.battleClass.value,
+      block: state.elements.block.value
+    }));
     state.setPendingGuilds(Object.values(state.currentBattleData.guilds || {}));
     state.setUsesFallbackGuilds(false);
 
