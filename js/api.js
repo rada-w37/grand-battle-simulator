@@ -2,6 +2,10 @@ import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-visibility
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+export {
+  getAttackingGuild,
+  getOccupyingGuild
+} from "./domain/battle-snapshot.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
 
@@ -183,17 +187,6 @@ export async function fetchBattleDataIfReady() {
     if (_setStatus) _setStatus(`エラー: ${error.message} / 仮名ギルドで手動反映できます`, "error");
     return;
   }
-}
-
-// Guild Data Application
-export function getOccupyingGuild(castleData, guilds) {
-  const isCapturedOrCountering = castleData.GvgCastleState === 2 || castleData.GvgCastleState === 3;
-  const guildId = isCapturedOrCountering ? castleData.AttackerGuildId : castleData.GuildId;
-  return guilds[guildId] || "";
-}
-
-export function getAttackingGuild(castleData, guilds) {
-  return guilds[castleData.AttackerGuildId] || "";
 }
 
 export function areGuildsDifferent(nextGuilds) {

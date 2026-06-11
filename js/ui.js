@@ -9,6 +9,7 @@ import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+import { createOccupationStatesFromBattleSnapshot } from "./domain/battle-snapshot.js?v=20260524-visibility-toggles";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
@@ -744,16 +745,12 @@ export function applyBattleData() {
   renderGuildGrid(state.currentGuilds);
   updateGuildOptions();
 
-  const guilds = state.currentBattleData.guilds || {};
-  const castlesById = new Map(state.currentBattleData.castles.map(castle => [castle.CastleId, castle]));
+  const snapshotStates = createOccupationStatesFromBattleSnapshot(state.currentBattleData);
 
-  document.querySelectorAll(".point").forEach(point => {
-    const castleId = Number(point.dataset.castleId);
+  document.querySelectorAll(".point").forEach((point, index) => {
     const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
-    const castleData = castlesById.get(castleId);
-    const guildName = castleData ? getOccupyingGuild(castleData, guilds) : "";
-    const attackerGuildName = castleData ? getAttackingGuild(castleData, guilds) : "";
+    const { defender: guildName, attacker: attackerGuildName } = snapshotStates[index] || { defender: "", attacker: "" };
 
     defenderSelect.value = guildName;
     attackerSelect.value = attackerGuildName;
