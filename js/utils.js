@@ -1,4 +1,4 @@
-import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 export {
@@ -6,6 +6,10 @@ export {
   createEmptyOccupationStates,
   normalizePointState
 } from "./domain/occupation-state.js?v=20260524-visibility-toggles";
+export {
+  addPointScore,
+  createEmptyScores
+} from "./domain/scoring.js?v=20260524-visibility-toggles";
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
@@ -89,24 +93,10 @@ export function setMapImagePosition(element, x, y) {
   element.style.top = `${topPercent}%`;
 }
 
-// Score Utilities
+// DOM Score Utilities
 export function createScoreCell(value, className = "") {
   const cell = document.createElement("td");
   cell.textContent = String(value);
   if (className) cell.className = className;
   return cell;
-}
-
-export function createEmptyScores(guildNames) {
-  return Object.fromEntries(guildNames.map(name => [
-    name,
-    { total: 0, temple: 0, castle: 0, church: 0 }
-  ]));
-}
-
-export function addPointScore(scores, guildName, type) {
-  if (!guildName || !(guildName in scores)) return;
-
-  scores[guildName][type] += 1;
-  scores[guildName].total += POINT_SCORES[type] || 0;
 }

@@ -1,7 +1,7 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
+import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
 import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
@@ -9,6 +9,7 @@ import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
 export {
   _setFetchBattleDataFn,
@@ -363,30 +364,16 @@ export function updateGuildOptions() {
 
 // Score Calculation
 export function calculateScoresFromStates(selectStates, guildNames) {
-  const scores = createEmptyScores(guildNames);
-
-  BATTLE_POINTS.forEach((point, index) => {
-    addPointScore(scores, normalizePointState(selectStates[index]).defender, point.type || "church");
-  });
-
-  return scores;
+  return calculateDomainScoresFromStates(selectStates, guildNames);
 }
 
 export function getCumulativeScores(guildNames) {
-  const scores = createEmptyScores(guildNames);
-  const activeIndex = Math.max(0, state.occupationTabs.findIndex(tab => tab.id === state.activeTabId));
-  const currentSelectStates = getCurrentSelectStates();
-
-  state.occupationTabs.slice(0, activeIndex + 1).forEach(tab => {
-    const selectStates = tab.id === state.activeTabId ? currentSelectStates : tab.selectStates;
-    const tabScores = calculateScoresFromStates(selectStates, guildNames);
-
-    guildNames.forEach(guildName => {
-      scores[guildName].total += tabScores[guildName].total;
-    });
+  return calculateCumulativeScores({
+    occupationTabs: state.occupationTabs,
+    activeTabId: state.activeTabId,
+    currentSelectStates: getCurrentSelectStates(),
+    guildNames
   });
-
-  return scores;
 }
 
 export function updateCumulativeScope() {
