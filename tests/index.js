@@ -7,3 +7,4 @@ import "./domain/scoring.test.mjs";
 import "./domain/worlds.test.mjs";
 import "./infrastructure/mentemori-api.test.mjs";
 import "./infrastructure/storage.test.mjs";
+import "./presentation/dom-helpers.test.mjs";

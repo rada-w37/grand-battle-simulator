@@ -3,6 +3,10 @@ import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-t
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { readJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
+export {
+  createOption,
+  createScoreCell
+} from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import {
   getAuraColorForGuildName as getAuraColorForGuildNameFromEntries,
   getColorForGuildName as getColorForGuildNameFromEntries,
@@ -27,14 +31,6 @@ export { normalizePointState };
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
   return readJsonStorage(key, fallback);
-}
-
-// DOM Utilities
-export function createOption(value, text) {
-  const option = document.createElement("option");
-  option.value = value;
-  option.textContent = text;
-  return option;
 }
 
 export function getPointSelects() {
@@ -89,12 +85,4 @@ export function setMapImagePosition(element, x, y) {
   const { leftPercent, topPercent } = basePxToPercent(x, y);
   element.style.left = `${leftPercent}%`;
   element.style.top = `${topPercent}%`;
-}
-
-// DOM Score Utilities
-export function createScoreCell(value, className = "") {
-  const cell = document.createElement("td");
-  cell.textContent = String(value);
-  if (className) cell.className = className;
-  return cell;
 }

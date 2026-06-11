@@ -10,6 +10,7 @@ import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { prepareBattleDataApplicationState, resolveFallbackGuildNames, shouldResetBattleDataApplication } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
@@ -204,16 +205,6 @@ function createScoreGuildRadioCell(guildName) {
 
   cell.appendChild(radio);
   return cell;
-}
-
-function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
-  element.dataset.devLayoutId = targetId;
-  element.dataset.devLayoutKey = layoutKey;
-  element.dataset.devLayoutPointId = pointId;
-  element.dataset.devLayoutTargetType = targetType || role || layoutKey;
-  if (role) {
-    element.dataset.devLayoutRole = role;
-  }
 }
 
 // Render Battle Points Map
