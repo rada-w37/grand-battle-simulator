@@ -6,7 +6,12 @@ import {
   createEmptyOccupationStates,
   normalizePointState
 } from "../../js/domain/occupation-state.js?v=test";
-import { BATTLE_POINTS } from "../../js/layout/layout-config.js?v=test";
+
+const battlePoints = [
+  { id: "point-1" },
+  { id: "point-2" },
+  { id: "point-3" }
+];
 
 test("normalizes legacy string state as defender", () => {
   assert.deepEqual(normalizePointState("Guild A"), {
@@ -35,7 +40,7 @@ test("normalizes empty values", () => {
 test("clones defender and attacker states without mutating source objects", () => {
   const sourceState = { defender: "Guild A", attacker: "Guild B" };
   const states = [sourceState];
-  const cloned = cloneOccupationStates(states);
+  const cloned = cloneOccupationStates(states, battlePoints);
 
   assert.deepEqual(cloned[0], sourceState);
   assert.notEqual(cloned[0], sourceState);
@@ -45,15 +50,15 @@ test("clones defender and attacker states without mutating source objects", () =
 });
 
 test("fills missing clone entries with empty occupation states", () => {
-  const cloned = cloneOccupationStates([{ defender: "Guild A", attacker: "Guild B" }]);
+  const cloned = cloneOccupationStates([{ defender: "Guild A", attacker: "Guild B" }], battlePoints);
 
-  assert.equal(cloned.length, BATTLE_POINTS.length);
+  assert.equal(cloned.length, battlePoints.length);
   assert.deepEqual(cloned[1], { defender: "", attacker: "" });
 });
 
 test("creates empty occupation states for every battle point", () => {
-  const states = createEmptyOccupationStates();
+  const states = createEmptyOccupationStates(battlePoints);
 
-  assert.equal(states.length, BATTLE_POINTS.length);
+  assert.equal(states.length, battlePoints.length);
   assert.ok(states.every(state => state.defender === "" && state.attacker === ""));
 });

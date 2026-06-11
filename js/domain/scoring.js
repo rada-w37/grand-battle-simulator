@@ -1,6 +1,10 @@
-import { POINT_SCORES } from "../constants.js?v=20260524-visibility-toggles";
-import { BATTLE_POINTS } from "../layout/layout-config.js?v=20260524-visibility-toggles";
 import { normalizePointState } from "./occupation-state.js?v=20260524-visibility-toggles";
+
+export const POINT_SCORES = {
+  temple: 4,
+  castle: 2,
+  church: 1
+};
 
 export function createEmptyScores(guildNames) {
   return Object.fromEntries(guildNames.map(name => [
@@ -16,7 +20,7 @@ export function addPointScore(scores, guildName, type) {
   scores[guildName].total += POINT_SCORES[type] || 0;
 }
 
-export function calculateScoresFromStates(selectStates, guildNames, battlePoints = BATTLE_POINTS) {
+export function calculateScoresFromStates(selectStates, guildNames, battlePoints = []) {
   const scores = createEmptyScores(guildNames);
 
   battlePoints.forEach((point, index) => {
@@ -31,7 +35,7 @@ export function calculateCumulativeScores({
   activeTabId = "",
   currentSelectStates = [],
   guildNames = [],
-  battlePoints = BATTLE_POINTS
+  battlePoints = []
 } = {}) {
   const scores = createEmptyScores(guildNames);
   const activeIndex = Math.max(0, occupationTabs.findIndex(tab => tab.id === activeTabId));

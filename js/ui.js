@@ -366,7 +366,7 @@ export function updateGuildOptions() {
 
 // Score Calculation
 export function calculateScoresFromStates(selectStates, guildNames) {
-  return calculateDomainScoresFromStates(selectStates, guildNames);
+  return calculateDomainScoresFromStates(selectStates, guildNames, BATTLE_POINTS);
 }
 
 export function getCumulativeScores(guildNames) {
@@ -374,7 +374,8 @@ export function getCumulativeScores(guildNames) {
     occupationTabs: state.occupationTabs,
     activeTabId: state.activeTabId,
     currentSelectStates: getCurrentSelectStates(),
-    guildNames
+    guildNames,
+    battlePoints: BATTLE_POINTS
   });
 }
 
@@ -479,7 +480,7 @@ function pushOccupationHistory(entry, tabId = state.activeTabId) {
 }
 
 function applyOccupationHistoryEntry(entry, direction) {
-  const nextStates = applyOccupationHistoryEntryToStates(getCurrentSelectStates(), entry, direction);
+  const nextStates = applyOccupationHistoryEntryToStates(getCurrentSelectStates(), entry, direction, BATTLE_POINTS);
 
   applySelectStates(nextStates);
   saveSelectStates();
@@ -490,7 +491,7 @@ export function recordCurrentOccupationEdit() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
 
-  pushOccupationHistory(createOccupationHistoryEntry(activeTab.selectStates, getCurrentSelectStates()), activeTab.id);
+  pushOccupationHistory(createOccupationHistoryEntry(activeTab.selectStates, getCurrentSelectStates(), BATTLE_POINTS), activeTab.id);
 }
 
 export function canUndoOccupation(tabId = state.activeTabId) {
@@ -716,7 +717,7 @@ export function applyBattleData() {
     resetOccupationTabs();
     updateGuildOptions();
     applySelectStates(state.occupationTabs[0].selectStates);
-    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
+    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
     updateScores();
     state.setUsesFallbackGuilds(false);
     if (_setPendingStateFn) {
@@ -745,7 +746,7 @@ export function applyBattleData() {
   renderGuildGrid(state.currentGuilds);
   updateGuildOptions();
 
-  const snapshotStates = createOccupationStatesFromBattleSnapshot(state.currentBattleData);
+  const snapshotStates = createOccupationStatesFromBattleSnapshot(state.currentBattleData, BATTLE_POINTS);
 
   document.querySelectorAll(".point").forEach((point, index) => {
     const defenderSelect = point.querySelector(".point-defender-select");
@@ -760,7 +761,7 @@ export function applyBattleData() {
     updatePointSelfAttackState(point);
   });
 
-  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
+  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
   saveSelectStates();
   updateScores();
   if (_setPendingStateFn) {

@@ -65,9 +65,7 @@ export function getWorldRangeKey(world) {
 }
 
 export function getWorldRangeLabel(rangeStart, worlds) {
-  const first = worlds[0].id;
-  const last = worlds[worlds.length - 1].id;
-  return `${first} ～ ${last}`;
+  return getDomainWorldRangeLabel(rangeStart, worlds);
 }
 
 export function getGroupedWorldOptions() {

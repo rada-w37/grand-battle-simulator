@@ -1,7 +1,8 @@
-import { GUILD_AURA_COLORS, GUILD_COLORS, EMPTY_POINT_COLOR } from "../constants.js?v=20260524-visibility-toggles";
 import { normalizePointState } from "./occupation-state.js?v=20260524-visibility-toggles";
 
-export function getGuildEntries(guildNames, colors = GUILD_COLORS) {
+const DEFAULT_EMPTY_POINT_COLOR = "rgba(255, 255, 255, 0.86)";
+
+export function getGuildEntries(guildNames, colors = []) {
   return guildNames
     .map((name, index) => ({
       name,
@@ -14,12 +15,12 @@ export function getGuildIndex(guildEntries, guildName) {
   return guildEntries.findIndex(guild => guild.name === guildName) + 1;
 }
 
-export function getColorForGuildName(guildEntries, guildName, emptyColor = EMPTY_POINT_COLOR) {
+export function getColorForGuildName(guildEntries, guildName, emptyColor = DEFAULT_EMPTY_POINT_COLOR) {
   const match = guildEntries.find(guild => guild.name === guildName);
   return match?.color || emptyColor;
 }
 
-export function getAuraColorForGuildName(guildEntries, guildName, auraColors = GUILD_AURA_COLORS) {
+export function getAuraColorForGuildName(guildEntries, guildName, auraColors = []) {
   const index = getGuildIndex(guildEntries, guildName);
   return index ? auraColors[index - 1] : "transparent";
 }

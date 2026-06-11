@@ -1,7 +1,6 @@
-import { BATTLE_POINTS } from "../layout/layout-config.js?v=20260524-visibility-toggles";
 import { normalizePointState } from "./occupation-state.js?v=20260524-visibility-toggles";
 
-export function createOccupationHistoryEntry(beforeStates, afterStates, battlePoints = BATTLE_POINTS) {
+export function createOccupationHistoryEntry(beforeStates, afterStates, battlePoints = beforeStates) {
   const changes = battlePoints.map((point, index) => {
     const before = normalizePointState(beforeStates[index]);
     const after = normalizePointState(afterStates[index]);
@@ -13,7 +12,7 @@ export function createOccupationHistoryEntry(beforeStates, afterStates, battlePo
   return changes.length ? { changes } : null;
 }
 
-export function applyOccupationHistoryEntryToStates(currentStates, entry, direction, battlePoints = BATTLE_POINTS) {
+export function applyOccupationHistoryEntryToStates(currentStates, entry, direction, battlePoints = currentStates) {
   const stateKey = direction === "undo" ? "before" : "after";
   const nextStates = currentStates.map(pointState => ({ ...normalizePointState(pointState) }));
 

@@ -1,4 +1,5 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import {
@@ -7,9 +8,9 @@ import {
   getGuildEntries as createGuildEntries,
   getGuildIndex as getGuildIndexFromEntries
 } from "./domain/guilds.js?v=20260524-visibility-toggles";
-export {
-  cloneOccupationStates,
-  createEmptyOccupationStates,
+import {
+  cloneOccupationStates as cloneDomainOccupationStates,
+  createEmptyOccupationStates as createDomainEmptyOccupationStates,
   normalizePointState
 } from "./domain/occupation-state.js?v=20260524-visibility-toggles";
 export {
@@ -19,6 +20,8 @@ export {
 export {
   normalizeWorldName
 } from "./domain/worlds.js?v=20260524-visibility-toggles";
+
+export { normalizePointState };
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
@@ -44,6 +47,14 @@ export function getPointSelects() {
 
 export function getAllPointSelects() {
   return Array.from(document.querySelectorAll(".point select"));
+}
+
+export function cloneOccupationStates(states = createEmptyOccupationStates()) {
+  return cloneDomainOccupationStates(states, BATTLE_POINTS);
+}
+
+export function createEmptyOccupationStates() {
+  return createDomainEmptyOccupationStates(BATTLE_POINTS);
 }
 
 // Guild Utilities
