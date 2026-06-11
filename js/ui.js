@@ -3,14 +3,14 @@ import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
+import { getSelectedWorld, getOccupyingGuild, getAttackingGuild } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
 import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+import { prepareBattleDataApplicationState, resolveFallbackGuildNames, shouldResetBattleDataApplication } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
@@ -740,7 +740,10 @@ export function applyBattleData() {
     battlePoints: BATTLE_POINTS
   });
   const nextGuilds = preparedBattleData.guilds;
-  if (state.currentGuilds.length > 0 && areGuildsDifferent(nextGuilds)) {
+  if (shouldResetBattleDataApplication({
+    currentGuilds: state.currentGuilds,
+    nextGuilds
+  })) {
     const confirmed = window.confirm(
       "最新の拠点情報から取得したギルド名が、現在の拠点情報のギルドと異なります。\n" +
       "各拠点情報およびタブをすべて初期化してから反映します。よろしいですか？"

@@ -2,9 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  areGuildNameListsDifferent,
+  prepareBattleDataFetchFailureState,
   prepareBattleDataApplicationState,
+  prepareFetchedBattleDataState,
   resolveBattleDataGuildNames,
-  resolveFallbackGuildNames
+  resolveFallbackGuildNames,
+  shouldResetBattleDataApplication
 } from "../../js/application/battle-data-boundary.js?v=test";
 
 const battlePoints = [
@@ -73,4 +77,44 @@ test("prepares guild names and occupation states for UI application", () => {
     { defender: "Guild A", attacker: "Guild B" },
     { defender: "Guild B", attacker: "Guild B" }
   ]);
+});
+
+test("prepares fetched battle data state for existing api facade", () => {
+  assert.deepEqual(prepareFetchedBattleDataState(battleData), {
+    battleData,
+    pendingGuilds: ["Guild A", "Guild B"],
+    usesFallbackGuilds: false
+  });
+});
+
+test("prepares fallback state for failed battle data fetches", () => {
+  assert.deepEqual(prepareBattleDataFetchFailureState(["Fallback A", "Fallback B"]), {
+    battleData: null,
+    pendingGuilds: ["Fallback A", "Fallback B"],
+    usesFallbackGuilds: true
+  });
+});
+
+test("detects guild list changes with current non-empty next guild behavior", () => {
+  assert.equal(areGuildNameListsDifferent(["Guild A", "Guild B"], ["Guild A", "Guild B"]), false);
+  assert.equal(areGuildNameListsDifferent(["Guild A", "Guild B"], ["Guild A", "", "Guild B"]), false);
+  assert.equal(areGuildNameListsDifferent(["Guild A", "Guild B"], ["Guild B", "Guild A"]), true);
+  assert.equal(areGuildNameListsDifferent(["Guild A"], ["Guild A", "Guild B"]), true);
+});
+
+test("requests battle data reset only when existing guilds differ from next guilds", () => {
+  assert.equal(shouldResetBattleDataApplication({
+    currentGuilds: [],
+    nextGuilds: ["Guild A"]
+  }), false);
+
+  assert.equal(shouldResetBattleDataApplication({
+    currentGuilds: ["Guild A"],
+    nextGuilds: ["Guild A"]
+  }), false);
+
+  assert.equal(shouldResetBattleDataApplication({
+    currentGuilds: ["Guild A"],
+    nextGuilds: ["Guild B"]
+  }), true);
 });

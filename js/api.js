@@ -7,6 +7,11 @@ import {
   fetchWorldGroups
 } from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 import {
+  areGuildNameListsDifferent,
+  prepareBattleDataFetchFailureState,
+  prepareFetchedBattleDataState
+} from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+import {
   getGroupedWorldOptions as groupWorldOptions,
   getWorldOptionsForServer as createWorldOptionsForServer,
   getWorldRangeKey as getDomainWorldRangeKey,
@@ -143,22 +148,24 @@ export async function fetchBattleDataIfReady() {
     const worldNumeric = selectedWorld.numeric;
     const groupId = getSelectedGroupId(worldNumeric);
 
-    state.setCurrentBattleData(await fetchLatestBattleData({
+    const nextBattleState = prepareFetchedBattleDataState(await fetchLatestBattleData({
       groupId,
       battleClass: state.elements.battleClass.value,
       block: state.elements.block.value
     }));
-    state.setPendingGuilds(Object.values(state.currentBattleData.guilds || {}));
-    state.setUsesFallbackGuilds(false);
+    state.setCurrentBattleData(nextBattleState.battleData);
+    state.setPendingGuilds(nextBattleState.pendingGuilds);
+    state.setUsesFallbackGuilds(nextBattleState.usesFallbackGuilds);
 
     if (_renderGuildGrid) _renderGuildGrid(state.pendingGuilds);
     setPendingState(true);
     state.elements.applyButton.disabled = false;
     if (_setStatus) _setStatus("最新データを取得しました。", "success");
   } catch (error) {
-    state.setCurrentBattleData(null);
-    state.setPendingGuilds(FALLBACK_GUILDS);
-    state.setUsesFallbackGuilds(true);
+    const fallbackBattleState = prepareBattleDataFetchFailureState(FALLBACK_GUILDS);
+    state.setCurrentBattleData(fallbackBattleState.battleData);
+    state.setPendingGuilds(fallbackBattleState.pendingGuilds);
+    state.setUsesFallbackGuilds(fallbackBattleState.usesFallbackGuilds);
     state.elements.applyButton.disabled = false;
     setPendingState(true);
     if (_renderGuildGrid) _renderGuildGrid(FALLBACK_GUILDS);
@@ -169,10 +176,7 @@ export async function fetchBattleDataIfReady() {
 
 export function areGuildsDifferent(nextGuilds) {
   const currentNames = getGuildEntries().map(guild => guild.name);
-  const nextNames = nextGuilds.filter(name => name !== "");
-
-  if (currentNames.length !== nextNames.length) return true;
-  return nextNames.some((name, index) => currentNames[index] !== name);
+  return areGuildNameListsDifferent(currentNames, nextGuilds);
 }
 
 export function setPendingState(isPending) {
