@@ -1,8 +1,8 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
-import { getStorageItem, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
+import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
+import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
@@ -82,7 +82,7 @@ export function setStatus(message, type = "") {
 
 // Guild Storage
 export function loadAppliedGuilds() {
-  state.setCurrentGuilds(parseStoredJson(STORAGE_KEYS.appliedGuilds, []));
+  state.setCurrentGuilds(readJsonStorage(STORAGE_KEYS.appliedGuilds, []));
 }
 
 export function saveAppliedGuilds() {
@@ -601,8 +601,8 @@ export function saveOccupationTabs() {
 }
 
 export function loadOccupationTabs() {
-  const saved = parseStoredJson(STORAGE_KEYS.occupationTabs, null);
-  const legacySelectStates = parseStoredJson(STORAGE_KEYS.selectStates, null);
+  const saved = readJsonStorage(STORAGE_KEYS.occupationTabs, null);
+  const legacySelectStates = readJsonStorage(STORAGE_KEYS.selectStates, null);
 
   if (saved?.tabs?.length) {
     state.setOccupationTabs(saved.tabs.map((tab, index) => ({

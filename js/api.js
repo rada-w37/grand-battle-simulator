@@ -1,9 +1,8 @@
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
-import { STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
+import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import { readJsonStorage, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import {
-  fetchJson,
   fetchLatestBattleData,
   fetchWorldGroups
 } from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
@@ -105,7 +104,7 @@ export function saveBattleSelection() {
 }
 
 export function restoreBattleSelection() {
-  const selection = parseStoredJson(STORAGE_KEYS.battleSelection, {});
+  const selection = readJsonStorage(STORAGE_KEYS.battleSelection, {});
 
   if (selection.server) state.elements.server.value = selection.server;
   if (_updateWorldOptions) _updateWorldOptions();
