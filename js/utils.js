@@ -1,6 +1,12 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
+import {
+  getAuraColorForGuildName as getAuraColorForGuildNameFromEntries,
+  getColorForGuildName as getColorForGuildNameFromEntries,
+  getGuildEntries as createGuildEntries,
+  getGuildIndex as getGuildIndexFromEntries
+} from "./domain/guilds.js?v=20260524-visibility-toggles";
 export {
   cloneOccupationStates,
   createEmptyOccupationStates,
@@ -42,26 +48,19 @@ export function getAllPointSelects() {
 
 // Guild Utilities
 export function getGuildEntries() {
-  return state.currentGuilds
-    .map((name, index) => ({
-      name,
-      color: GUILD_COLORS[index]
-    }))
-    .filter(guild => guild.name !== "");
+  return createGuildEntries(state.currentGuilds, GUILD_COLORS);
 }
 
 export function getGuildIndex(guildName) {
-  return getGuildEntries().findIndex(guild => guild.name === guildName) + 1;
+  return getGuildIndexFromEntries(getGuildEntries(), guildName);
 }
 
 export function getColorForGuildName(guildName) {
-  const match = getGuildEntries().find(guild => guild.name === guildName);
-  return match?.color || EMPTY_POINT_COLOR;
+  return getColorForGuildNameFromEntries(getGuildEntries(), guildName, EMPTY_POINT_COLOR);
 }
 
 export function getAuraColorForGuildName(guildName) {
-  const index = getGuildIndex(guildName);
-  return index ? GUILD_AURA_COLORS[index - 1] : "transparent";
+  return getAuraColorForGuildNameFromEntries(getGuildEntries(), guildName, GUILD_AURA_COLORS);
 }
 
 // Tab Utilities
