@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "../constants.js?v=20260524-visibility-toggles";
+import { STORAGE_KEYS } from "../config/app-config.js?v=20260524-visibility-toggles";
 
 export { STORAGE_KEYS };
 

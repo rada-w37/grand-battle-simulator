@@ -1,14 +1,7 @@
-// API Configuration
-export const API_BASE_URL = "https://api.mentemori.icu";
-
-// Storage Keys
-export const STORAGE_KEYS = {
-  selectStates: "selectStates",
-  battleSelection: "battleSelection",
-  occupationTabs: "occupationTabs",
-  appliedGuilds: "appliedGuilds",
-  highlightedGuildName: "highlightedGuildName"
-};
+export {
+  API_BASE_URL,
+  STORAGE_KEYS
+} from "./config/app-config.js?v=20260524-visibility-toggles";
 
 // Guild Colors
 export const GUILD_COLORS = ["#6f3a38", "#3f465d", "#3f5a43", "#5d5637"];

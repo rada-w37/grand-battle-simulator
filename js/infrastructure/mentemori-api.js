@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../constants.js?v=20260524-visibility-toggles";
+import { API_BASE_URL } from "../config/app-config.js?v=20260524-visibility-toggles";
 
 export function createWorldGroupsUrl() {
   return `${API_BASE_URL}/wgroups`;
