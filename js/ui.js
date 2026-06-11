@@ -9,6 +9,7 @@ import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
 export {
@@ -462,18 +463,6 @@ function getOccupationHistory(tabId = state.activeTabId) {
   return state.occupationHistoryByTabId[tabId];
 }
 
-function createOccupationHistoryEntry(beforeStates, afterStates) {
-  const changes = BATTLE_POINTS.map((point, index) => {
-    const before = normalizePointState(beforeStates[index]);
-    const after = normalizePointState(afterStates[index]);
-
-    if (before.attacker === after.attacker && before.defender === after.defender) return null;
-    return { pointId: point.id, before, after };
-  }).filter(Boolean);
-
-  return changes.length ? { changes } : null;
-}
-
 function pushOccupationHistory(entry, tabId = state.activeTabId) {
   if (!entry?.changes?.length) return;
 
@@ -489,14 +478,7 @@ function pushOccupationHistory(entry, tabId = state.activeTabId) {
 }
 
 function applyOccupationHistoryEntry(entry, direction) {
-  const nextStates = getCurrentSelectStates();
-  const stateKey = direction === "undo" ? "before" : "after";
-
-  entry.changes.forEach(change => {
-    const pointIndex = BATTLE_POINTS.findIndex(point => point.id === change.pointId);
-    if (pointIndex < 0) return;
-    nextStates[pointIndex] = { ...change[stateKey] };
-  });
+  const nextStates = applyOccupationHistoryEntryToStates(getCurrentSelectStates(), entry, direction);
 
   applySelectStates(nextStates);
   saveSelectStates();
