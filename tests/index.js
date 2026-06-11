@@ -1,3 +1,4 @@
+import "./application/battle-data-boundary.test.mjs";
 import "./domain/battle-snapshot.test.mjs";
 import "./domain/guilds.test.mjs";
 import "./domain/occupation-state.test.mjs";

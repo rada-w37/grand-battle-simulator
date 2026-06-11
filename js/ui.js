@@ -10,7 +10,7 @@ import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { createOccupationStatesFromBattleSnapshot } from "./domain/battle-snapshot.js?v=20260524-visibility-toggles";
+import { prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
@@ -711,7 +711,10 @@ export function applyBattleData() {
   const beforeSelectStates = getCurrentSelectStates();
 
   if (state.usesFallbackGuilds) {
-    const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : getEditableGuildNames();
+    const nextGuilds = resolveFallbackGuildNames({
+      pendingGuilds: state.pendingGuilds,
+      editableGuildNames: getEditableGuildNames()
+    });
     state.setCurrentGuilds(nextGuilds);
     saveAppliedGuilds();
     renderGuildGrid(state.currentGuilds);
@@ -731,7 +734,12 @@ export function applyBattleData() {
 
   if (!state.currentBattleData || !Array.isArray(state.currentBattleData.castles)) return;
 
-  const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : Object.values(state.currentBattleData.guilds || {});
+  const preparedBattleData = prepareBattleDataApplicationState({
+    battleData: state.currentBattleData,
+    pendingGuilds: state.pendingGuilds,
+    battlePoints: BATTLE_POINTS
+  });
+  const nextGuilds = preparedBattleData.guilds;
   if (state.currentGuilds.length > 0 && areGuildsDifferent(nextGuilds)) {
     const confirmed = window.confirm(
       "最新の拠点情報から取得したギルド名が、現在の拠点情報のギルドと異なります。\n" +
@@ -747,7 +755,7 @@ export function applyBattleData() {
   renderGuildGrid(state.currentGuilds);
   updateGuildOptions();
 
-  const snapshotStates = createOccupationStatesFromBattleSnapshot(state.currentBattleData, BATTLE_POINTS);
+  const snapshotStates = preparedBattleData.occupationStates;
 
   document.querySelectorAll(".point").forEach((point, index) => {
     const defenderSelect = point.querySelector(".point-defender-select");
