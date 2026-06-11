@@ -291,3 +291,28 @@ Step 13ではdocs-onlyで `layout/` の境界方針を明文化した。
 - `layout/` はPhase6 layout migrationとdev layout editorの互換契約を含むため、DDD refactorのついでにdomainへ移動しない。
 - `ui.js`、`main.js`、map rendering modulesからのlayout importは、表示支援責務として許容する。
 - Step 14 final import cleanupでは、layoutをdomainへ移すのではなく、facade/import noiseの整理に留める。
+
+## Step 14 Final Import/Export Cleanup
+
+Step 14では削除を主目的にせず、Step 1からStep 13で作った境界が実装と矛盾していないかを確認した。
+
+最終方針:
+
+- `domain/` は `layout/`、`constants.js`、`localStorage`、`fetch`、DOMへ依存しない。
+- `infrastructure/` は `config/` と外部入出力だけを扱い、`ui.js`、`state.js`、`presentation/` へ依存しない。
+- `application/` はDOM/event/localStorage/fetchを持たず、UI/API間のデータ準備に留める。
+- `presentation/` は小さなDOM helperに留め、domain ruleを直接持たない。
+- `config/` はlayoutやutilsへ依存しない。
+- `constants.js`、`utils.js`、`api.js`、`ui.js` の既存exportは、互換facadeとして必要なものを残す。
+
+Step 14で実施したコード整理:
+
+- `api.js` の未使用 `BATTLE_POINTS` importを削除した。
+- `ui.js` の未使用API helper importを削除した。
+
+残したfacade:
+
+- `constants.js`: 既存import互換のため、config値と表示定数、layout再exportを保持する。
+- `utils.js`: 既存call site互換のため、domain/presentation helperへの委譲exportを保持する。
+- `api.js`: 既存API facadeとして `fetchJson` re-exportやbattle API orchestrationを保持する。
+- `ui.js`: 既存presentation facadeとして各UI exportと既存bridgeを保持する。

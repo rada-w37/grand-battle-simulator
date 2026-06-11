@@ -1,4 +1,3 @@
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
 import { readJsonStorage, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";

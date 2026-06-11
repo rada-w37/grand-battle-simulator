@@ -3,7 +3,6 @@ import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { getSelectedWorld, getOccupyingGuild, getAttackingGuild } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
 import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
