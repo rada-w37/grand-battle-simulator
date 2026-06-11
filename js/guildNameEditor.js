@@ -1,14 +1,14 @@
-import { STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { getActiveTab } from "./utils.js?v=20260524-visibility-toggles";
 import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260524-visibility-toggles";
+import { removeStorageItem, setStorageItem, STORAGE_KEYS } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260524-visibility-toggles";
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {
-    localStorage.setItem(STORAGE_KEYS.highlightedGuildName, guildName);
+    setStorageItem(STORAGE_KEYS.highlightedGuildName, guildName);
   } else {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 export function getEditableGuildNames() {

@@ -1,7 +1,8 @@
-import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
+import { readJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import {
   getAuraColorForGuildName as getAuraColorForGuildNameFromEntries,
   getColorForGuildName as getColorForGuildNameFromEntries,
@@ -25,12 +26,7 @@ export { normalizePointState };
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
-  try {
-    const value = JSON.parse(localStorage.getItem(key) || "null");
-    return value ?? fallback;
-  } catch {
-    return fallback;
-  }
+  return readJsonStorage(key, fallback);
 }
 
 // DOM Utilities

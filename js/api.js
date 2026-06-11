@@ -1,7 +1,8 @@
-import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
+import { API_BASE_URL } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import { STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import {
   getGroupedWorldOptions as groupWorldOptions,
   getWorldOptionsForServer as createWorldOptionsForServer,
@@ -99,12 +100,12 @@ export function canFetchBattleData() {
 
 // Battle Selection Storage
 export function saveBattleSelection() {
-  localStorage.setItem(STORAGE_KEYS.battleSelection, JSON.stringify({
+  writeJsonStorage(STORAGE_KEYS.battleSelection, {
     server: state.elements.server.value,
     world: normalizeWorldName(state.elements.world.value),
     battleClass: state.elements.battleClass.value,
     block: state.elements.block.value
-  }));
+  });
 }
 
 export function restoreBattleSelection() {

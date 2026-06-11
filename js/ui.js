@@ -1,7 +1,8 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
+import { getStorageItem, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
@@ -85,11 +86,11 @@ export function loadAppliedGuilds() {
 }
 
 export function saveAppliedGuilds() {
-  localStorage.setItem(STORAGE_KEYS.appliedGuilds, JSON.stringify(state.currentGuilds));
+  writeJsonStorage(STORAGE_KEYS.appliedGuilds, state.currentGuilds);
 }
 
 export function loadHighlightedGuildName() {
-  const savedName = localStorage.getItem(STORAGE_KEYS.highlightedGuildName) || "";
+  const savedName = getStorageItem(STORAGE_KEYS.highlightedGuildName) || "";
   if (savedName && state.currentGuilds.includes(savedName)) {
     state.setHighlightedGuildName(savedName);
     return;
@@ -97,15 +98,15 @@ export function loadHighlightedGuildName() {
 
   state.setHighlightedGuildName("");
   if (savedName) {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {
-    localStorage.setItem(STORAGE_KEYS.highlightedGuildName, guildName);
+    setStorageItem(STORAGE_KEYS.highlightedGuildName, guildName);
   } else {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 
@@ -593,10 +594,10 @@ export function persistCurrentTabState() {
 }
 
 export function saveOccupationTabs() {
-  localStorage.setItem(STORAGE_KEYS.occupationTabs, JSON.stringify({
+  writeJsonStorage(STORAGE_KEYS.occupationTabs, {
     activeTabId: state.activeTabId,
     tabs: state.occupationTabs
-  }));
+  });
 }
 
 export function loadOccupationTabs() {
@@ -776,7 +777,7 @@ export function resetAllData() {
   const confirmed = window.confirm("全ての占拠データを初期化します。\nこの操作はUndoでは戻せません。");
   if (!confirmed) return;
 
-  Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+  removeStorageKeys();
   clearOccupationHistory();
 
   state.setCurrentBattleData(null);
