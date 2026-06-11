@@ -2,6 +2,12 @@ import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-visibility
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import {
+  getGroupedWorldOptions as groupWorldOptions,
+  getWorldOptionsForServer as createWorldOptionsForServer,
+  getWorldRangeKey as getDomainWorldRangeKey,
+  getWorldRangeLabel as getDomainWorldRangeLabel
+} from "./domain/worlds.js?v=20260524-visibility-toggles";
 export {
   getAttackingGuild,
   getOccupyingGuild
@@ -47,18 +53,7 @@ export async function loadGroups() {
 
 // World Selection Utilities
 export function getWorldOptionsForServer(serverId) {
-  const worlds = state.worldGroupData.flatMap(group => (
-    group.worlds
-      .filter(worldId => String(worldId).startsWith(serverId))
-      .map(worldId => ({
-        id: `W${Number(String(worldId).slice(-3))}`,
-        numeric: worldId,
-        groupId: group.group_id
-      }))
-  ));
-
-  return Array.from(new Map(worlds.map(world => [world.id, world])).values())
-    .sort((a, b) => a.numeric - b.numeric);
+  return createWorldOptionsForServer(state.worldGroupData, serverId);
 }
 
 export function getFilteredWorldOptions() {
@@ -66,9 +61,7 @@ export function getFilteredWorldOptions() {
 }
 
 export function getWorldRangeKey(world) {
-  const worldNumber = Number(world.id.replace("W", ""));
-  const rangeStart = worldNumber < 10 ? 1 : Math.floor(worldNumber / 10) * 10;
-  return String(rangeStart);
+  return getDomainWorldRangeKey(world);
 }
 
 export function getWorldRangeLabel(rangeStart, worlds) {
@@ -78,19 +71,7 @@ export function getWorldRangeLabel(rangeStart, worlds) {
 }
 
 export function getGroupedWorldOptions() {
-  const groups = new Map();
-
-  getFilteredWorldOptions().forEach(world => {
-    const key = getWorldRangeKey(world);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(world);
-  });
-
-  return Array.from(groups.entries()).map(([key, worlds]) => ({
-    key,
-    worlds,
-    label: getWorldRangeLabel(Number(key), worlds)
-  }));
+  return groupWorldOptions(getFilteredWorldOptions());
 }
 
 export function getSelectedWorld() {

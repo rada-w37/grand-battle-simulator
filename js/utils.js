@@ -10,6 +10,9 @@ export {
   addPointScore,
   createEmptyScores
 } from "./domain/scoring.js?v=20260524-visibility-toggles";
+export {
+  normalizeWorldName
+} from "./domain/worlds.js?v=20260524-visibility-toggles";
 
 // Storage Utilities
 export function parseStoredJson(key, fallback) {
@@ -73,17 +76,6 @@ export function getNextTabDayNumber() {
 
 export function getActiveTab() {
   return state.occupationTabs.find(tab => tab.id === state.activeTabId) || state.occupationTabs[0];
-}
-
-// World Utilities
-export function normalizeWorldName(value) {
-  const trimmed = value.normalize("NFKC").trim();
-  if (!trimmed) return "";
-
-  const match = trimmed.match(/^w?\s*0*(\d+)$/i);
-  if (!match) return trimmed.toUpperCase();
-
-  return `W${Number(match[1])}`;
 }
 
 // Map Utilities
