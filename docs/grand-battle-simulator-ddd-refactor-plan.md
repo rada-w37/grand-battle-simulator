@@ -277,3 +277,17 @@ node --check js/domain/occupation-state.js
 node --check js/utils.js
 git diff --check
 ```
+
+## Step 13 Layout Boundary Review
+
+Step 13ではdocs-onlyで `layout/` の境界方針を明文化した。
+
+詳細は `docs/grand-battle-simulator-layout-boundary.md` を参照する。
+
+要点:
+
+- `js/layout/` はdomainではなく presentation-support / layout-support として扱う。
+- `domain/` は `layout/`、`BATTLE_POINTS`、CSS vars、dev layout editor metadataへ直接依存しない。
+- `layout/` はPhase6 layout migrationとdev layout editorの互換契約を含むため、DDD refactorのついでにdomainへ移動しない。
+- `ui.js`、`main.js`、map rendering modulesからのlayout importは、表示支援責務として許容する。
+- Step 14 final import cleanupでは、layoutをdomainへ移すのではなく、facade/import noiseの整理に留める。
