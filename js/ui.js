@@ -1,8 +1,55 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
-import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, BATTLE_POINTS, POINT_AURA_COORDINATES, MAP_LABEL_LAYOUT, getBannerTextOffset, getMapLayoutCssVars, getMapPointUiOffsets } from "./layout/layout-config.js?v=20260524-visibility-toggles";
+import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption, getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
-import { getGroupedWorldOptions, getSelectedWorld, getFilteredWorldOptions, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
+import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
+import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
+import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
+import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
+import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
+import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+
+export {
+  _setFetchBattleDataFn,
+  hideWorldSuggestions,
+  showWorldSuggestions,
+  selectWorld,
+  renderWorldSuggestions,
+  updateWorldOptions
+} from "./worldSelector.js?v=20260524-visibility-toggles";
+
+export {
+  startGuildNameEditing,
+  cancelGuildNameEditing,
+  confirmGuildNameEditing,
+  getEditableGuildNames,
+  updateGuildNameEditControls
+} from "./guildNameEditor.js?v=20260524-visibility-toggles";
+
+export {
+  renderEmptyGuildGrid,
+  renderGuildGrid
+} from "./renderGuildGrid.js?v=20260524-visibility-toggles";
+
+export {
+  focusEditingTabName,
+  hideTabContextMenu,
+  startEditingTab,
+  commitEditingTab,
+  cancelEditingTab,
+  showTabContextMenu,
+  renderOccupationTabs,
+  switchOccupationTab,
+  addOccupationTab,
+  deleteActiveOccupationTab,
+  resetOccupationTabs,
+  updateTabScrollState
+} from "./occupationTabs.js?v=20260524-visibility-toggles";
+
+export {
+  refreshMapLayout
+} from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -27,25 +74,6 @@ export function setStatus(message, type = "") {
       state.elements.statusMessage.dataset.type = "";
     }, 3000));
   }
-}
-
-// Guild Grid Display
-export function renderEmptyGuildGrid() {
-  renderGuildGrid(["", "", "", ""]);
-}
-
-export function renderGuildGrid(guildNames) {
-  const guildGrid = getRequiredElement("guildGrid", "guild-grid");
-  if (!guildGrid) return;
-
-  const cells = Array.from({ length: 4 }, (_, index) => {
-    const cell = document.createElement("div");
-    cell.className = `guild-cell guild-cell${index + 1}`;
-    cell.textContent = guildNames[index] || "";
-    return cell;
-  });
-
-  guildGrid.replaceChildren(...cells);
 }
 
 // Guild Storage
@@ -76,72 +104,6 @@ function saveHighlightedGuildName(guildName) {
   } else {
     localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
   }
-}
-
-function getEditableGuildNames() {
-  return Array.from({ length: 4 }, (_, index) => state.currentGuilds[index] || `ギルド${index + 1}`);
-}
-
-function updateGuildNameEditControls() {
-  state.elements.editGuildNamesButton.hidden = state.isEditingGuildNames;
-  state.elements.confirmGuildNamesButton.hidden = !state.isEditingGuildNames;
-  state.elements.cancelGuildNamesButton.hidden = !state.isEditingGuildNames;
-}
-
-function renameGuildReferences(previousNames, nextNames) {
-  const nameMap = new Map(previousNames.map((name, index) => [name, nextNames[index]]).filter(([from, to]) => from && to && from !== to));
-  if (nameMap.size === 0) return;
-
-  const renameState = pointState => ({
-    defender: nameMap.get(pointState.defender) || pointState.defender,
-    attacker: nameMap.get(pointState.attacker) || pointState.attacker
-  });
-
-  state.occupationTabs.forEach(tab => {
-    tab.selectStates = tab.selectStates.map(pointState => renameState(normalizePointState(pointState)));
-  });
-  state.setPendingSelectStates(state.pendingSelectStates.map(pointState => renameState(normalizePointState(pointState))));
-
-  if (nameMap.has(state.highlightedGuildName)) {
-    const nextHighlightedGuildName = nameMap.get(state.highlightedGuildName);
-    state.setHighlightedGuildName(nextHighlightedGuildName);
-    saveHighlightedGuildName(nextHighlightedGuildName);
-  }
-}
-
-export function startGuildNameEditing() {
-  state.setGuildNameDrafts(getEditableGuildNames());
-  state.setIsEditingGuildNames(true);
-  updateGuildNameEditControls();
-  updateScores();
-}
-
-export function cancelGuildNameEditing() {
-  state.setGuildNameDrafts([]);
-  state.setIsEditingGuildNames(false);
-  updateGuildNameEditControls();
-  updateScores();
-}
-
-export function confirmGuildNameEditing() {
-  persistCurrentTabState();
-  const previousNames = getEditableGuildNames();
-  const nextNames = previousNames.map((name, index) => {
-    const draft = (state.guildNameDrafts[index] || "").trim();
-    return draft || name;
-  });
-
-  renameGuildReferences(previousNames, nextNames);
-  state.setCurrentGuilds(nextNames);
-  saveAppliedGuilds();
-  saveOccupationTabs();
-  renderGuildGrid(state.currentGuilds);
-  state.setGuildNameDrafts([]);
-  state.setIsEditingGuildNames(false);
-  updateGuildNameEditControls();
-  updateGuildOptions();
-  applySelectStates(getActiveTab()?.selectStates);
-  updateScores();
 }
 
 // Point Aura and Chip Updates
@@ -248,100 +210,6 @@ function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = ""
   if (role) {
     element.dataset.devLayoutRole = role;
   }
-}
-
-const POINT_UI_OFFSET_VARS = {
-  pointLabels: {
-    x: "--map-point-labels-left",
-    y: "--map-point-labels-top",
-    width: "--map-point-labels-width",
-    height: "--map-point-labels-height"
-  },
-  sword: {
-    x: "--map-sword-left",
-    y: "--map-sword-top",
-    size: "--map-sword-size"
-  },
-  shield: {
-    x: "--map-shield-left",
-    y: "--map-shield-top",
-    size: "--map-shield-size"
-  },
-  select: {
-    x: "--map-point-select-left",
-    y: "--map-point-select-top",
-    width: "--map-point-select-width",
-    height: "--map-point-select-height"
-  }
-};
-
-function getCssPxNumber(value) {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function formatCssPx(value) {
-  return `${Math.round(value * 100) / 100}px`;
-}
-
-function applyPointUiOffsets(element, pointId, width = window.innerWidth) {
-  const offsets = getMapPointUiOffsets(pointId, width);
-  if (!offsets) return;
-
-  const baseVars = getMapLayoutCssVars(width);
-  Object.entries(offsets).forEach(([targetType, targetOffsets]) => {
-    const targetVars = POINT_UI_OFFSET_VARS[targetType];
-    if (!targetVars) return;
-    const targetElement = targetType === "select"
-      ? element.querySelector(".point-selects") || element
-      : element;
-
-    Object.entries(targetOffsets).forEach(([property, offset]) => {
-      const variableName = targetVars[property];
-      const baseValue = getCssPxNumber(baseVars[variableName]);
-      if (!variableName || baseValue === null) return;
-      const finalValue = formatCssPx(baseValue + offset);
-      targetElement.style.setProperty(variableName, finalValue);
-      if (targetType === "select" && property === "height") {
-        targetElement.style.setProperty("--map-point-select-min-height", finalValue);
-      }
-    });
-  });
-}
-
-function clearPointUiOffsets(element) {
-  Object.values(POINT_UI_OFFSET_VARS).forEach(targetVars => {
-    Object.values(targetVars).forEach(variableName => {
-      element.style.removeProperty(variableName);
-    });
-  });
-
-  const selectGroup = element.querySelector(".point-selects");
-  if (selectGroup) {
-    Object.values(POINT_UI_OFFSET_VARS.select).forEach(variableName => {
-      selectGroup.style.removeProperty(variableName);
-    });
-    selectGroup.style.removeProperty("--map-point-select-min-height");
-  }
-}
-
-export function refreshMapLayout(width = window.innerWidth) {
-  document.querySelectorAll(".point").forEach(point => {
-    clearPointUiOffsets(point);
-    applyPointUiOffsets(point, point.dataset.id, width);
-  });
-
-  MAP_BANNER_PLACEMENTS.forEach(placement => {
-    const label = document.querySelector(`.point-name-label[data-point-id="${placement.pointId}"]`);
-    if (!label) return;
-
-    const textOffset = getBannerTextOffset(placement);
-    setMapImagePosition(
-      label,
-      placement.x + textOffset.x,
-      placement.y + textOffset.y
-    );
-  });
 }
 
 // Render Battle Points Map
@@ -464,66 +332,6 @@ export function renderBattlePoints() {
   });
 
   battlePoints.replaceChildren(fragment);
-}
-
-function renderStructurePlacements(fragment) {
-  MAP_STRUCTURE_PLACEMENTS.forEach(placement => {
-    const structure = document.createElement("img");
-    structure.className = `point-structure ${placement.className}`;
-    structure.src = placement.src;
-    structure.alt = "";
-    structure.dataset.pointId = placement.pointId;
-    setDevLayoutMetadata(structure, {
-      targetId: `structure:${placement.pointId}`,
-      layoutKey: "MAP_STRUCTURE_PLACEMENTS",
-      pointId: placement.pointId,
-      targetType: "structure"
-    });
-    structure.style.width = `${placement.scale}%`;
-    setMapImagePosition(structure, placement.x, placement.y);
-    fragment.appendChild(structure);
-  });
-}
-
-function renderBannerPlacements(fragment) {
-  MAP_BANNER_PLACEMENTS.forEach(placement => {
-    const banner = document.createElement("img");
-    banner.className = "point-banner";
-    banner.src = "resource/banner.png?v=lowres-1";
-    banner.alt = "";
-    banner.dataset.pointId = placement.pointId;
-    setDevLayoutMetadata(banner, {
-      targetId: `banner:${placement.pointId}`,
-      layoutKey: "MAP_BANNER_PLACEMENTS",
-      pointId: placement.pointId,
-      role: "banner",
-      targetType: "banner"
-    });
-    banner.style.width = `${placement.scale}%`;
-    setMapImagePosition(banner, placement.x, placement.y);
-    fragment.appendChild(banner);
-
-    const label = document.createElement("span");
-    label.className = "point-name-label";
-    label.textContent = placement.name;
-    label.dataset.pointId = placement.pointId;
-    setDevLayoutMetadata(label, {
-      targetId: `pointName:${placement.pointId}`,
-      layoutKey: "MAP_BANNER_PLACEMENTS",
-      pointId: placement.pointId,
-      role: "pointName",
-      targetType: "pointName"
-    });
-    label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
-    label.style.transformOrigin = "center";
-    const textOffset = getBannerTextOffset(placement);
-    setMapImagePosition(
-      label,
-      placement.x + textOffset.x,
-      placement.y + textOffset.y
-    );
-    fragment.appendChild(label);
-  });
 }
 
 // Guild Options Update
@@ -754,7 +562,7 @@ export function redoOccupationChange() {
   return true;
 }
 
-function deleteOccupationHistory(tabId) {
+export function deleteOccupationHistory(tabId) {
   if (!tabId) return;
   delete state.occupationHistoryByTabId[tabId];
 }
@@ -805,22 +613,6 @@ export function createOccupationTab(index, selectStates = createEmptyOccupationS
   };
 }
 
-function scrollOccupationTabsToEnd() {
-  requestAnimationFrame(() => {
-    state.elements.occupationTabs.scrollLeft = state.elements.occupationTabs.scrollWidth;
-  });
-}
-
-export function updateTabScrollState() {
-  requestAnimationFrame(() => {
-    const tabs = state.elements.occupationTabs;
-    const tabRow = tabs?.closest(".tab-row");
-    if (!tabs || !tabRow) return;
-
-    tabRow.classList.toggle("has-tab-scroll", tabs.scrollWidth > tabs.clientWidth + 1);
-  });
-}
-
 export function persistCurrentTabState() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
@@ -855,278 +647,6 @@ export function loadOccupationTabs() {
   ]);
   state.setActiveTabId(state.occupationTabs[0].id);
   saveOccupationTabs();
-}
-
-// Tab UI
-export function focusEditingTabName() {
-  window.setTimeout(() => {
-    const input = document.querySelector(".tab-name-input");
-    if (!input) return;
-
-    input.focus();
-    input.select();
-  }, 0);
-}
-
-export function hideTabContextMenu() {
-  const menu = document.querySelector(".tab-context-menu");
-  if (menu) menu.remove();
-  state.setContextMenuTabId("");
-}
-
-export function startEditingTab(tabId) {
-  hideTabContextMenu();
-  state.setEditingTabId(tabId);
-  renderOccupationTabs();
-  focusEditingTabName();
-}
-
-export function commitEditingTab(input) {
-  const tab = state.occupationTabs.find(item => item.id === state.editingTabId);
-  if (tab) {
-    const nextName = input.value.trim();
-    if (nextName) tab.name = nextName;
-  }
-
-  state.setEditingTabId("");
-  saveOccupationTabs();
-  renderOccupationTabs();
-}
-
-export function cancelEditingTab() {
-  state.setEditingTabId("");
-  renderOccupationTabs();
-}
-
-export function showTabContextMenu(tabId, x, y) {
-  hideTabContextMenu();
-  state.setContextMenuTabId(tabId);
-
-  const menu = document.createElement("div");
-  menu.className = "tab-context-menu";
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
-
-  const renameButton = document.createElement("button");
-  renameButton.type = "button";
-  renameButton.textContent = "名前を変更";
-  renameButton.addEventListener("click", () => startEditingTab(state.contextMenuTabId));
-
-  menu.appendChild(renameButton);
-  document.body.appendChild(menu);
-}
-
-export function renderOccupationTabs() {
-  const buttons = state.occupationTabs.map(tab => {
-    if (tab.id === state.editingTabId) {
-      const input = document.createElement("input");
-      input.className = "tab-name-input";
-      input.value = tab.name;
-      input.setAttribute("aria-label", "タブ名");
-      input.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          commitEditingTab(input);
-        }
-
-        if (event.key === "Escape") {
-          event.preventDefault();
-          cancelEditingTab();
-        }
-      });
-      input.addEventListener("blur", () => commitEditingTab(input));
-      return input;
-    }
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "tab-button";
-    button.textContent = tab.name;
-    button.dataset.tabId = tab.id;
-    button.setAttribute("aria-selected", String(tab.id === state.activeTabId));
-
-    if (tab.id === state.activeTabId) {
-      button.classList.add("is-active");
-    }
-
-    button.addEventListener("click", () => switchOccupationTab(tab.id));
-    button.addEventListener("contextmenu", event => {
-      event.preventDefault();
-      showTabContextMenu(tab.id, event.clientX, event.clientY);
-    });
-    button.addEventListener("dblclick", event => {
-      event.preventDefault();
-      startEditingTab(tab.id);
-    });
-    return button;
-  });
-
-  const occupationTabs = getRequiredElement("occupationTabs", "occupation-tabs");
-  if (!occupationTabs) return;
-
-  occupationTabs.replaceChildren(...buttons);
-  state.elements.deleteTabButton.disabled = state.occupationTabs.length <= 1;
-  updateTabScrollState();
-}
-
-export function switchOccupationTab(tabId) {
-  if (tabId === state.activeTabId) return;
-
-  persistCurrentTabState();
-  state.setActiveTabId(tabId);
-  saveOccupationTabs();
-  renderOccupationTabs();
-  updateGuildOptions();
-  applySelectStates(getActiveTab()?.selectStates);
-  updateOccupationHistoryControls();
-}
-
-export function addOccupationTab() {
-  persistCurrentTabState();
-
-  const nextIndex = getNextTabDayNumber();
-  const sourceStates = getActiveTab()?.selectStates || createEmptyOccupationStates();
-  const newTab = createOccupationTab(nextIndex, cloneOccupationStates(sourceStates));
-  state.occupationTabs.push(newTab);
-  state.setActiveTabId(newTab.id);
-  saveOccupationTabs();
-  renderOccupationTabs();
-  scrollOccupationTabsToEnd();
-  updateGuildOptions();
-  applySelectStates(newTab.selectStates);
-  updateOccupationHistoryControls();
-}
-
-export function deleteActiveOccupationTab() {
-  if (state.occupationTabs.length <= 1) return;
-
-  const activeIndex = state.occupationTabs.findIndex(tab => tab.id === state.activeTabId);
-  const activeTab = getActiveTab();
-  if (!activeTab) return;
-
-  const confirmed = window.confirm("選択中のタブを削除します。\nこの操作はUndoでは戻せません。");
-  if (!confirmed) return;
-
-  hideTabContextMenu();
-  state.setEditingTabId("");
-  deleteOccupationHistory(activeTab.id);
-  state.occupationTabs.splice(activeIndex, 1);
-  const nextIndex = Math.max(0, activeIndex - 1);
-  state.setActiveTabId(state.occupationTabs[nextIndex].id);
-
-  saveOccupationTabs();
-  renderOccupationTabs();
-  updateGuildOptions();
-  applySelectStates(getActiveTab()?.selectStates);
-  updateOccupationHistoryControls();
-}
-
-export function resetOccupationTabs() {
-  state.setOccupationTabs([createOccupationTab(1)]);
-  state.setActiveTabId(state.occupationTabs[0].id);
-  state.setEditingTabId("");
-  state.setPendingSelectStates(state.occupationTabs[0].selectStates);
-  saveOccupationTabs();
-  renderOccupationTabs();
-  updateOccupationHistoryControls();
-}
-
-// World Suggestions
-export function hideWorldSuggestions() {
-  state.elements.worldSuggestions.hidden = true;
-}
-
-export function showWorldSuggestions() {
-  renderWorldSuggestions();
-  state.elements.worldSuggestions.hidden = false;
-}
-
-export function selectWorld(world, fetchBattleDataIfReadyFn) {
-  state.setIsSelectingWorldSuggestion(true);
-  state.setIsInteractingWithWorldSuggestions(false);
-  state.elements.world.value = world.id;
-  hideWorldSuggestions();
-  state.elements.world.blur();
-  if (fetchBattleDataIfReadyFn) {
-    fetchBattleDataIfReadyFn();
-  }
-}
-
-// Internal function for renderWorldSuggestions
-let _fetchBattleDataIfReady = null;
-
-export function _setFetchBattleDataFn(fn) {
-  _fetchBattleDataIfReady = fn;
-}
-
-export function renderWorldSuggestions() {
-  const worldSuggestions = getRequiredElement("worldSuggestions", "world-suggestions");
-  if (!worldSuggestions) return;
-
-  const groups = getGroupedWorldOptions();
-
-  if (groups.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "combo-empty";
-    empty.textContent = "候補がありません";
-    worldSuggestions.replaceChildren(empty);
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  groups.forEach(group => {
-    const groupButton = document.createElement("button");
-    groupButton.type = "button";
-    groupButton.className = "combo-group-button";
-    const isExpanded = state.expandedWorldRangeKeys.has(group.key);
-    groupButton.textContent = `${isExpanded ? "▼" : "▶"} ${group.label}`;
-    groupButton.addEventListener("click", () => {
-      if (state.expandedWorldRangeKeys.has(group.key)) {
-        state.expandedWorldRangeKeys.delete(group.key);
-      } else {
-        state.expandedWorldRangeKeys.add(group.key);
-      }
-      renderWorldSuggestions();
-    });
-    fragment.appendChild(groupButton);
-
-    if (!isExpanded) return;
-
-    group.worlds.forEach(world => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.role = "option";
-      button.className = "combo-world-button";
-      button.textContent = world.id;
-      button.dataset.numeric = String(world.numeric);
-      button.addEventListener("click", () => selectWorld(world, _fetchBattleDataIfReady));
-      fragment.appendChild(button);
-    });
-  });
-
-  worldSuggestions.replaceChildren(fragment);
-}
-
-export function updateWorldOptions() {
-  const currentWorld = normalizeWorldName(state.elements.world.value);
-  const options = [];
-
-  getFilteredWorldOptions().forEach(world => {
-    const option = createOption(world.id, world.id);
-    option.dataset.numeric = String(world.numeric);
-    options.push(option);
-  });
-
-  const worldOptions = getRequiredElement("worldOptions", "world-options");
-  if (!worldOptions) return;
-
-  worldOptions.replaceChildren(...options);
-  renderWorldSuggestions();
-
-  if (currentWorld) {
-    state.elements.world.value = currentWorld;
-  }
 }
 
 // Mobile Point Picker
