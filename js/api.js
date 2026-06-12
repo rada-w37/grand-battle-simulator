@@ -1,7 +1,28 @@
-import { API_BASE_URL, STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
-import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import { readJsonStorage, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
+import {
+  fetchLatestBattleData,
+  fetchWorldGroups
+} from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
+import {
+  areGuildNameListsDifferent,
+  prepareBattleDataFetchFailureState,
+  prepareFetchedBattleDataState
+} from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+import {
+  getGroupedWorldOptions as groupWorldOptions,
+  getWorldOptionsForServer as createWorldOptionsForServer,
+  getWorldRangeKey as getDomainWorldRangeKey,
+  getWorldRangeLabel as getDomainWorldRangeLabel
+} from "./domain/worlds.js?v=20260524-visibility-toggles";
+export {
+  getAttackingGuild,
+  getOccupyingGuild
+} from "./domain/battle-snapshot.js?v=20260524-visibility-toggles";
+export {
+  fetchJson
+} from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
 
@@ -22,39 +43,17 @@ export function _setUiFunctions(fns) {
   _updateWorldOptions = fns.updateWorldOptions;
 }
 
-// API Fetch
-export async function fetchJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
-
-  const json = await response.json();
-  if (json.status !== 200) throw new Error(`APIエラー: status ${json.status}`);
-
-  return json.data;
-}
-
 // Load World Groups
 export async function loadGroups() {
   if (_setStatus) _setStatus("ワールド情報を読み込み中...");
-  state.setWorldGroupData(await fetchJson(`${API_BASE_URL}/wgroups`));
+  state.setWorldGroupData(await fetchWorldGroups());
   if (_updateWorldOptions) _updateWorldOptions();
   if (_setStatus) _setStatus("");
 }
 
 // World Selection Utilities
 export function getWorldOptionsForServer(serverId) {
-  const worlds = state.worldGroupData.flatMap(group => (
-    group.worlds
-      .filter(worldId => String(worldId).startsWith(serverId))
-      .map(worldId => ({
-        id: `W${Number(String(worldId).slice(-3))}`,
-        numeric: worldId,
-        groupId: group.group_id
-      }))
-  ));
-
-  return Array.from(new Map(worlds.map(world => [world.id, world])).values())
-    .sort((a, b) => a.numeric - b.numeric);
+  return createWorldOptionsForServer(state.worldGroupData, serverId);
 }
 
 export function getFilteredWorldOptions() {
@@ -62,31 +61,15 @@ export function getFilteredWorldOptions() {
 }
 
 export function getWorldRangeKey(world) {
-  const worldNumber = Number(world.id.replace("W", ""));
-  const rangeStart = worldNumber < 10 ? 1 : Math.floor(worldNumber / 10) * 10;
-  return String(rangeStart);
+  return getDomainWorldRangeKey(world);
 }
 
 export function getWorldRangeLabel(rangeStart, worlds) {
-  const first = worlds[0].id;
-  const last = worlds[worlds.length - 1].id;
-  return `${first} ～ ${last}`;
+  return getDomainWorldRangeLabel(rangeStart, worlds);
 }
 
 export function getGroupedWorldOptions() {
-  const groups = new Map();
-
-  getFilteredWorldOptions().forEach(world => {
-    const key = getWorldRangeKey(world);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(world);
-  });
-
-  return Array.from(groups.entries()).map(([key, worlds]) => ({
-    key,
-    worlds,
-    label: getWorldRangeLabel(Number(key), worlds)
-  }));
+  return groupWorldOptions(getFilteredWorldOptions());
 }
 
 export function getSelectedWorld() {
@@ -116,16 +99,16 @@ export function canFetchBattleData() {
 
 // Battle Selection Storage
 export function saveBattleSelection() {
-  localStorage.setItem(STORAGE_KEYS.battleSelection, JSON.stringify({
+  writeJsonStorage(STORAGE_KEYS.battleSelection, {
     server: state.elements.server.value,
     world: normalizeWorldName(state.elements.world.value),
     battleClass: state.elements.battleClass.value,
     block: state.elements.block.value
-  }));
+  });
 }
 
 export function restoreBattleSelection() {
-  const selection = parseStoredJson(STORAGE_KEYS.battleSelection, {});
+  const selection = readJsonStorage(STORAGE_KEYS.battleSelection, {});
 
   if (selection.server) state.elements.server.value = selection.server;
   if (_updateWorldOptions) _updateWorldOptions();
@@ -163,20 +146,25 @@ export async function fetchBattleDataIfReady() {
     state.elements.world.value = selectedWorld.id;
     const worldNumeric = selectedWorld.numeric;
     const groupId = getSelectedGroupId(worldNumeric);
-    const url = `${API_BASE_URL}/wg/${groupId}/globalgvg/${state.elements.battleClass.value}/${state.elements.block.value}/latest`;
 
-    state.setCurrentBattleData(await fetchJson(url));
-    state.setPendingGuilds(Object.values(state.currentBattleData.guilds || {}));
-    state.setUsesFallbackGuilds(false);
+    const nextBattleState = prepareFetchedBattleDataState(await fetchLatestBattleData({
+      groupId,
+      battleClass: state.elements.battleClass.value,
+      block: state.elements.block.value
+    }));
+    state.setCurrentBattleData(nextBattleState.battleData);
+    state.setPendingGuilds(nextBattleState.pendingGuilds);
+    state.setUsesFallbackGuilds(nextBattleState.usesFallbackGuilds);
 
     if (_renderGuildGrid) _renderGuildGrid(state.pendingGuilds);
     setPendingState(true);
     state.elements.applyButton.disabled = false;
     if (_setStatus) _setStatus("最新データを取得しました。", "success");
   } catch (error) {
-    state.setCurrentBattleData(null);
-    state.setPendingGuilds(FALLBACK_GUILDS);
-    state.setUsesFallbackGuilds(true);
+    const fallbackBattleState = prepareBattleDataFetchFailureState(FALLBACK_GUILDS);
+    state.setCurrentBattleData(fallbackBattleState.battleData);
+    state.setPendingGuilds(fallbackBattleState.pendingGuilds);
+    state.setUsesFallbackGuilds(fallbackBattleState.usesFallbackGuilds);
     state.elements.applyButton.disabled = false;
     setPendingState(true);
     if (_renderGuildGrid) _renderGuildGrid(FALLBACK_GUILDS);
@@ -185,23 +173,9 @@ export async function fetchBattleDataIfReady() {
   }
 }
 
-// Guild Data Application
-export function getOccupyingGuild(castleData, guilds) {
-  const isCapturedOrCountering = castleData.GvgCastleState === 2 || castleData.GvgCastleState === 3;
-  const guildId = isCapturedOrCountering ? castleData.AttackerGuildId : castleData.GuildId;
-  return guilds[guildId] || "";
-}
-
-export function getAttackingGuild(castleData, guilds) {
-  return guilds[castleData.AttackerGuildId] || "";
-}
-
 export function areGuildsDifferent(nextGuilds) {
   const currentNames = getGuildEntries().map(guild => guild.name);
-  const nextNames = nextGuilds.filter(name => name !== "");
-
-  if (currentNames.length !== nextNames.length) return true;
-  return nextNames.some((name, index) => currentNames[index] !== name);
+  return areGuildNameListsDifferent(currentNames, nextGuilds);
 }
 
 export function setPendingState(isPending) {

@@ -1,14 +1,18 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR, SWORD_MARKER_ICON, STORAGE_KEYS, POINT_SCORES } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { parseStoredJson, cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, createEmptyScores, addPointScore, getTabDayNumber, getActiveTab, createOption, getAllPointSelects } from "./utils.js?v=20260524-visibility-toggles";
-import { getSelectedWorld, getOccupyingGuild, getAttackingGuild, areGuildsDifferent } from "./api.js?v=20260524-visibility-toggles";
+import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
+import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
 import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
 import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
 import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
+import { prepareBattleDataApplicationState, resolveFallbackGuildNames, shouldResetBattleDataApplication } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
+import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
 export {
   _setFetchBattleDataFn,
@@ -78,15 +82,15 @@ export function setStatus(message, type = "") {
 
 // Guild Storage
 export function loadAppliedGuilds() {
-  state.setCurrentGuilds(parseStoredJson(STORAGE_KEYS.appliedGuilds, []));
+  state.setCurrentGuilds(readJsonStorage(STORAGE_KEYS.appliedGuilds, []));
 }
 
 export function saveAppliedGuilds() {
-  localStorage.setItem(STORAGE_KEYS.appliedGuilds, JSON.stringify(state.currentGuilds));
+  writeJsonStorage(STORAGE_KEYS.appliedGuilds, state.currentGuilds);
 }
 
 export function loadHighlightedGuildName() {
-  const savedName = localStorage.getItem(STORAGE_KEYS.highlightedGuildName) || "";
+  const savedName = getStorageItem(STORAGE_KEYS.highlightedGuildName) || "";
   if (savedName && state.currentGuilds.includes(savedName)) {
     state.setHighlightedGuildName(savedName);
     return;
@@ -94,15 +98,15 @@ export function loadHighlightedGuildName() {
 
   state.setHighlightedGuildName("");
   if (savedName) {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {
-    localStorage.setItem(STORAGE_KEYS.highlightedGuildName, guildName);
+    setStorageItem(STORAGE_KEYS.highlightedGuildName, guildName);
   } else {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 
@@ -200,16 +204,6 @@ function createScoreGuildRadioCell(guildName) {
 
   cell.appendChild(radio);
   return cell;
-}
-
-function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
-  element.dataset.devLayoutId = targetId;
-  element.dataset.devLayoutKey = layoutKey;
-  element.dataset.devLayoutPointId = pointId;
-  element.dataset.devLayoutTargetType = targetType || role || layoutKey;
-  if (role) {
-    element.dataset.devLayoutRole = role;
-  }
 }
 
 // Render Battle Points Map
@@ -363,30 +357,17 @@ export function updateGuildOptions() {
 
 // Score Calculation
 export function calculateScoresFromStates(selectStates, guildNames) {
-  const scores = createEmptyScores(guildNames);
-
-  BATTLE_POINTS.forEach((point, index) => {
-    addPointScore(scores, normalizePointState(selectStates[index]).defender, point.type || "church");
-  });
-
-  return scores;
+  return calculateDomainScoresFromStates(selectStates, guildNames, BATTLE_POINTS);
 }
 
 export function getCumulativeScores(guildNames) {
-  const scores = createEmptyScores(guildNames);
-  const activeIndex = Math.max(0, state.occupationTabs.findIndex(tab => tab.id === state.activeTabId));
-  const currentSelectStates = getCurrentSelectStates();
-
-  state.occupationTabs.slice(0, activeIndex + 1).forEach(tab => {
-    const selectStates = tab.id === state.activeTabId ? currentSelectStates : tab.selectStates;
-    const tabScores = calculateScoresFromStates(selectStates, guildNames);
-
-    guildNames.forEach(guildName => {
-      scores[guildName].total += tabScores[guildName].total;
-    });
+  return calculateCumulativeScores({
+    occupationTabs: state.occupationTabs,
+    activeTabId: state.activeTabId,
+    currentSelectStates: getCurrentSelectStates(),
+    guildNames,
+    battlePoints: BATTLE_POINTS
   });
-
-  return scores;
 }
 
 export function updateCumulativeScope() {
@@ -475,18 +456,6 @@ function getOccupationHistory(tabId = state.activeTabId) {
   return state.occupationHistoryByTabId[tabId];
 }
 
-function createOccupationHistoryEntry(beforeStates, afterStates) {
-  const changes = BATTLE_POINTS.map((point, index) => {
-    const before = normalizePointState(beforeStates[index]);
-    const after = normalizePointState(afterStates[index]);
-
-    if (before.attacker === after.attacker && before.defender === after.defender) return null;
-    return { pointId: point.id, before, after };
-  }).filter(Boolean);
-
-  return changes.length ? { changes } : null;
-}
-
 function pushOccupationHistory(entry, tabId = state.activeTabId) {
   if (!entry?.changes?.length) return;
 
@@ -502,14 +471,7 @@ function pushOccupationHistory(entry, tabId = state.activeTabId) {
 }
 
 function applyOccupationHistoryEntry(entry, direction) {
-  const nextStates = getCurrentSelectStates();
-  const stateKey = direction === "undo" ? "before" : "after";
-
-  entry.changes.forEach(change => {
-    const pointIndex = BATTLE_POINTS.findIndex(point => point.id === change.pointId);
-    if (pointIndex < 0) return;
-    nextStates[pointIndex] = { ...change[stateKey] };
-  });
+  const nextStates = applyOccupationHistoryEntryToStates(getCurrentSelectStates(), entry, direction, BATTLE_POINTS);
 
   applySelectStates(nextStates);
   saveSelectStates();
@@ -520,7 +482,7 @@ export function recordCurrentOccupationEdit() {
   const activeTab = getActiveTab();
   if (!activeTab) return;
 
-  pushOccupationHistory(createOccupationHistoryEntry(activeTab.selectStates, getCurrentSelectStates()), activeTab.id);
+  pushOccupationHistory(createOccupationHistoryEntry(activeTab.selectStates, getCurrentSelectStates(), BATTLE_POINTS), activeTab.id);
 }
 
 export function canUndoOccupation(tabId = state.activeTabId) {
@@ -622,15 +584,15 @@ export function persistCurrentTabState() {
 }
 
 export function saveOccupationTabs() {
-  localStorage.setItem(STORAGE_KEYS.occupationTabs, JSON.stringify({
+  writeJsonStorage(STORAGE_KEYS.occupationTabs, {
     activeTabId: state.activeTabId,
     tabs: state.occupationTabs
-  }));
+  });
 }
 
 export function loadOccupationTabs() {
-  const saved = parseStoredJson(STORAGE_KEYS.occupationTabs, null);
-  const legacySelectStates = parseStoredJson(STORAGE_KEYS.selectStates, null);
+  const saved = readJsonStorage(STORAGE_KEYS.occupationTabs, null);
+  const legacySelectStates = readJsonStorage(STORAGE_KEYS.selectStates, null);
 
   if (saved?.tabs?.length) {
     state.setOccupationTabs(saved.tabs.map((tab, index) => ({
@@ -739,14 +701,17 @@ export function applyBattleData() {
   const beforeSelectStates = getCurrentSelectStates();
 
   if (state.usesFallbackGuilds) {
-    const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : getEditableGuildNames();
+    const nextGuilds = resolveFallbackGuildNames({
+      pendingGuilds: state.pendingGuilds,
+      editableGuildNames: getEditableGuildNames()
+    });
     state.setCurrentGuilds(nextGuilds);
     saveAppliedGuilds();
     renderGuildGrid(state.currentGuilds);
     resetOccupationTabs();
     updateGuildOptions();
     applySelectStates(state.occupationTabs[0].selectStates);
-    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
+    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
     updateScores();
     state.setUsesFallbackGuilds(false);
     if (_setPendingStateFn) {
@@ -759,8 +724,16 @@ export function applyBattleData() {
 
   if (!state.currentBattleData || !Array.isArray(state.currentBattleData.castles)) return;
 
-  const nextGuilds = state.pendingGuilds.length ? state.pendingGuilds : Object.values(state.currentBattleData.guilds || {});
-  if (state.currentGuilds.length > 0 && areGuildsDifferent(nextGuilds)) {
+  const preparedBattleData = prepareBattleDataApplicationState({
+    battleData: state.currentBattleData,
+    pendingGuilds: state.pendingGuilds,
+    battlePoints: BATTLE_POINTS
+  });
+  const nextGuilds = preparedBattleData.guilds;
+  if (shouldResetBattleDataApplication({
+    currentGuilds: state.currentGuilds,
+    nextGuilds
+  })) {
     const confirmed = window.confirm(
       "最新の拠点情報から取得したギルド名が、現在の拠点情報のギルドと異なります。\n" +
       "各拠点情報およびタブをすべて初期化してから反映します。よろしいですか？"
@@ -775,16 +748,12 @@ export function applyBattleData() {
   renderGuildGrid(state.currentGuilds);
   updateGuildOptions();
 
-  const guilds = state.currentBattleData.guilds || {};
-  const castlesById = new Map(state.currentBattleData.castles.map(castle => [castle.CastleId, castle]));
+  const snapshotStates = preparedBattleData.occupationStates;
 
-  document.querySelectorAll(".point").forEach(point => {
-    const castleId = Number(point.dataset.castleId);
+  document.querySelectorAll(".point").forEach((point, index) => {
     const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
-    const castleData = castlesById.get(castleId);
-    const guildName = castleData ? getOccupyingGuild(castleData, guilds) : "";
-    const attackerGuildName = castleData ? getAttackingGuild(castleData, guilds) : "";
+    const { defender: guildName, attacker: attackerGuildName } = snapshotStates[index] || { defender: "", attacker: "" };
 
     defenderSelect.value = guildName;
     attackerSelect.value = attackerGuildName;
@@ -794,7 +763,7 @@ export function applyBattleData() {
     updatePointSelfAttackState(point);
   });
 
-  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates()));
+  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
   saveSelectStates();
   updateScores();
   if (_setPendingStateFn) {
@@ -809,7 +778,7 @@ export function resetAllData() {
   const confirmed = window.confirm("全ての占拠データを初期化します。\nこの操作はUndoでは戻せません。");
   if (!confirmed) return;
 
-  Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+  removeStorageKeys();
   clearOccupationHistory();
 
   state.setCurrentBattleData(null);

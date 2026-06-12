@@ -1,13 +1,14 @@
-import { STORAGE_KEYS } from "./constants.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260524-visibility-toggles";
-import { getActiveTab, normalizePointState } from "./utils.js?v=20260524-visibility-toggles";
+import { getActiveTab } from "./utils.js?v=20260524-visibility-toggles";
+import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260524-visibility-toggles";
+import { removeStorageItem, setStorageItem, STORAGE_KEYS } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260524-visibility-toggles";
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {
-    localStorage.setItem(STORAGE_KEYS.highlightedGuildName, guildName);
+    setStorageItem(STORAGE_KEYS.highlightedGuildName, guildName);
   } else {
-    localStorage.removeItem(STORAGE_KEYS.highlightedGuildName);
+    removeStorageItem(STORAGE_KEYS.highlightedGuildName);
   }
 }
 export function getEditableGuildNames() {
@@ -21,23 +22,21 @@ export function updateGuildNameEditControls() {
 }
 
 function renameGuildReferences(previousNames, nextNames) {
-  const nameMap = new Map(previousNames.map((name, index) => [name, nextNames[index]]).filter(([from, to]) => from && to && from !== to));
-  if (nameMap.size === 0) return;
-
-  const renameState = pointState => ({
-    defender: nameMap.get(pointState.defender) || pointState.defender,
-    attacker: nameMap.get(pointState.attacker) || pointState.attacker
+  const result = renameDomainGuildReferences({
+    occupationTabs: state.occupationTabs,
+    pendingSelectStates: state.pendingSelectStates,
+    highlightedGuildName: state.highlightedGuildName,
+    previousNames,
+    nextNames
   });
+  if (!result.changed) return;
 
-  state.occupationTabs.forEach(tab => {
-    tab.selectStates = tab.selectStates.map(pointState => renameState(normalizePointState(pointState)));
-  });
-  state.setPendingSelectStates(state.pendingSelectStates.map(pointState => renameState(normalizePointState(pointState))));
+  state.setOccupationTabs(result.occupationTabs);
+  state.setPendingSelectStates(result.pendingSelectStates);
 
-  if (nameMap.has(state.highlightedGuildName)) {
-    const nextHighlightedGuildName = nameMap.get(state.highlightedGuildName);
-    state.setHighlightedGuildName(nextHighlightedGuildName);
-    saveHighlightedGuildName(nextHighlightedGuildName);
+  if (result.highlightedGuildName !== state.highlightedGuildName) {
+    state.setHighlightedGuildName(result.highlightedGuildName);
+    saveHighlightedGuildName(result.highlightedGuildName);
   }
 }
 
