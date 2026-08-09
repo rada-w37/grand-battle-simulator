@@ -8,9 +8,13 @@
 </head>
 <body>
   <main class="app-shell">
+    <h1 class="visually-hidden">Grand Battle Simulator</h1>
+
     <div class="top-layout">
-      <section class="panel source-panel">
-      <div class="source-grid">
+      <section class="panel source-panel" aria-labelledby="source-heading">
+      <h2 id="source-heading" class="visually-hidden">バトルデータ選択</h2>
+      <fieldset class="source-grid">
+        <legend class="visually-hidden">サーバー・ワールド・クラス・ブロック</legend>
         <label>
           <span>サーバー</span>
           <select id="server-select">
@@ -50,16 +54,16 @@
             <option value="3">D</option>
           </select>
         </label>
-      </div>
+      </fieldset>
 
-      <div class="guild-display" aria-labelledby="guild-heading">
+      <section class="guild-display" aria-labelledby="guild-heading">
         <h3 id="guild-heading">ギルド名</h3>
-        <div id="guild-grid" class="guild-grid" aria-live="polite"></div>
+        <div id="guild-grid" class="guild-grid" role="list" aria-live="polite"></div>
         <button type="button" id="apply-data-button" class="apply-data-button" disabled>データを反映</button>
         <p id="pending-message" class="pending-message" hidden>未反映データがあります</p>
-      </div>
+      </section>
 
-      <p id="status-message" class="status-message" aria-live="polite"></p>
+      <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
     </section>
 
       <hr class="section-divider">
@@ -67,7 +71,7 @@
       <section class="panel score-panel" aria-labelledby="score-heading">
       <h2 id="score-heading">獲得ポイント</h2>
       <p id="cumulative-scope" class="cumulative-scope"></p>
-      <div class="score-edit-actions" aria-label="ギルド名編集">
+      <div class="score-edit-actions" role="group" aria-label="ギルド名編集" aria-controls="score-body">
         <button type="button" id="edit-guild-names-button" class="score-edit-button" aria-label="ギルド名を編集" title="ギルド名を編集">
           <span class="score-edit-pen-icon" aria-hidden="true"></span>
         </button>
@@ -85,15 +89,16 @@
       </div>
       <div class="table-scroll">
         <table class="score-table">
+          <caption class="visually-hidden">ギルド別獲得ポイント</caption>
           <thead>
             <tr>
-              <th class="score-icon-header"></th>
-              <th>ギルド名</th>
-              <th>神殿</th>
-              <th>城</th>
-              <th>教会</th>
-              <th>合計</th>
-              <th>累計</th>
+              <th class="score-icon-header" scope="col" aria-hidden="true"></th>
+              <th scope="col">ギルド名</th>
+              <th scope="col">神殿</th>
+              <th scope="col">城</th>
+              <th scope="col">教会</th>
+              <th scope="col">合計</th>
+              <th scope="col">累計</th>
             </tr>
           </thead>
           <tbody id="score-body"></tbody>
@@ -103,8 +108,9 @@
 
     </div>
 
-    <section class="panel map-panel">
-      <div class="tab-row">
+    <section class="panel map-panel" aria-labelledby="map-heading">
+      <h2 id="map-heading" class="visually-hidden">拠点マップ</h2>
+      <header class="tab-row">
         <nav id="occupation-tabs" class="occupation-tabs" aria-label="拠点状況タブ"></nav>
         <button type="button" id="tab-add-button" class="tab-add-button" aria-label="タブを追加" title="タブを追加">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -112,18 +118,18 @@
             <path d="M5 12h14" />
           </svg>
         </button>
-        <div class="map-actions">
+        <div class="map-actions" role="group" aria-label="マップデータ操作">
           <button type="button" id="delete-tab-button" class="delete-tab-button">選択中のタブを削除</button>
           <button type="button" id="reset-data-button" class="reset-data-button">全データ初期化</button>
         </div>
-    </div>
+      </header>
 
-    <section class="map-container" aria-label="拠点マップ">
+    <section class="map-container" aria-labelledby="map-heading">
       <div id="map-inner" class="map-inner">
         <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
         <div id="battle-points"></div>
       </div>
-      <div class="map-history-controls" aria-label="MAP編集履歴操作">
+      <div class="map-history-controls" role="group" aria-label="MAP編集履歴操作">
         <button type="button" id="map-undo-button" class="map-history-button" aria-label="MAP編集を元に戻す" title="MAP編集を元に戻す" disabled>
           <span class="map-history-icon" aria-hidden="true"></span>
         </button>
@@ -131,7 +137,7 @@
           <span class="map-history-icon is-redo" aria-hidden="true"></span>
         </button>
       </div>
-      <div class="map-zoom-controls" aria-label="MAP表示操作">
+      <div class="map-zoom-controls" role="group" aria-label="MAP表示操作">
         <div class="map-zoom-actions">
           <span id="map-zoom-value" class="map-zoom-value" aria-live="polite">100%</span>
           <button type="button" id="map-zoom-in-button" class="map-zoom-button" aria-label="MAPを拡大">+</button>
@@ -147,11 +153,11 @@
           </button>
         </div>
       </div>
-      <div id="map-visibility-controls" class="map-visibility-controls" aria-label="MAP要素表示切替"></div>
+      <div id="map-visibility-controls" class="map-visibility-controls" role="group" aria-label="MAP要素表示切替"></div>
     </section>
     </section>
 
-    <div id="mobile-point-picker" class="mobile-point-picker" hidden>
+    <div id="mobile-point-picker" class="mobile-point-picker" role="dialog" aria-modal="true" aria-labelledby="mobile-point-picker-title" hidden>
       <div class="mobile-point-picker-panel">
         <div class="mobile-point-picker-header">
           <strong id="mobile-point-picker-title">拠点選択</strong>

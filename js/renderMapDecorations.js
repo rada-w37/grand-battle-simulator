@@ -52,6 +52,7 @@ export function renderBannerPlacements(fragment) {
     const label = document.createElement("span");
     label.className = "point-name-label";
     label.textContent = placement.name;
+    label.id = `point-label-${placement.pointId}`;
     label.dataset.pointId = placement.pointId;
     setDevLayoutMetadata(label, {
       targetId: `pointName:${placement.pointId}`,

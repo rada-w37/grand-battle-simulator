@@ -241,6 +241,8 @@ export function renderBattlePoints() {
     wrapper.dataset.type = point.type;
     wrapper.dataset.id = point.id;
     wrapper.dataset.castleId = String(point.castleId);
+    wrapper.setAttribute("role", "group");
+    wrapper.setAttribute("aria-labelledby", `point-label-${point.id}`);
     setDevLayoutMetadata(wrapper, {
       targetId: `point:${point.id}`,
       layoutKey: "BATTLE_POINTS",

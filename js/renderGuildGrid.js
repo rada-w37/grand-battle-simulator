@@ -22,6 +22,7 @@ export function renderGuildGrid(guildNames) {
   const cells = Array.from({ length: 4 }, (_, index) => {
     const cell = document.createElement("div");
     cell.className = `guild-cell guild-cell${index + 1}`;
+    cell.setAttribute("role", "listitem");
     cell.textContent = guildNames[index] || "";
     return cell;
   });
