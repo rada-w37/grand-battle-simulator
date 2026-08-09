@@ -1,5 +1,6 @@
 import "./application/battle-data-boundary.test.mjs";
 import "./domain/battle-snapshot.test.mjs";
+import "./domain/declaration-candidates.test.mjs";
 import "./domain/guilds.test.mjs";
 import "./domain/occupation-state.test.mjs";
 import "./domain/occupation-history.test.mjs";
