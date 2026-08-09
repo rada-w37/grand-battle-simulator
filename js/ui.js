@@ -4,14 +4,15 @@ import * as state from "./state.js?v=20260524-visibility-toggles";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260524-visibility-toggles";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-declaration-candidates";
 import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260524-visibility-toggles";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-declaration-candidates";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { prepareBattleDataApplicationState, resolveFallbackGuildNames, shouldResetBattleDataApplication } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
+import { getDeclarationCandidateGuildNames } from "./domain/declaration-candidates.js?v=20260810-declaration-candidates";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
 
 export {
@@ -29,7 +30,7 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260524-visibility-toggles";
+} from "./guildNameEditor.js?v=20260810-declaration-candidates";
 
 export {
   renderEmptyGuildGrid,
@@ -49,7 +50,7 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260524-visibility-toggles";
+} from "./occupationTabs.js?v=20260810-declaration-candidates";
 
 export {
   refreshMapLayout
@@ -331,30 +332,57 @@ export function renderBattlePoints() {
 }
 
 // Guild Options Update
-export function updateGuildOptions() {
-  const guilds = getGuildEntries();
+function replaceGuildSelectOptions(select, guildNames) {
+  select.replaceChildren(
+    createOption("", "選択"),
+    ...guildNames.map(guildName => createOption(guildName, guildName))
+  );
+}
+
+export function updateAttackerGuildOptions(selectStates = getCurrentSelectStates()) {
+  const guildNames = getGuildEntries().map(guild => guild.name);
 
   document.querySelectorAll(".point").forEach((point, index) => {
-    const pointState = normalizePointState(state.pendingSelectStates[index]);
-    const defenderSelect = point.querySelector(".point-defender-select");
     const attackerSelect = point.querySelector(".point-attacker-select");
-    const currentdefender = defenderSelect.value || pointState.defender;
-    const currentAttacker = attackerSelect.value || pointState.attacker;
-
-    [defenderSelect, attackerSelect].forEach(select => {
-      select.replaceChildren(createOption("", select === attackerSelect ? "選択" : "選択"));
-      guilds.forEach(guild => {
-        select.appendChild(createOption(guild.name, guild.name));
-      });
+    const pointState = normalizePointState(selectStates[index]);
+    const candidateGuildNames = getDeclarationCandidateGuildNames({
+      targetPointId: point.dataset.id,
+      battlePoints: BATTLE_POINTS,
+      selectStates,
+      guildNames
     });
 
-    defenderSelect.value = guilds.some(guild => guild.name === currentdefender) ? currentdefender : "";
-    attackerSelect.value = guilds.some(guild => guild.name === currentAttacker) ? currentAttacker : "";
-    setPointAura(point, defenderSelect.value);
-    updatePointChip(point, defenderSelect.value);
+    replaceGuildSelectOptions(attackerSelect, candidateGuildNames);
+    attackerSelect.value = candidateGuildNames.includes(pointState.attacker) ? pointState.attacker : "";
     updatePointDeclaration(point, attackerSelect.value);
     updatePointSelfAttackState(point);
   });
+}
+
+export function updateGuildOptions() {
+  const guilds = getGuildEntries();
+  const guildNames = guilds.map(guild => guild.name);
+  const points = Array.from(document.querySelectorAll(".point"));
+  const pointStates = points.map((point, index) => {
+    const pendingPointState = normalizePointState(state.pendingSelectStates[index]);
+    return {
+      defender: point.querySelector(".point-defender-select").value || pendingPointState.defender,
+      attacker: point.querySelector(".point-attacker-select").value || pendingPointState.attacker
+    };
+  });
+
+  points.forEach((point, index) => {
+    const defenderSelect = point.querySelector(".point-defender-select");
+    replaceGuildSelectOptions(defenderSelect, guildNames);
+    defenderSelect.value = guildNames.includes(pointStates[index].defender) ? pointStates[index].defender : "";
+    setPointAura(point, defenderSelect.value);
+    updatePointChip(point, defenderSelect.value);
+  });
+
+  updateAttackerGuildOptions(points.map((point, index) => ({
+    defender: point.querySelector(".point-defender-select").value,
+    attacker: pointStates[index].attacker
+  })));
 }
 
 // Score Calculation
@@ -548,15 +576,13 @@ export function applySelectStates(selectStates = createEmptyOccupationStates()) 
   document.querySelectorAll(".point").forEach((point, index) => {
     const pointState = normalizePointState(state.pendingSelectStates[index]);
     const defenderSelect = point.querySelector(".point-defender-select");
-    const attackerSelect = point.querySelector(".point-attacker-select");
 
     defenderSelect.value = pointState.defender;
-    attackerSelect.value = pointState.attacker;
     setPointAura(point, pointState.defender);
     updatePointChip(point, pointState.defender);
-    updatePointDeclaration(point, pointState.attacker);
-    updatePointSelfAttackState(point);
   });
+  updateAttackerGuildOptions(state.pendingSelectStates);
+  state.setPendingSelectStates(getCurrentSelectStates());
   updateScores();
 }
 
@@ -626,14 +652,17 @@ export function closeMobilePointPicker() {
 export function setPointGuild(point, role, guildName) {
   const select = point.querySelector(role === "attacker" ? ".point-attacker-select" : ".point-defender-select");
   select.value = guildName;
+  const selectedGuildName = select.value;
 
   if (role === "attacker") {
-    updatePointDeclaration(point, guildName);
+    updatePointDeclaration(point, selectedGuildName);
   } else {
-    setPointAura(point, guildName);
-    updatePointChip(point, guildName);
+    setPointAura(point, selectedGuildName);
+    updatePointChip(point, selectedGuildName);
+    updateAttackerGuildOptions();
   }
 
+  updatePointSelfAttackState(point);
   saveSelectStates();
   updateScores();
 }
@@ -642,6 +671,13 @@ export function openMobilePointPicker(point) {
   state.setActiveMobilePoint(point);
   const defenderSelect = point.querySelector(".point-defender-select");
   const attackerSelect = point.querySelector(".point-attacker-select");
+  const guilds = getGuildEntries();
+  const attackerGuildNames = new Set(getDeclarationCandidateGuildNames({
+    targetPointId: point.dataset.id,
+    battlePoints: BATTLE_POINTS,
+    selectStates: getCurrentSelectStates(),
+    guildNames: guilds.map(guild => guild.name)
+  }));
   const pointLabel = point.dataset.id || "拠点";
   state.elements.mobilePointPickerTitle.textContent = pointLabel;
 
@@ -669,9 +705,12 @@ export function openMobilePointPicker(point) {
 
     const options = document.createElement("div");
     options.className = "mobile-picker-group-options";
+    const optionGuilds = role === "attacker"
+      ? guilds.filter(guild => attackerGuildNames.has(guild.name))
+      : guilds;
     const optionItems = [
       { label: emptyLabel, value: "" },
-      ...getGuildEntries().map((guild, index) => ({
+      ...optionGuilds.map((guild, index) => ({
         label: `${index + 1}. ${guild.name}`,
         value: guild.name
       }))
@@ -752,18 +791,7 @@ export function applyBattleData() {
 
   const snapshotStates = preparedBattleData.occupationStates;
 
-  document.querySelectorAll(".point").forEach((point, index) => {
-    const defenderSelect = point.querySelector(".point-defender-select");
-    const attackerSelect = point.querySelector(".point-attacker-select");
-    const { defender: guildName, attacker: attackerGuildName } = snapshotStates[index] || { defender: "", attacker: "" };
-
-    defenderSelect.value = guildName;
-    attackerSelect.value = attackerGuildName;
-    setPointAura(point, guildName);
-    updatePointChip(point, guildName);
-    updatePointDeclaration(point, attackerGuildName);
-    updatePointSelfAttackState(point);
-  });
+  applySelectStates(snapshotStates);
 
   pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
   saveSelectStates();

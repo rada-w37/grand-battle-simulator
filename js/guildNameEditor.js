@@ -2,7 +2,7 @@ import * as state from "./state.js?v=20260524-visibility-toggles";
 import { getActiveTab } from "./utils.js?v=20260524-visibility-toggles";
 import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260524-visibility-toggles";
 import { removeStorageItem, setStorageItem, STORAGE_KEYS } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260524-visibility-toggles";
+import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260810-declaration-candidates";
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {

@@ -1,6 +1,6 @@
 import * as state from "./state.js?v=20260524-visibility-toggles";
 import * as api from "./api.js?v=20260524-visibility-toggles";
-import * as ui from "./ui.js?v=20260524-visibility-toggles";
+import * as ui from "./ui.js?v=20260810-declaration-candidates";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
@@ -589,6 +589,7 @@ export function bindEvents() {
       } else {
         ui.setPointAura(point, select.value);
         ui.updatePointChip(point, select.value);
+        ui.updateAttackerGuildOptions();
       }
       ui.updatePointSelfAttackState(point);
       ui.recordCurrentOccupationEdit();
