@@ -61,7 +61,7 @@ export function renderBannerPlacements(fragment) {
       role: "pointName",
       targetType: "pointName"
     });
-    label.style.transform = `translate(-50%, calc(-50% + ${MAP_LABEL_LAYOUT.translateY})) scale(${placement.scale / MAP_LABEL_LAYOUT.scaleDivisor})`;
+    label.style.setProperty("--map-point-label-scale", String(placement.scale / MAP_LABEL_LAYOUT.scaleDivisor));
     label.style.transformOrigin = "center";
     const { bannerTextOffset: textOffset } = getPointLayout(placement.pointId);
     setMapImagePosition(

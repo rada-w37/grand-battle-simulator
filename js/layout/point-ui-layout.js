@@ -38,6 +38,26 @@ const POINT_UI_OFFSET_TARGETS = {
 };
 
 const POINT_UI_COMPAT_OFFSET_VARS = {
+  pointStack: {
+    x: {
+      target: POINT_UI_OFFSET_TARGETS.point,
+      variables: [
+        "--map-point-labels-left",
+        "--map-point-select-left",
+        "--map-sword-left",
+        "--map-shield-left"
+      ]
+    },
+    y: {
+      target: POINT_UI_OFFSET_TARGETS.point,
+      variables: [
+        "--map-point-labels-top",
+        "--map-point-select-top",
+        "--map-sword-top",
+        "--map-shield-top"
+      ]
+    }
+  },
   pointLabels: {
     x: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-left"] },
     y: { target: POINT_UI_OFFSET_TARGETS.point, variables: ["--map-point-labels-top"] },
@@ -94,14 +114,17 @@ function collectPointUiOffsetRules(offsets = {}) {
     Object.entries(targetOffsets).forEach(([property, offset]) => {
       const rule = targetVars[property];
       if (!rule) return;
+      const isSharedOffset = targetType === "pointStack";
       const isNewOffset = rule.isNewOffset || NEW_OFFSET_SECTIONS.has(targetType);
 
       rule.variables.forEach(variableName => {
         const existingRule = rulesByVariable.get(variableName);
-        if (existingRule?.isNewOffset && !isNewOffset) return;
+        if (existingRule && !existingRule.isSharedOffset && isSharedOffset) return;
+        if (existingRule?.isNewOffset && !isNewOffset && !existingRule.isSharedOffset) return;
 
         rulesByVariable.set(variableName, {
           isNewOffset,
+          isSharedOffset,
           offset,
           sourceVariable: rule.sourceVariable || variableName,
           target: rule.target,
@@ -166,7 +189,7 @@ export function refreshMapLayout(width = window.innerWidth) {
     const label = document.querySelector(`.point-name-label[data-point-id="${placement.pointId}"]`);
     if (!label) return;
 
-    const { bannerTextOffset: textOffset } = getPointLayout(placement.pointId);
+    const { bannerTextOffset: textOffset } = getPointLayout(placement.pointId, undefined, width);
     setMapImagePosition(
       label,
       placement.x + textOffset.x,

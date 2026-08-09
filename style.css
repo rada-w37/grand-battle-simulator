@@ -1192,7 +1192,7 @@ button:focus-visible {
     0 0 3px rgba(47, 21, 6, 0.82),
     0 0 5px rgba(88, 50, 18, 0.45);
   pointer-events: none;
-  transform: translate(-50%, calc(-50% + var(--map-point-label-transform-y)));
+  transform: translate(-50%, calc(-50% + var(--map-point-label-transform-y))) scale(var(--map-point-label-scale, 1));
   transform-origin: center;
   will-change: transform;
   white-space: nowrap;
@@ -1303,7 +1303,7 @@ button:focus-visible {
 }
 
 .point-labels::after {
-  bottom: 0;
+  top: calc(var(--map-point-band-height) + var(--map-point-band-gap));
   right: 0;
   background:
     linear-gradient(90deg,
@@ -1344,6 +1344,7 @@ button:focus-visible {
   width: var(--map-point-select-width);
   height: var(--map-point-select-height);
   min-height: var(--map-point-select-min-height);
+  padding: var(--map-point-select-padding);
   /* min-width: 50; */
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1443,8 +1444,8 @@ button:focus-visible {
   } */
 
   .point {
-    width: fit-content;
-    min-height: 0;
+    width: var(--map-point-width);
+    min-height: var(--map-point-min-height);
     pointer-events: none;
   }
 
@@ -1715,7 +1716,7 @@ button:focus-visible {
       0 0 3px rgba(47, 21, 6, 0.82),
       0 0 5px rgba(88, 50, 18, 0.45);
     pointer-events: none;
-    transform: translate(-50%, calc(-50% + var(--map-point-label-transform-y)));
+    transform: translate(-50%, calc(-50% + var(--map-point-label-transform-y))) scale(var(--map-point-label-scale, 1));
     transform-origin: center;
     white-space: nowrap;
   }
@@ -1744,9 +1745,9 @@ button:focus-visible {
   .point select {
     height: var(--map-point-select-height);
     min-width: 44px;
-    min-height: 24px;
+    min-height: var(--map-point-select-min-height);
     line-height: var(--map-point-select-line-height);
-    padding: 4px 6px;
+    padding: var(--map-point-select-padding);
     font-size: calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));
     touch-action: manipulation;
     pointer-events: auto;

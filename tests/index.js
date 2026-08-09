@@ -9,3 +9,4 @@ import "./infrastructure/mentemori-api.test.mjs";
 import "./infrastructure/storage.test.mjs";
 import "./presentation/dom-helpers.test.mjs";
 import "./presentation/dom-structure.test.mjs";
+import "./presentation/map-layout.test.mjs";

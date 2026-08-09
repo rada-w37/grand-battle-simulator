@@ -4,8 +4,9 @@
 import { getLayoutViewport } from "./layout-coordinate.js?v=20260524-visibility-toggles";
 
 export const MAP_LABEL_LAYOUT = {
-  translateY: "-1px",
-  scaleDivisor: 35
+  scaleDivisor: 35,
+  textOffsetX: 0,
+  textOffsetY: -1.75
 };
 
 export const MAP_STRUCTURE_PLACEMENTS = [
@@ -33,40 +34,40 @@ export const MAP_STRUCTURE_PLACEMENTS = [
 ];
 
 export const MAP_BANNER_PLACEMENTS = [
-  { pointId: "ganette", name: "ガネット", x: 198, y: 274, scale: 10.9, textOffsetX: 0.05, textOffsetY: -1.6 },
-  { pointId: "laven", name: "ラペン", x: 310, y: 1009, scale: 10.9, textOffsetX: 0.07, textOffsetY: -1.98 },
-  { pointId: "cushel", name: "クシェル", x: 698, y: 280, scale: 10.9, textOffsetX: 0.18, textOffsetY: -1.6 },
-  { pointId: "amest", name: "アメト", x: 566, y: 872, scale: 10.9, textOffsetX: 0.15, textOffsetY: -1.92 },
-  { pointId: "meral", name: "メラル", x: 1118, y: 584, scale: 10.9, textOffsetX: 0.29, textOffsetY: -1.75 },
-  { pointId: "yesod", name: "イエソド", x: 814, y: 528, scale: 10.9, textOffsetX: 0.2, textOffsetY: -1.73 },
-  { pointId: "tiferet", name: "テファレト", x: 486, y: 464, scale: 10.9, textOffsetX: 0.12, textOffsetY: -1.69 },
-  { pointId: "toppaz", name: "トパズ", x: 1158, y: 416, scale: 10.9, textOffsetX: 0.3, textOffsetY: -1.67 },
-  { pointId: "keter", name: "ケテル", x: 422, y: 754, scale: 10.9, textOffsetX: 0.1, textOffsetY: -1.85 },
-  { pointId: "marin", name: "マリン", x: 526, y: 1031, scale: 10.9, textOffsetX: 0.14, textOffsetY: -2 },
-  { pointId: "ein", name: "アイン", x: 646, y: 592, scale: 10.9, textOffsetX: 0.17, textOffsetY: -1.77 },
-  { pointId: "lapis", name: "ラピス", x: 918, y: 904, scale: 10.9, textOffsetX: 0.23, textOffsetY: -1.92 },
-  { pointId: "rula", name: "ルラ", x: 500, y: 171, scale: 10.9, textOffsetX: 0.12, textOffsetY: -1.54 },
-  { pointId: "malkuth", name: "マルクト", x: 755, y: 746, scale: 10.9, textOffsetX: 0.19, textOffsetY: -1.85 },
-  { pointId: "pharia", name: "ファリア", x: 902, y: 190, scale: 10.9, textOffsetX: 0.23, textOffsetY: -1.55 },
-  { pointId: "citri", name: "シトリ", x: 998, y: 316, scale: 10.9, textOffsetX: 0.26, textOffsetY: -1.62 },
-  { pointId: "perido", name: "ペリド", x: 969, y: 646, scale: 10.9, textOffsetX: 0.24, textOffsetY: -1.8 },
-  { pointId: "larimal", name: "ラリマル", x: 751, y: 1157, scale: 10.9, textOffsetX: 0.19, textOffsetY: -2.06 },
-  { pointId: "zircon", name: "ジルコン", x: 251, y: 748, scale: 10.9, textOffsetX: 0.06, textOffsetY: -1.85 },
-  { pointId: "onyx", name: "オニキス", x: 111, y: 621, scale: 10.9, textOffsetX: 0.02, textOffsetY: -1.78 },
-  { pointId: "floryte", name: "フロライト", x: 261, y: 436, scale: 10.9, textOffsetX: 0.06, textOffsetY: -1.68 }
+  { pointId: "ganette", name: "ガネット", x: 198, y: 274, scale: 10.9 },
+  { pointId: "laven", name: "ラペン", x: 310, y: 1009, scale: 10.9 },
+  { pointId: "cushel", name: "クシェル", x: 698, y: 280, scale: 10.9 },
+  { pointId: "amest", name: "アメト", x: 566, y: 872, scale: 10.9 },
+  { pointId: "meral", name: "メラル", x: 1118, y: 584, scale: 10.9 },
+  { pointId: "yesod", name: "イエソド", x: 814, y: 528, scale: 10.9 },
+  { pointId: "tiferet", name: "テファレト", x: 486, y: 464, scale: 10.9 },
+  { pointId: "toppaz", name: "トパズ", x: 1158, y: 416, scale: 10.9 },
+  { pointId: "keter", name: "ケテル", x: 422, y: 754, scale: 10.9 },
+  { pointId: "marin", name: "マリン", x: 526, y: 1031, scale: 10.9 },
+  { pointId: "ein", name: "アイン", x: 646, y: 592, scale: 10.9 },
+  { pointId: "lapis", name: "ラピス", x: 918, y: 904, scale: 10.9 },
+  { pointId: "rula", name: "ルラ", x: 500, y: 171, scale: 10.9 },
+  { pointId: "malkuth", name: "マルクト", x: 755, y: 746, scale: 10.9 },
+  { pointId: "pharia", name: "ファリア", x: 902, y: 190, scale: 10.9 },
+  { pointId: "citri", name: "シトリ", x: 998, y: 316, scale: 10.9 },
+  { pointId: "perido", name: "ペリド", x: 969, y: 646, scale: 10.9 },
+  { pointId: "larimal", name: "ラリマル", x: 751, y: 1157, scale: 10.9 },
+  { pointId: "zircon", name: "ジルコン", x: 251, y: 748, scale: 10.9 },
+  { pointId: "onyx", name: "オニキス", x: 111, y: 621, scale: 10.9 },
+  { pointId: "floryte", name: "フロライト", x: 261, y: 436, scale: 10.9 }
 ];
 
 export function getBannerTextOffset(placement, viewport = getLayoutViewport()) {
   const viewportOffset = placement.textOffsets?.[viewport];
   if (viewportOffset) {
     return {
-      x: viewportOffset.x ?? placement.textOffsetX ?? 0,
-      y: viewportOffset.y ?? placement.textOffsetY ?? 0
+      x: viewportOffset.x ?? placement.textOffsetX ?? MAP_LABEL_LAYOUT.textOffsetX,
+      y: viewportOffset.y ?? placement.textOffsetY ?? MAP_LABEL_LAYOUT.textOffsetY
     };
   }
 
   return {
-    x: placement.textOffsetX ?? 0,
-    y: placement.textOffsetY ?? 0
+    x: placement.textOffsetX ?? MAP_LABEL_LAYOUT.textOffsetX,
+    y: placement.textOffsetY ?? MAP_LABEL_LAYOUT.textOffsetY
   };
 }

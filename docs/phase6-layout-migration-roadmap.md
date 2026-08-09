@@ -9,25 +9,34 @@ alignment.
 This document is a roadmap only. It must not be treated as approval to change
 runtime behavior, CSS effective values, DOM structure, or existing point offsets.
 
+## Current Status (2026-08-09)
+
+- Desktop band rows, select rows, sword, and shield now share an aligned base.
+- Point-specific whole-stack movement uses `pointStack.x` / `pointStack.y`.
+- Repeated desktop `select.y`, row-height, control-height, and min-height offsets
+  were consolidated into viewport base values.
+- Mobile select controls now use non-overlapping `24px` rows with a `2px` gap.
+- Hidden mobile `pointLabels` offsets were removed.
+- Banner labels use one shared default text offset and one CSS transform source.
+- `tools/map-layout-preview.html` provides a real `390 x 844` iframe for mobile
+  visual verification.
+- The dev editor still writes local `pointLabels`, `select`, `sword`, and
+  `shield` offsets. These remain supported and override `pointStack` locally.
+
 ## Current Responsibility Mix
 
-The current point guild UI keeps several responsibilities bundled together.
+The remaining compatibility layer keeps some legacy responsibilities available.
 
-- `--map-point-select-height` currently represents three things:
-  - `.point-selects` grid row height
-  - `.point select` element height
-  - `select.height` offset base and runtime override target
-- Desktop layout depends on `select.height` offsets for every point.
-- `--map-point-labels-height` currently represents three things:
-  - `.point-labels` stack height
-  - the implied gap between `::before` and `::after` background bands
-  - `pointLabels.height` offset base and runtime override target
-- The background bands and select rows are sibling layers:
-  - `.point-labels` is positioned from `--map-point-labels-left/top`.
-  - `.point-selects` is positioned from point center plus `--map-point-select-left/top`.
-- Mobile and desktop use different dominant adjustment paths:
-  - desktop is heavily select-offset driven.
-  - mobile is heavily pointLabels-offset driven.
+- Legacy `select.height` still mirrors to row height, control height, and
+  min-height when old editor output is applied.
+- New runtime values separate row height, row gap, control height, and control
+  min-height.
+- Background bands and select rows remain sibling layers, but their base centers
+  and per-point `pointStack` movement are shared.
+- `--map-point-labels-height` remains the band-stack bounding height for editor
+  compatibility.
+- Mobile uses select-only offsets because the background bands and point markers
+  are hidden.
 
 Named vocabulary already exists for future separation:
 
@@ -36,8 +45,8 @@ Named vocabulary already exists for future separation:
 - `--map-point-band-height`
 - `--map-point-band-gap`
 
-At this stage, these names are vocabulary and documentation aids. They should
-not all be used as runtime sources until offset and editor behavior are ready.
+These names are active runtime sources. Legacy mirrors remain only for existing
+editor output compatibility.
 
 ## Ideal Phase 6-C Shape
 
