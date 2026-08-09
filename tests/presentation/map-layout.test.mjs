@@ -82,10 +82,10 @@ test("keeps mobile controls in non-overlapping rows and removes hidden band offs
   const mobile = MAP_LAYOUT_CSS_VARS.mobile;
 
   assert.equal(mobile["--map-point-width"], "0px");
-  assert.equal(mobile["--map-point-select-row-height"], "24px");
-  assert.equal(mobile["--map-point-select-height"], "24px");
-  assert.equal(mobile["--map-point-select-min-height"], "24px");
-  assert.equal(mobile["--map-point-select-gap"], "2px");
+  assert.equal(mobile["--map-point-select-row-height"], "18px");
+  assert.equal(mobile["--map-point-select-height"], "18px");
+  assert.equal(mobile["--map-point-select-min-height"], "18px");
+  assert.equal(mobile["--map-point-select-gap"], "0px");
 
   Object.values(MAP_POINT_UI_OFFSETS.mobile).forEach(offsets => {
     assert.deepEqual(Object.keys(offsets), ["select"]);

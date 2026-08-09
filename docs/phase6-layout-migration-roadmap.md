@@ -15,7 +15,7 @@ runtime behavior, CSS effective values, DOM structure, or existing point offsets
 - Point-specific whole-stack movement uses `pointStack.x` / `pointStack.y`.
 - Repeated desktop `select.y`, row-height, control-height, and min-height offsets
   were consolidated into viewport base values.
-- Mobile select controls now use non-overlapping `24px` rows with a `2px` gap.
+- Mobile select controls now use compact, non-overlapping `18px` rows with no gap.
 - Hidden mobile `pointLabels` offsets were removed.
 - Banner labels use one shared default text offset and one CSS transform source.
 - `tools/map-layout-preview.html` provides a real `390 x 844` iframe for mobile
