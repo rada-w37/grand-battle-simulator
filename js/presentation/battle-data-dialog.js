@@ -26,7 +26,18 @@ function formatContext(context) {
 
 let activeDialogPromise = null;
 
-export function showBattleDataConfirmation({ mode, reason = "", context = null } = {}) {
+function showConfirmationDialog({
+  title,
+  message,
+  contextText = "",
+  noteText = "",
+  mode = "",
+  confirmLabel = "上書き",
+  confirmClass = "dialog-primary-button",
+  showNewTab = false,
+  showOverwrite = true,
+  showReplace = false
+} = {}) {
   if (activeDialogPromise) return activeDialogPromise;
 
   const dialog = document.getElementById(DIALOG_ID);
@@ -35,27 +46,23 @@ export function showBattleDataConfirmation({ mode, reason = "", context = null }
   }
 
   const elements = getDialogElements(dialog);
-  const contextText = formatContext(context);
-  const isReplacement = mode === "replace";
   const previousFocus = document.activeElement;
-
-  elements.title.textContent = isReplacement
-    ? "別のバトルデータを反映しますか？"
-    : "編集したMAPへデータを反映しますか？";
-  elements.message.textContent = isReplacement
-    ? reason === "context"
-      ? "別の反映元のデータです。現在の全タブとMAP編集履歴を初期化して反映します。"
-      : "ギルド構成が変わっています。現在の全タブとMAP編集履歴を初期化して反映します。"
-    : "現在のタブには、データ反映後の編集があります。";
+  elements.title.textContent = title;
+  elements.message.textContent = message;
   elements.context.textContent = contextText ? "反映元: " + contextText : "";
   elements.context.hidden = !contextText;
-  elements.note.textContent = "上書き直後は、MAP左上のUndoで反映前に戻せます。";
-  elements.note.hidden = isReplacement;
+  elements.note.textContent = noteText;
+  elements.note.hidden = !noteText;
 
   elements.cancel.hidden = false;
-  elements.replace.hidden = !isReplacement;
-  elements.newTab.hidden = isReplacement;
-  elements.overwrite.hidden = isReplacement;
+  elements.newTab.hidden = !showNewTab;
+  elements.overwrite.hidden = !showOverwrite;
+  elements.replace.hidden = !showReplace;
+  elements.newTab.textContent = "新しいタブ";
+  elements.overwrite.textContent = showOverwrite ? confirmLabel : "上書き";
+  elements.replace.textContent = showReplace ? confirmLabel : "データを反映";
+  elements.overwrite.className = showOverwrite ? confirmClass : "dialog-primary-button";
+  elements.replace.className = showReplace ? confirmClass : "dialog-danger-button";
   dialog.dataset.mode = mode;
 
   activeDialogPromise = new Promise(resolve => {
@@ -109,4 +116,38 @@ export function showBattleDataConfirmation({ mode, reason = "", context = null }
   });
 
   return activeDialogPromise;
+}
+
+export function showBattleDataConfirmation({ mode, reason = "", context = null } = {}) {
+  const isReplacement = mode === "replace";
+
+  return showConfirmationDialog({
+    title: isReplacement
+      ? "別のバトルデータを反映しますか？"
+      : "編集したMAPへデータを反映しますか？",
+    message: isReplacement
+      ? reason === "context"
+        ? "別の反映元のデータです。現在の全タブとMAP編集履歴を初期化して反映します。"
+        : "ギルド構成が変わっています。現在の全タブとMAP編集履歴を初期化して反映します。"
+      : "現在のタブには、データ反映後の編集があります。",
+    contextText: formatContext(context),
+    noteText: isReplacement ? "" : "上書き直後は、MAP左上のUndoで反映前に戻せます。",
+    mode,
+    confirmLabel: isReplacement ? "データを反映" : "上書き",
+    confirmClass: isReplacement ? "dialog-danger-button" : "dialog-primary-button",
+    showNewTab: !isReplacement,
+    showOverwrite: !isReplacement,
+    showReplace: isReplacement
+  });
+}
+
+export function showDestructiveConfirmation({ title, message, confirmLabel } = {}) {
+  return showConfirmationDialog({
+    title,
+    message,
+    confirmLabel,
+    mode: "destructive",
+    confirmClass: "dialog-danger-button",
+    showOverwrite: true
+  }).then(action => action === "overwrite");
 }

@@ -7,6 +7,18 @@ const indexHtml = readFileSync(
   fileURLToPath(new URL("../../index.html", import.meta.url)),
   "utf8"
 );
+const uiSource = readFileSync(
+  fileURLToPath(new URL("../../js/ui.js", import.meta.url)),
+  "utf8"
+);
+const occupationTabsSource = readFileSync(
+  fileURLToPath(new URL("../../js/occupationTabs.js", import.meta.url)),
+  "utf8"
+);
+const mapExportSource = readFileSync(
+  fileURLToPath(new URL("../../js/presentation/map-export.js", import.meta.url)),
+  "utf8"
+);
 
 test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /<h1 class="visually-hidden">Grand Battle Simulator<\/h1>/);
@@ -26,4 +38,15 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /data-dialog-action="cancel"/);
   assert.match(indexHtml, /class="map-zoom-controls" role="group"/);
   assert.match(indexHtml, /id="mobile-point-picker" class="mobile-point-picker" role="dialog" aria-modal="true" aria-labelledby="mobile-point-picker-title"/);
+});
+
+test("uses modal confirmation for destructive actions and keeps map export labels visible", () => {
+  assert.doesNotMatch(uiSource, /window\.confirm/);
+  assert.doesNotMatch(occupationTabsSource, /window\.confirm/);
+  assert.match(uiSource, /showDestructiveConfirmation/);
+  assert.match(occupationTabsSource, /showDestructiveConfirmation/);
+  assert.match(mapExportSource, /root\.dataset\.showAttacker = "true"/);
+  assert.match(mapExportSource, /root\.dataset\.showDefender = "true"/);
+  assert.match(mapExportSource, /\.point-selects\{display:grid!important/);
+  assert.match(mapExportSource, /\.point-name-label\[data-point-id='/);
 });

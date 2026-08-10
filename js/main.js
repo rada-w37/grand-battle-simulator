@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-data-apply";
-import * as api from "./api.js?v=20260810-data-apply";
-import * as ui from "./ui.js?v=20260810-data-apply";
-import { bindEvents } from "./events.js?v=20260810-data-apply";
+import * as state from "./state.js?v=20260810-ui-followup";
+import * as api from "./api.js?v=20260810-ui-followup";
+import * as ui from "./ui.js?v=20260810-ui-followup";
+import { bindEvents } from "./events.js?v=20260810-ui-followup";
 import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 

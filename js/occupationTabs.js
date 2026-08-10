@@ -1,6 +1,7 @@
-import * as state from "./state.js?v=20260810-data-apply";
-import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-data-apply";
-import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-data-apply";
+import * as state from "./state.js?v=20260810-ui-followup";
+import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-ui-followup";
+import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-ui-followup";
+import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-ui-followup";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -173,14 +174,18 @@ export function addOccupationTab() {
   updateOccupationHistoryControls();
 }
 
-export function deleteActiveOccupationTab() {
+export async function deleteActiveOccupationTab() {
   if (state.occupationTabs.length <= 1) return;
 
   const activeIndex = state.occupationTabs.findIndex(tab => tab.id === state.activeTabId);
   const activeTab = getActiveTab();
   if (!activeTab) return;
 
-  const confirmed = window.confirm("選択中のタブを削除します。\nこの操作はUndoでは戻せません。");
+  const confirmed = await showDestructiveConfirmation({
+    title: "選択中のタブを削除しますか？",
+    message: "選択中のタブと、そのタブの履歴を削除します。この操作はUndoでは戻せません。",
+    confirmLabel: "削除"
+  });
   if (!confirmed) return;
 
   hideTabContextMenu();

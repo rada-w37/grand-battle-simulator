@@ -956,9 +956,10 @@ button:focus-visible {
 
 .battle-data-dialog-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 100%;
   gap: 8px;
-  margin-top: 4px;
+  margin: 8px auto 0;
 }
 
 .battle-data-dialog-actions button {
@@ -1927,6 +1928,7 @@ button:focus-visible {
 
   .battle-data-dialog-actions {
     flex-direction: column-reverse;
+    width: 100%;
   }
 
   .battle-data-dialog-actions button {

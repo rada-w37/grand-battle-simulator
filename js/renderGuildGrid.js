@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260810-data-apply";
+import * as state from "./state.js?v=20260810-ui-followup";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

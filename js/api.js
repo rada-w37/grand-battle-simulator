@@ -1,5 +1,5 @@
-import * as state from "./state.js?v=20260810-data-apply";
-import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260810-data-apply";
+import * as state from "./state.js?v=20260810-ui-followup";
+import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260810-ui-followup";
 import { readJsonStorage, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import {
   fetchLatestBattleData,
@@ -11,7 +11,7 @@ import {
   prepareBattleDataFetchFailureState,
   prepareBattleDataApplicationState,
   prepareFetchedBattleDataState
-} from "./application/battle-data-boundary.js?v=20260810-data-apply";
+} from "./application/battle-data-boundary.js?v=20260810-ui-followup";
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import {
   getGroupedWorldOptions as groupWorldOptions,

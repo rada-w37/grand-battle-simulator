@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-data-apply";
+import { setMapImagePosition } from "../utils.js?v=20260810-ui-followup";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -121,11 +121,13 @@ function applyDesktopLayoutToClone(mapInner) {
   });
 
   MAP_BANNER_PLACEMENTS.forEach(placement => {
-    const label = mapInner.querySelector("[data-point-id='" + placement.pointId + "']");
-    if (!label) return;
+    const banner = mapInner.querySelector(".point-banner[data-point-id='" + placement.pointId + "']");
+    const label = mapInner.querySelector(".point-name-label[data-point-id='" + placement.pointId + "']");
+    if (!banner || !label) return;
 
     const layout = getPointLayout(placement.pointId, undefined, MAP_BASE_WIDTH);
     const textOffset = layout.bannerTextOffset;
+    setMapImagePosition(banner, placement.x, placement.y);
     setMapImagePosition(label, placement.x + textOffset.x, placement.y + textOffset.y);
   });
 }
@@ -144,8 +146,8 @@ async function createExportRoot(mapContainer) {
 
   const root = document.createElement("div");
   root.className = "map-container map-export-root";
-  root.dataset.showAttacker = mapContainer.dataset.showAttacker || "true";
-  root.dataset.showDefender = mapContainer.dataset.showDefender || "true";
+  root.dataset.showAttacker = "true";
+  root.dataset.showDefender = "true";
   root.style.width = MAP_BASE_WIDTH + "px";
   root.style.height = MAP_BASE_HEIGHT + "px";
   root.style.margin = "0";
@@ -177,7 +179,9 @@ async function getExportStyles() {
   return stylesheetText + [
     ".map-export-root{position:relative!important;display:block!important;}",
     ".map-export-root .map-inner{position:relative!important;}",
-    ".map-export-root .map-export-select{display:block;width:var(--map-point-select-width);height:var(--map-point-select-height);min-height:var(--map-point-select-min-height);padding:var(--map-point-select-padding);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:0;color:#eef4f8;font-size:calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));font-weight:700;line-height:var(--map-point-select-line-height);text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.75);background:transparent;}",
+    ".map-export-root .point-selects{display:grid!important;visibility:visible!important;opacity:1!important;z-index:6!important;}",
+    ".map-export-root .map-export-select{position:static!important;display:block!important;visibility:visible!important;opacity:1!important;width:var(--map-point-select-width);height:var(--map-point-select-height);min-height:var(--map-point-select-min-height);padding:var(--map-point-select-padding);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:0;color:#eef4f8;font-size:calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));font-weight:700;line-height:var(--map-point-select-line-height);text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.75);background:transparent;}",
+    ".map-export-root .point-name-label{z-index:7!important;}",
     ".map-export-root .map-export-select.is-highlight-guild{color:limegreen;}",
     ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}"
   ].join("");
@@ -275,11 +279,13 @@ export function createMapExportFilename(tabName = "Day") {
 
 export function canSharePngFile(file) {
   try {
-    const isTouchDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-      navigator.maxTouchPoints > 1 ||
-      window.matchMedia?.("(pointer: coarse)").matches;
+    const isMobileSharePlatform = Boolean(
+      navigator.userAgentData?.mobile ||
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
     return Boolean(
-      isTouchDevice &&
+      isMobileSharePlatform &&
       navigator.share &&
       navigator.canShare &&
       navigator.canShare({ files: [file] })
