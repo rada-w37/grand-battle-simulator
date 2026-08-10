@@ -377,6 +377,26 @@ button:focus-visible {
   --guild-ink-rgb: var(--guild-4-ink);
 }
 
+.guild-grid .guild-cell1 {
+  --guild-ink-rgb: 151, 53, 57;
+  border-color: rgba(224, 94, 101, 0.58);
+}
+
+.guild-grid .guild-cell2 {
+  --guild-ink-rgb: 54, 82, 143;
+  border-color: rgba(112, 139, 225, 0.58);
+}
+
+.guild-grid .guild-cell3 {
+  --guild-ink-rgb: 57, 112, 71;
+  border-color: rgba(100, 185, 116, 0.58);
+}
+
+.guild-grid .guild-cell4 {
+  --guild-ink-rgb: 139, 108, 37;
+  border-color: rgba(226, 190, 75, 0.6);
+}
+
 .apply-data-button {
   width: auto;
   min-width: 130px;

@@ -108,6 +108,10 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
   assert.match(styleSource, /\.map-score-castle-icon[\s\S]*?invert\(70%\)/);
   assert.match(styleSource, /\.map-score-church-icon[\s\S]*?invert\(51%\)/);
+  assert.match(styleSource, /\.guild-grid \.guild-cell1[\s\S]*?151, 53, 57/);
+  assert.match(styleSource, /\.guild-grid \.guild-cell2[\s\S]*?54, 82, 143/);
+  assert.match(styleSource, /\.guild-grid \.guild-cell3[\s\S]*?57, 112, 71/);
+  assert.match(styleSource, /\.guild-grid \.guild-cell4[\s\S]*?139, 108, 37/);
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
   const battleDataDialogSource = readFileSync(
