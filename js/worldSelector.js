@@ -1,6 +1,6 @@
 import * as state from "./state.js?v=20260810-map-score";
 import { createOption, normalizeWorldName } from "./utils.js?v=20260810-map-score";
-import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-battle-selection";
+import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-score-highlight";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

@@ -3,11 +3,11 @@ import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js
 import * as state from "./state.js?v=20260810-map-score";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-map-score";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-battle-selection";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-battle-selection";
-import { renderBattleBlockGuilds, renderEmptyGuildGrid, renderGuildGrid, syncBattleSelectionControls } from "./renderGuildGrid.js?v=20260810-battle-selection";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-score-highlight";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-score-highlight";
+import { renderBattleBlockGuilds, renderEmptyGuildGrid, renderGuildGrid, syncBattleSelectionControls } from "./renderGuildGrid.js?v=20260810-score-highlight";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-map-score";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-battle-selection";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-score-highlight";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-map-score";
@@ -30,7 +30,7 @@ export {
   selectWorld,
   renderWorldSuggestions,
   updateWorldOptions
-} from "./worldSelector.js?v=20260810-battle-selection";
+} from "./worldSelector.js?v=20260810-score-highlight";
 
 export {
   startGuildNameEditing,
@@ -38,14 +38,14 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260810-battle-selection";
+} from "./guildNameEditor.js?v=20260810-score-highlight";
 
 export {
   renderBattleBlockGuilds,
   renderEmptyGuildGrid,
   renderGuildGrid,
   syncBattleSelectionControls
-} from "./renderGuildGrid.js?v=20260810-battle-selection";
+} from "./renderGuildGrid.js?v=20260810-score-highlight";
 
 export {
   focusEditingTabName,
@@ -60,7 +60,7 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260810-battle-selection";
+} from "./occupationTabs.js?v=20260810-score-highlight";
 
 export {
   refreshMapLayout
@@ -386,6 +386,8 @@ export function updateMapScorePanel(guilds, activeScores, cumulativeScores) {
     const nameCell = document.createElement("td");
     const nameButton = document.createElement("button");
     const isHighlighted = Boolean(guild.name) && state.highlightedGuildName === guild.name;
+    row.className = `map-score-row guild-row${index + 1}`;
+    row.classList.toggle("is-highlighted", isHighlighted);
     nameCell.className = `map-score-guild-cell guild-cell${index + 1}`;
     nameButton.type = "button";
     nameButton.className = "map-score-guild-button";

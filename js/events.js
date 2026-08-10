@@ -1,6 +1,6 @@
 import * as state from "./state.js?v=20260810-map-score";
-import * as api from "./api.js?v=20260810-battle-selection";
-import * as ui from "./ui.js?v=20260810-battle-selection";
+import * as api from "./api.js?v=20260810-score-highlight";
+import * as ui from "./ui.js?v=20260810-score-highlight";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-map-score";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 

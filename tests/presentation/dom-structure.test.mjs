@@ -94,6 +94,8 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(uiSource, /export function updateMapScorePanel/);
   assert.match(uiSource, /export function toggleMapScorePanel/);
   assert.match(uiSource, /className = "map-score-guild-button"/);
+  assert.match(uiSource, /row\.className = `map-score-row guild-row\$\{index \+ 1\}`/);
+  assert.match(uiSource, /row\.classList\.toggle\("is-highlighted", isHighlighted\)/);
   assert.match(uiSource, /state\.highlightedGuildName === guild\.name \? "" : guild\.name/);
   assert.match(uiSource, /nameButton\.setAttribute\("aria-pressed"/);
   assert.doesNotMatch(uiSource, /createScoreGuildRadioCell/);

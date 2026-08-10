@@ -1105,6 +1105,34 @@ button:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
+.map-score-table .map-score-row {
+  --map-score-highlight-rgb: 170, 139, 82;
+}
+
+.map-score-table .map-score-row.guild-row1 {
+  --map-score-highlight-rgb: 224, 94, 101;
+}
+
+.map-score-table .map-score-row.guild-row2 {
+  --map-score-highlight-rgb: 112, 139, 225;
+}
+
+.map-score-table .map-score-row.guild-row3 {
+  --map-score-highlight-rgb: 100, 185, 116;
+}
+
+.map-score-table .map-score-row.guild-row4 {
+  --map-score-highlight-rgb: 226, 190, 75;
+}
+
+.map-score-table .map-score-row.is-highlighted {
+  background: rgba(var(--map-score-highlight-rgb), 0.16);
+}
+
+.map-score-table .map-score-row.is-highlighted .map-score-guild-cell {
+  box-shadow: inset 3px 0 0 rgb(var(--map-score-highlight-rgb));
+}
+
 .map-score-guild-button {
   display: block;
   width: 100%;
