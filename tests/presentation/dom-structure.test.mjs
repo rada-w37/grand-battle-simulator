@@ -11,6 +11,10 @@ const uiSource = readFileSync(
   fileURLToPath(new URL("../../js/ui.js", import.meta.url)),
   "utf8"
 );
+const mainSource = readFileSync(
+  fileURLToPath(new URL("../../js/main.js", import.meta.url)),
+  "utf8"
+);
 const occupationTabsSource = readFileSync(
   fileURLToPath(new URL("../../js/occupationTabs.js", import.meta.url)),
   "utf8"
@@ -31,6 +35,18 @@ const guildGridSource = readFileSync(
   fileURLToPath(new URL("../../js/renderGuildGrid.js", import.meta.url)),
   "utf8"
 );
+const worldSelectorSource = readFileSync(
+  fileURLToPath(new URL("../../js/worldSelector.js", import.meta.url)),
+  "utf8"
+);
+const guildNameEditorSource = readFileSync(
+  fileURLToPath(new URL("../../js/guildNameEditor.js", import.meta.url)),
+  "utf8"
+);
+const battleDataDialogSource = readFileSync(
+  fileURLToPath(new URL("../../js/presentation/battle-data-dialog.js", import.meta.url)),
+  "utf8"
+);
 const styleSource = readFileSync(
   fileURLToPath(new URL("../../style.css", import.meta.url)),
   "utf8"
@@ -43,7 +59,7 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /id="battle-class-tabs" class="battle-class-tabs" role="tablist"/);
   assert.equal((indexHtml.match(/class="battle-block-card" data-block-value=/g) || []).length, 4);
   assert.equal((indexHtml.match(/data-block-guild-grid=/g) || []).length, 4);
-  assert.match(indexHtml, /js\/main\.js\?v=20260810-status-copy/);
+  assert.match(indexHtml, /js\/main\.js\?v=20260810-error-only-status/);
   assert.match(indexHtml, /id="battle-selection-summary" class="battle-selection-summary"/);
   assert.match(indexHtml, /id="guild-name-editor-controls" hidden/);
   assert.doesNotMatch(indexHtml, /id="score-body"/);
@@ -106,8 +122,19 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(guildGridSource, /export function syncBattleSelectionControls/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-class-value\]"\)/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-block-value\]"\)/);
-  assert.doesNotMatch(eventsSource, /api\.js\?v=20260810-score-highlight/);
-  assert.doesNotMatch(eventsSource, /ui\.js\?v=20260810-score-highlight/);
+  assert.match(mainSource, /api\.js\?v=20260810-error-only-status/);
+  assert.match(mainSource, /ui\.js\?v=20260810-error-only-status/);
+  assert.match(mainSource, /events\.js\?v=20260810-error-only-status/);
+  assert.match(eventsSource, /api\.js\?v=20260810-error-only-status/);
+  assert.match(eventsSource, /ui\.js\?v=20260810-error-only-status/);
+  assert.match(worldSelectorSource, /api\.js\?v=20260810-error-only-status/);
+  assert.match(guildNameEditorSource, /ui\.js\?v=20260810-error-only-status/);
+  assert.match(occupationTabsSource, /ui\.js\?v=20260810-error-only-status/);
+  assert.match(occupationTabsSource, /battle-data-dialog\.js\?v=20260810-error-only-status/);
+  assert.match(uiSource, /worldSelector\.js\?v=20260810-error-only-status/);
+  assert.match(uiSource, /guildNameEditor\.js\?v=20260810-error-only-status/);
+  assert.match(uiSource, /occupationTabs\.js\?v=20260810-error-only-status/);
+  assert.match(uiSource, /battle-data-dialog\.js\?v=20260810-error-only-status/);
   assert.match(eventsSource, /state\.elements\.block\.value === card\.dataset\.blockValue/);
   assert.match(eventsSource, /mapScorePanelToggle\?\.addEventListener/);
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
@@ -122,12 +149,15 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(styleSource, /\.guild-grid \.guild-cell3[\s\S]*?--guild-accent: #7ebf88/);
   assert.match(styleSource, /\.guild-grid \.guild-cell4[\s\S]*?--guild-accent: #d4af55/);
   assert.doesNotMatch(apiSource, /4ブロックの最新データを取得しました。/);
+  assert.doesNotMatch(apiSource, /ワールド情報を読み込み中/);
+  assert.doesNotMatch(apiSource, /ワールドを選択してください。/);
+  assert.doesNotMatch(apiSource, /4ブロックの最新データを読み込み中/);
+  assert.doesNotMatch(uiSource, /拠点情報を反映しました。/);
+  assert.doesNotMatch(uiSource, /全データを初期化しました。/);
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
-  const battleDataDialogSource = readFileSync(
-    fileURLToPath(new URL("../../js/presentation/battle-data-dialog.js", import.meta.url)),
-    "utf8"
-  );
+  assert.match(battleDataDialogSource, /const BATTLE_BLOCK_LABELS = \["A", "B", "C", "D"\]/);
+  assert.match(battleDataDialogSource, /hasBlock \? "ブロック" \+ blockLabel : ""/);
   assert.match(battleDataDialogSource, /message: isReplacement[\s\S]*?別の反映元のデータです。/);
   assert.match(battleDataDialogSource, /noteText: isReplacement[\s\S]*?現在の全タブとMAP編集履歴は初期化されます。/);
   assert.match(battleDataDialogSource, /noteTone: isReplacement \? "danger" : "info"/);

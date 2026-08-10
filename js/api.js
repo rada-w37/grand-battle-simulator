@@ -56,7 +56,6 @@ export function _setUiFunctions(fns) {
 
 // Load World Groups
 export async function loadGroups() {
-  if (_setStatus) _setStatus("ワールド情報を読み込み中...");
   state.setWorldGroupData(await fetchWorldGroups());
   if (_updateWorldOptions) _updateWorldOptions();
   if (_setStatus) _setStatus("");
@@ -232,7 +231,7 @@ export async function fetchBattleDataIfReady() {
 
   if (!canFetchBattleData()) {
     resetFetchedData();
-    if (_setStatus) _setStatus("ワールドを選択してください。");
+    if (_setStatus) _setStatus("");
     return;
   }
 
@@ -242,7 +241,7 @@ export async function fetchBattleDataIfReady() {
   setPendingState(false);
 
   try {
-    if (_setStatus) _setStatus("4ブロックの最新データを読み込み中...");
+    if (_setStatus) _setStatus("");
     state.elements.applyButton.disabled = true;
     if (_renderEmptyGuildGrid) _renderEmptyGuildGrid();
 

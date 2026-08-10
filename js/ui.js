@@ -3,15 +3,15 @@ import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js
 import * as state from "./state.js?v=20260810-map-score";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-map-score";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-score-highlight";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-score-highlight";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-error-only-status";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-error-only-status";
 import { renderBattleBlockGuilds, renderEmptyGuildGrid, renderGuildGrid, syncBattleSelectionControls } from "./renderGuildGrid.js?v=20260810-score-highlight";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-map-score";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-score-highlight";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-error-only-status";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-map-score";
-import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-status-copy";
+import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-error-only-status";
 import {
   canSharePngFile,
   captureMapPng,
@@ -902,7 +902,7 @@ export async function applyBattleData() {
     });
   }
 
-  setStatus("拠点情報を反映しました。", "success");
+  setStatus("");
 }
 
 function setMapExportStatus(message, { showSaveButton = false, type = "" } = {}) {
@@ -1036,5 +1036,5 @@ export async function resetAllData() {
   }
   state.elements.applyButton.disabled = true;
   updateOccupationHistoryControls();
-  setStatus("全データを初期化しました。", "success");
+  setStatus("");
 }

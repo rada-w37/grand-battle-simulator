@@ -1,4 +1,5 @@
 const DIALOG_ID = "battle-data-confirmation-dialog";
+const BATTLE_BLOCK_LABELS = ["A", "B", "C", "D"];
 
 function getDialogElements(dialog) {
   return {
@@ -16,11 +17,17 @@ function getDialogElements(dialog) {
 function formatContext(context) {
   if (!context) return "";
 
+  const blockIndex = Number(context.block);
+  const blockLabel = Number.isInteger(blockIndex) && BATTLE_BLOCK_LABELS[blockIndex]
+    ? BATTLE_BLOCK_LABELS[blockIndex]
+    : context.block;
+  const hasBlock = blockLabel !== undefined && blockLabel !== null && blockLabel !== "";
+
   return [
     context.world ? "ワールド " + context.world : "",
     context.groupId ? "グループ " + context.groupId : "",
     context.battleClass ? "クラス " + context.battleClass : "",
-    context.block ? "ブロック " + context.block : ""
+    hasBlock ? "ブロック" + blockLabel : ""
   ].filter(Boolean).join(" / ");
 }
 
