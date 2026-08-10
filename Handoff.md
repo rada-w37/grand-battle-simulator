@@ -8,6 +8,14 @@ Grand Battle Simulator の DDD 化初期リファクタリング Step 0-14 は�
 今回のリファクタリングの目的は、仕様や UI を変えずに、AI/Codex でも安全に改修しやすい境界を作ること。
 厳密な DDD の全面移行ではなく、既存の `ui.js` / `api.js` / `utils.js` を互換 facade として残しながら、純粋関数と外部入出力を段階的に分離した。
 
+## Recent UI Work (2026-08-10)
+
+- Map内スコアパネルを追加済み。折り畳み、ギルド別の累計/合計、神殿/城/教会の保有数を表示する。
+- 累計アイコンは積み上げ矢印、合計アイコンは `Σ`。拠点アイコンは `resource/map-score-*.png` を使用する。
+- 神殿は控えめなゴールド、城はシルバー、教会は控えめなブロンズとしてCSS filterで配色している。元PNGは変更しない。
+- 最新コミット: `044fa08 スコアアイコンのゴールドとブロンズを強調`
+- ユーザー側の未追跡コピー `resource/map-score-*-コピー.png` は変更・削除・コミットしていない。
+
 ## Completed: Step 0-14
 
 - Step 0: `docs/grand-battle-simulator-ddd-refactor-plan.md` を追加し、DDD 化方針、現状責務、移行ステップ、テスト方針を記録した。
@@ -77,6 +85,17 @@ js/
 今後削る場合も、1コミット単位で参照調査、テスト、ブラウザ確認を行う。
 
 ## Current Validation Baseline
+
+最新のスコアアイコン配色調整後:
+
+- `node --test tests`: 71 pass
+- `node --check js/ui.js js/events.js js/presentation/map-export.js js/dom-elements.js`: pass
+- `git diff --check`: pass
+- `http://127.0.0.1:5180/index.html` で表示確認済み。スコアパネル、MAP上の配置、神殿/城/教会の配色を確認した。
+- ブラウザのコンソールエラーなし。
+- 配色調整はUI改善サイクル2回（調整1回、再監査1回）で完了。追加の色変更は不要と判断した。
+- push / deploy は実施していない。
+- 作業ツリーは追跡対象ファイルがクリーンで、未追跡コピー3件のみ残っている。
 
 Step 14 完了時点の確認:
 
