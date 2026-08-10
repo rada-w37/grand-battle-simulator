@@ -23,6 +23,10 @@ const eventsSource = readFileSync(
   fileURLToPath(new URL("../../js/events.js", import.meta.url)),
   "utf8"
 );
+const styleSource = readFileSync(
+  fileURLToPath(new URL("../../style.css", import.meta.url)),
+  "utf8"
+);
 
 test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /<h1 class="visually-hidden">Grand Battle Simulator<\/h1>/);
@@ -47,6 +51,9 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /resource\/map-score-temple\.png/);
   assert.match(indexHtml, /resource\/map-score-castle\.png/);
   assert.match(indexHtml, /resource\/map-score-church\.png/);
+  assert.match(indexHtml, /class="map-score-structure-icon map-score-temple-icon"/);
+  assert.match(indexHtml, /class="map-score-structure-icon map-score-castle-icon"/);
+  assert.match(indexHtml, /class="map-score-structure-icon map-score-church-icon"/);
   assert.match(indexHtml, /<path d="M18 21V8m0 0-3 3m3-3 3 3" \/>/);
   assert.match(indexHtml, /id="mobile-point-picker" class="mobile-point-picker" role="dialog" aria-modal="true" aria-labelledby="mobile-point-picker-title"/);
 });
@@ -74,6 +81,9 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(uiSource, /export function updateMapScorePanel/);
   assert.match(uiSource, /export function toggleMapScorePanel/);
   assert.match(eventsSource, /mapScorePanelToggle\?\.addEventListener/);
+  assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(81%\)/);
+  assert.match(styleSource, /\.map-score-castle-icon[\s\S]*?invert\(81%\)/);
+  assert.match(styleSource, /\.map-score-church-icon[\s\S]*?invert\(55%\)/);
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
   const battleDataDialogSource = readFileSync(

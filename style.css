@@ -978,6 +978,45 @@ button:focus-visible {
   object-fit: contain;
 }
 
+.map-score-temple-icon {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(81%)
+    sepia(31%)
+    saturate(693%)
+    hue-rotate(357deg)
+    brightness(91%)
+    contrast(91%)
+    drop-shadow(0 0 2px rgba(226, 196, 126, 0.28));
+}
+
+.map-score-castle-icon {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(81%)
+    sepia(7%)
+    saturate(295%)
+    hue-rotate(175deg)
+    brightness(94%)
+    contrast(88%)
+    drop-shadow(0 0 2px rgba(200, 208, 215, 0.18));
+}
+
+.map-score-church-icon {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(55%)
+    sepia(20%)
+    saturate(759%)
+    hue-rotate(345deg)
+    brightness(93%)
+    contrast(89%)
+    drop-shadow(0 0 2px rgba(177, 119, 78, 0.18));
+}
+
 .map-score-symbol {
   display: inline-grid;
   place-items: center;
