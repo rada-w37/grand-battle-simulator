@@ -113,6 +113,7 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(styleSource, /\.map-score-guild-button[\s\S]*?padding: 0 4px 0 5px/);
   assert.match(styleSource, /\.map-score-table th:first-child[\s\S]*?padding-left: 9px/);
   assert.match(styleSource, /\.guild-grid \.guild-cell::after[\s\S]*?height: 1px/);
+  assert.match(styleSource, /\.guild-grid \.guild-cell[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
   assert.match(styleSource, /\.guild-grid \.guild-cell1[\s\S]*?--guild-accent: #c76565/);
   assert.match(styleSource, /\.guild-grid \.guild-cell2[\s\S]*?--guild-accent: #768be0/);
   assert.match(styleSource, /\.guild-grid \.guild-cell3[\s\S]*?--guild-accent: #7ebf88/);
