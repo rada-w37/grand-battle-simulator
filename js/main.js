@@ -1,7 +1,7 @@
 import * as state from "./state.js?v=20260810-map-score";
-import * as api from "./api.js?v=20260810-map-score";
-import * as ui from "./ui.js?v=20260810-map-score";
-import { bindEvents } from "./events.js?v=20260810-map-score";
+import * as api from "./api.js?v=20260810-battle-selection";
+import * as ui from "./ui.js?v=20260810-battle-selection";
+import { bindEvents } from "./events.js?v=20260810-battle-selection";
 import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
@@ -40,7 +40,9 @@ async function initializeApp() {
   api._setUiFunctions({
     setStatus: ui.setStatus,
     renderGuildGrid: ui.renderGuildGrid,
+    renderBattleBlockGuilds: ui.renderBattleBlockGuilds,
     renderEmptyGuildGrid: ui.renderEmptyGuildGrid,
+    syncBattleSelectionControls: ui.syncBattleSelectionControls,
     updateGuildOptions: ui.updateGuildOptions,
     applySelectStates: ui.applySelectStates,
     updateWorldOptions: ui.updateWorldOptions
@@ -48,6 +50,7 @@ async function initializeApp() {
 
   applyMapLayoutCssVars();
   ui.renderEmptyGuildGrid();
+  ui.syncBattleSelectionControls();
   ui.renderBattlePoints();
   ui.loadAppliedGuilds();
   ui.loadHighlightedGuildName();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grand Battle Simulator</title>
-  <link rel="stylesheet" href="style.css?v=20260810-map-score-accent-icons">
+  <link rel="stylesheet" href="style.css?v=20260810-battle-selection">
 </head>
 <body>
   <main class="app-shell">
@@ -14,7 +14,7 @@
       <section class="panel source-panel" aria-labelledby="source-heading">
       <h2 id="source-heading" class="visually-hidden">バトルデータ選択</h2>
       <fieldset class="source-grid">
-        <legend class="visually-hidden">サーバー・ワールド・クラス・ブロック</legend>
+        <legend class="visually-hidden">サーバー・ワールド</legend>
         <label>
           <span>サーバー</span>
           <select id="server-select">
@@ -36,42 +36,61 @@
           </div>
         </label>
 
-        <label>
-          <span>クラス</span>
-          <select id="class-select">
-            <option value="3">グランドマスター</option>
-            <option value="2">エキスパート</option>
-            <option value="1">エリート</option>
-          </select>
-        </label>
-
-        <label>
-          <span>ブロック</span>
-          <select id="block-select">
-            <option value="0">A</option>
-            <option value="1">B</option>
-            <option value="2">C</option>
-            <option value="3">D</option>
-          </select>
-        </label>
       </fieldset>
 
-      <section class="guild-display" aria-labelledby="guild-heading">
-        <h3 id="guild-heading">ギルド名</h3>
-        <div id="guild-grid" class="guild-grid" role="list" aria-live="polite"></div>
-        <button type="button" id="apply-data-button" class="apply-data-button" disabled>データを反映</button>
-        <p id="pending-message" class="pending-message" hidden>未反映データがあります</p>
+      <div class="selection-backing-controls" hidden>
+        <select id="class-select" aria-hidden="true" tabindex="-1">
+          <option value="3">グランドマスター</option>
+          <option value="2">エキスパート</option>
+          <option value="1">エリート</option>
+        </select>
+        <select id="block-select" aria-hidden="true" tabindex="-1">
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+        </select>
+      </div>
+
+      <section class="battle-selection" aria-label="クラスとブロックの選択">
+        <div id="battle-class-tabs" class="battle-class-tabs" role="tablist" aria-label="クラス">
+          <button type="button" class="battle-class-tab" data-class-value="3" role="tab" aria-selected="true">グランドマスター</button>
+          <button type="button" class="battle-class-tab" data-class-value="2" role="tab" aria-selected="false">エキスパート</button>
+          <button type="button" class="battle-class-tab" data-class-value="1" role="tab" aria-selected="false">エリート</button>
+        </div>
+
+        <div id="battle-block-grid" class="battle-block-grid" role="group" aria-label="ブロック">
+          <button type="button" class="battle-block-card" data-block-value="0" aria-pressed="true">
+            <span class="battle-block-title">ブロックA</span>
+            <span class="guild-grid" data-block-guild-grid="0" role="list" aria-live="polite"></span>
+          </button>
+          <button type="button" class="battle-block-card" data-block-value="1" aria-pressed="false">
+            <span class="battle-block-title">ブロックB</span>
+            <span class="guild-grid" data-block-guild-grid="1" role="list" aria-live="polite"></span>
+          </button>
+          <button type="button" class="battle-block-card" data-block-value="2" aria-pressed="false">
+            <span class="battle-block-title">ブロックC</span>
+            <span class="guild-grid" data-block-guild-grid="2" role="list" aria-live="polite"></span>
+          </button>
+          <button type="button" class="battle-block-card" data-block-value="3" aria-pressed="false">
+            <span class="battle-block-title">ブロックD</span>
+            <span class="guild-grid" data-block-guild-grid="3" role="list" aria-live="polite"></span>
+          </button>
+        </div>
+
+        <div class="battle-selection-footer">
+          <p id="battle-selection-summary" class="battle-selection-summary"></p>
+          <div class="apply-data-actions">
+            <p id="pending-message" class="pending-message" hidden><span aria-hidden="true">●</span> 未反映</p>
+            <button type="button" id="apply-data-button" class="apply-data-button" disabled>データを反映</button>
+          </div>
+        </div>
       </section>
 
       <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
     </section>
 
-      <hr class="section-divider">
-
-      <section class="panel score-panel" aria-labelledby="score-heading">
-      <h2 id="score-heading">獲得ポイント</h2>
-      <p id="cumulative-scope" class="cumulative-scope"></p>
-      <div class="score-edit-actions" role="group" aria-label="ギルド名編集" aria-controls="score-body">
+      <div id="guild-name-editor-controls" hidden>
         <button type="button" id="edit-guild-names-button" class="score-edit-button" aria-label="ギルド名を編集" title="ギルド名を編集">
           <span class="score-edit-pen-icon" aria-hidden="true"></span>
         </button>
@@ -87,25 +106,6 @@
           </svg>
         </button>
       </div>
-      <div class="table-scroll">
-        <table class="score-table">
-          <caption class="visually-hidden">ギルド別獲得ポイント</caption>
-          <thead>
-            <tr>
-              <th class="score-icon-header" scope="col" aria-hidden="true"></th>
-              <th scope="col">ギルド名</th>
-              <th scope="col">神殿</th>
-              <th scope="col">城</th>
-              <th scope="col">教会</th>
-              <th scope="col">合計</th>
-              <th scope="col">累計</th>
-            </tr>
-          </thead>
-          <tbody id="score-body"></tbody>
-        </table>
-      </div>
-    </section>
-
     </div>
 
     <section class="panel map-panel" aria-labelledby="map-heading">
@@ -240,6 +240,6 @@
     (c)BANK OF INNOVATION 該当画像の転載・配布等は禁止しております。
   </footer>
 
-  <script type="module" src="js/main.js?v=20260810-map-score"></script>
+  <script type="module" src="js/main.js?v=20260810-battle-selection"></script>
 </body>
 </html>

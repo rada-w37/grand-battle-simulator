@@ -1,6 +1,6 @@
 import * as state from "./state.js?v=20260810-map-score";
-import * as api from "./api.js?v=20260810-map-score";
-import * as ui from "./ui.js?v=20260810-map-score";
+import * as api from "./api.js?v=20260810-battle-selection";
+import * as ui from "./ui.js?v=20260810-battle-selection";
 import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-map-score";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
@@ -557,8 +557,38 @@ export function bindEvents() {
     state.setIsInteractingWithWorldSuggestions(false);
   });
 
+  document.querySelectorAll("[data-class-value]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      if (state.elements.battleClass.value === tab.dataset.classValue) return;
+      state.elements.battleClass.value = tab.dataset.classValue;
+      ui.syncBattleSelectionControls();
+      api.fetchBattleDataIfReady();
+    });
+
+    tab.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const tabs = Array.from(document.querySelectorAll("[data-class-value]"));
+      const currentIndex = tabs.indexOf(tab);
+      const nextIndex = event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? tabs.length - 1
+          : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[nextIndex].click();
+      tabs[nextIndex].focus();
+    });
+  });
+
+  document.querySelectorAll("[data-block-value]").forEach(card => {
+    card.addEventListener("click", () => {
+      if (state.elements.block.value === card.dataset.blockValue) return;
+      api.selectBattleBlock(card.dataset.blockValue);
+    });
+  });
+
   state.elements.battleClass.addEventListener("change", api.fetchBattleDataIfReady);
-  state.elements.block.addEventListener("change", api.fetchBattleDataIfReady);
+  state.elements.block.addEventListener("change", () => api.selectBattleBlock(state.elements.block.value));
 
   state.elements.applyButton.addEventListener("click", ui.applyBattleData);
   state.elements.editGuildNamesButton.addEventListener("click", ui.startGuildNameEditing);

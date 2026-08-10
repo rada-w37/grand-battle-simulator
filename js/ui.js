@@ -1,13 +1,13 @@
-import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
+import { GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import * as state from "./state.js?v=20260810-map-score";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-map-score";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-map-score";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-map-score";
-import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-map-score";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-battle-selection";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-battle-selection";
+import { renderBattleBlockGuilds, renderEmptyGuildGrid, renderGuildGrid, syncBattleSelectionControls } from "./renderGuildGrid.js?v=20260810-battle-selection";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-map-score";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-map-score";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-battle-selection";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-map-score";
@@ -30,7 +30,7 @@ export {
   selectWorld,
   renderWorldSuggestions,
   updateWorldOptions
-} from "./worldSelector.js?v=20260810-map-score";
+} from "./worldSelector.js?v=20260810-battle-selection";
 
 export {
   startGuildNameEditing,
@@ -38,12 +38,14 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260810-map-score";
+} from "./guildNameEditor.js?v=20260810-battle-selection";
 
 export {
+  renderBattleBlockGuilds,
   renderEmptyGuildGrid,
-  renderGuildGrid
-} from "./renderGuildGrid.js?v=20260810-map-score";
+  renderGuildGrid,
+  syncBattleSelectionControls
+} from "./renderGuildGrid.js?v=20260810-battle-selection";
 
 export {
   focusEditingTabName,
@@ -58,7 +60,7 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260810-map-score";
+} from "./occupationTabs.js?v=20260810-battle-selection";
 
 export {
   refreshMapLayout
@@ -177,42 +179,6 @@ function updateHighlightedGuildSelects() {
   document.querySelectorAll(".point-attacker-select, .point-defender-select").forEach(select => {
     select.classList.toggle("is-highlight-guild", Boolean(state.highlightedGuildName) && select.value === state.highlightedGuildName);
   });
-}
-
-function createScoreGuildRadioCell(guildName) {
-  const cell = document.createElement("td");
-  const radio = document.createElement("input");
-
-  cell.className = "score-guild-radio-cell";
-  radio.type = "radio";
-  radio.name = "highlight-guild";
-  radio.value = guildName;
-  radio.checked = Boolean(guildName) && state.highlightedGuildName === guildName;
-  radio.disabled = !guildName;
-  radio.addEventListener("pointerdown", () => {
-    radio.dataset.wasChecked = String(radio.checked);
-  });
-  radio.addEventListener("click", event => {
-    if (radio.dataset.wasChecked !== "true") return;
-
-    event.preventDefault();
-    radio.checked = false;
-    radio.dataset.wasChecked = "false";
-    state.setHighlightedGuildName("");
-    saveHighlightedGuildName("");
-    updateHighlightedGuildSelects();
-    updateScores();
-  });
-  radio.setAttribute("aria-label", guildName ? `${guildName}をマップ上で強調` : "ギルド未選択");
-  radio.addEventListener("change", () => {
-    if (!radio.checked) return;
-    state.setHighlightedGuildName(radio.value);
-    saveHighlightedGuildName(radio.value);
-    updateHighlightedGuildSelects();
-  });
-
-  cell.appendChild(radio);
-  return cell;
 }
 
 // Render Battle Points Map
@@ -408,17 +374,6 @@ export function getCumulativeScores(guildNames) {
   });
 }
 
-export function updateCumulativeScope() {
-  const activeIndex = state.occupationTabs.findIndex(tab => tab.id === state.activeTabId);
-  if (activeIndex < 0 || state.occupationTabs.length === 0) {
-    state.elements.cumulativeScope.textContent = "";
-    return;
-  }
-
-  const targetTabs = state.occupationTabs.slice(0, activeIndex + 1).map(tab => tab.name);
-  state.elements.cumulativeScope.textContent = `累計対象: ${targetTabs.join(" / ")}`;
-}
-
 export function updateMapScorePanel(guilds, activeScores, cumulativeScores) {
   const scoreBody = getRequiredElement("mapScoreBody", "map-score-body");
   if (!scoreBody) return;
@@ -429,8 +384,28 @@ export function updateMapScorePanel(guilds, activeScores, cumulativeScores) {
     const cumulativeScore = cumulativeScores[guild.name]?.total || 0;
     const row = document.createElement("tr");
     const nameCell = document.createElement("td");
+    const nameButton = document.createElement("button");
+    const isHighlighted = Boolean(guild.name) && state.highlightedGuildName === guild.name;
     nameCell.className = `map-score-guild-cell guild-cell${index + 1}`;
-    nameCell.textContent = guild.name;
+    nameButton.type = "button";
+    nameButton.className = "map-score-guild-button";
+    nameButton.textContent = guild.name;
+    nameButton.disabled = !guild.name;
+    nameButton.classList.toggle("is-highlighted", isHighlighted);
+    nameButton.setAttribute("aria-pressed", String(isHighlighted));
+    nameButton.setAttribute(
+      "aria-label",
+      guild.name
+        ? `${guild.name}${isHighlighted ? "の強調を解除" : "をマップ上で強調"}`
+        : "ギルド未選択"
+    );
+    nameButton.addEventListener("click", () => {
+      const nextGuildName = state.highlightedGuildName === guild.name ? "" : guild.name;
+      state.setHighlightedGuildName(nextGuildName);
+      saveHighlightedGuildName(nextGuildName);
+      updateScores();
+    });
+    nameCell.appendChild(nameButton);
     row.append(
       nameCell,
       createScoreCell(cumulativeScore, "map-score-cumulative-cell"),
@@ -464,7 +439,6 @@ export function toggleMapScorePanel() {
 }
 
 export function updateScores() {
-  updateCumulativeScope();
   const guilds = getGuildEntries();
   const guildNames = guilds.map(guild => guild.name);
   const activeScores = createEmptyScores(guildNames);
@@ -484,48 +458,7 @@ export function updateScores() {
     updatePointSelfAttackState(point);
   });
 
-  const rows = Array.from({ length: 4 }, (_, index) => {
-    const guild = guilds[index] || { name: "", color: GUILD_COLORS[index] };
-    const score = activeScores[guild.name] || { total: 0, temple: 0, castle: 0, church: 0 };
-    const cumulativeScore = cumulativeScores[guild.name]?.total || 0;
-    const row = document.createElement("tr");
-    const nameCell = document.createElement("td");
-    nameCell.className = `score-guild-name-cell guild-cell${index + 1}`;
-
-    if (state.isEditingGuildNames) {
-      const input = document.createElement("input");
-      input.className = "score-guild-name-input";
-      input.value = state.guildNameDrafts[index] || guild.name || `ギルド${index + 1}`;
-      input.maxLength = 24;
-      input.setAttribute("aria-label", `ギルド${index + 1}名`);
-      input.addEventListener("input", () => {
-        const drafts = [...state.guildNameDrafts];
-        drafts[index] = input.value;
-        state.setGuildNameDrafts(drafts);
-      });
-      nameCell.appendChild(input);
-    } else {
-      nameCell.textContent = guild.name;
-    }
-    row.append(
-      createScoreGuildRadioCell(guild.name),
-      nameCell,
-      createScoreCell(score.temple),
-      createScoreCell(score.castle),
-      createScoreCell(score.church),
-      createScoreCell(score.total, "score-total"),
-      createScoreCell(cumulativeScore, "score-cumulative")
-    );
-
-    return row;
-  });
-
   updateMapScorePanel(guilds, activeScores, cumulativeScores);
-
-  const scoreBody = getRequiredElement("scoreBody", "score-body");
-  if (!scoreBody) return;
-
-  scoreBody.replaceChildren(...rows);
   updateHighlightedGuildSelects();
 }
 

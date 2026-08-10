@@ -2,7 +2,7 @@ import * as state from "./state.js?v=20260810-map-score";
 import { getActiveTab } from "./utils.js?v=20260810-map-score";
 import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260810-map-score";
 import { removeStorageItem, setStorageItem, STORAGE_KEYS } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260810-map-score";
+import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260810-battle-selection";
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {

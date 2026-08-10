@@ -28,13 +28,17 @@ export {
 } from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
+const BATTLE_BLOCK_VALUES = ["0", "1", "2", "3"];
 
 let battleFetchRequestId = 0;
+let pendingBattleApplicationsByBlock = new Map();
 
 // UI Function References (set by main.js)
 let _setStatus = null;
 let _renderGuildGrid = null;
+let _renderBattleBlockGuilds = null;
 let _renderEmptyGuildGrid = null;
+let _syncBattleSelectionControls = null;
 let _updateGuildOptions = null;
 let _applySelectStates = null;
 let _updateWorldOptions = null;
@@ -42,7 +46,9 @@ let _updateWorldOptions = null;
 export function _setUiFunctions(fns) {
   _setStatus = fns.setStatus;
   _renderGuildGrid = fns.renderGuildGrid;
+  _renderBattleBlockGuilds = fns.renderBattleBlockGuilds;
   _renderEmptyGuildGrid = fns.renderEmptyGuildGrid;
+  _syncBattleSelectionControls = fns.syncBattleSelectionControls;
   _updateGuildOptions = fns.updateGuildOptions;
   _applySelectStates = fns.applySelectStates;
   _updateWorldOptions = fns.updateWorldOptions;
@@ -120,11 +126,13 @@ export function restoreBattleSelection() {
   if (selection.world) state.elements.world.value = selection.world;
   if (selection.battleClass) state.elements.battleClass.value = selection.battleClass;
   if (selection.block) state.elements.block.value = selection.block;
+  if (_syncBattleSelectionControls) _syncBattleSelectionControls();
 }
 
 // Fetch Battle Data
 export function resetFetchedData() {
   battleFetchRequestId += 1;
+  pendingBattleApplicationsByBlock = new Map();
   state.setCurrentBattleData(null);
   state.setPendingGuilds([]);
   state.setPendingBattleApplication(null);
@@ -134,8 +142,93 @@ export function resetFetchedData() {
   if (_renderEmptyGuildGrid) _renderEmptyGuildGrid();
 }
 
+function createBlockContext({ block, groupId, selectedWorld }) {
+  return createBattleDataContext({
+    server: state.elements.server.value,
+    world: selectedWorld.id,
+    groupId,
+    battleClass: state.elements.battleClass.value,
+    block
+  });
+}
+
+async function fetchBlockApplication({ block, groupId, selectedWorld, requestId }) {
+  const context = createBlockContext({ block, groupId, selectedWorld });
+
+  try {
+    const nextBattleState = prepareFetchedBattleDataState(await fetchLatestBattleData({
+      groupId,
+      battleClass: state.elements.battleClass.value,
+      block
+    }));
+    const preparedApplication = prepareBattleDataApplicationState({
+      battleData: nextBattleState.battleData,
+      pendingGuilds: nextBattleState.pendingGuilds,
+      battlePoints: BATTLE_POINTS
+    });
+
+    return {
+      block,
+      battleData: nextBattleState.battleData,
+      guilds: preparedApplication.guilds,
+      usesFallbackGuilds: nextBattleState.usesFallbackGuilds,
+      application: {
+        requestId,
+        context,
+        guilds: preparedApplication.guilds,
+        occupationStates: preparedApplication.occupationStates,
+        sourceType: "api"
+      },
+      error: null
+    };
+  } catch (error) {
+    const fallbackBattleState = prepareBattleDataFetchFailureState(FALLBACK_GUILDS);
+    return {
+      block,
+      battleData: fallbackBattleState.battleData,
+      guilds: fallbackBattleState.pendingGuilds,
+      usesFallbackGuilds: fallbackBattleState.usesFallbackGuilds,
+      application: {
+        requestId,
+        context,
+        guilds: fallbackBattleState.pendingGuilds,
+        occupationStates: fallbackBattleState.occupationStates,
+        sourceType: "fallback"
+      },
+      error
+    };
+  }
+}
+
+function activatePendingBattleBlock(blockValue) {
+  const result = pendingBattleApplicationsByBlock.get(blockValue);
+  if (!result) return false;
+
+  state.setCurrentBattleData(result.battleData);
+  state.setPendingGuilds(result.guilds);
+  state.setPendingBattleApplication(result.application);
+  state.setUsesFallbackGuilds(result.usesFallbackGuilds);
+  state.elements.applyButton.disabled = false;
+  setPendingState(true);
+  if (_renderGuildGrid) _renderGuildGrid(result.guilds, blockValue);
+  if (_syncBattleSelectionControls) _syncBattleSelectionControls();
+  return true;
+}
+
+export function selectBattleBlock(blockValue) {
+  if (!BATTLE_BLOCK_VALUES.includes(String(blockValue))) return;
+
+  state.elements.block.value = String(blockValue);
+  saveBattleSelection();
+  if (_syncBattleSelectionControls) _syncBattleSelectionControls();
+  if (!activatePendingBattleBlock(String(blockValue))) {
+    return fetchBattleDataIfReady();
+  }
+}
+
 export async function fetchBattleDataIfReady() {
   saveBattleSelection();
+  if (_syncBattleSelectionControls) _syncBattleSelectionControls();
 
   if (!canFetchBattleData()) {
     resetFetchedData();
@@ -144,13 +237,14 @@ export async function fetchBattleDataIfReady() {
   }
 
   const requestId = ++battleFetchRequestId;
+  pendingBattleApplicationsByBlock = new Map();
   state.setPendingBattleApplication(null);
   setPendingState(false);
 
-  let selectedContext = null;
   try {
-    if (_setStatus) _setStatus("最新データを読み込み中...");
+    if (_setStatus) _setStatus("4ブロックの最新データを読み込み中...");
     state.elements.applyButton.disabled = true;
+    if (_renderEmptyGuildGrid) _renderEmptyGuildGrid();
 
     const selectedWorld = getSelectedWorld();
     if (!selectedWorld) throw new Error("ワールドが見つかりません");
@@ -158,60 +252,28 @@ export async function fetchBattleDataIfReady() {
     state.elements.world.value = selectedWorld.id;
     const worldNumeric = selectedWorld.numeric;
     const groupId = getSelectedGroupId(worldNumeric);
-    selectedContext = createBattleDataContext({
-      server: state.elements.server.value,
-      world: selectedWorld.id,
-      groupId,
-      battleClass: state.elements.battleClass.value,
-      block: state.elements.block.value
-    });
-
-    const nextBattleState = prepareFetchedBattleDataState(await fetchLatestBattleData({
-      groupId,
-      battleClass: state.elements.battleClass.value,
-      block: state.elements.block.value
-    }));
+    const blockResults = await Promise.all(BATTLE_BLOCK_VALUES.map(block => (
+      fetchBlockApplication({ block, groupId, selectedWorld, requestId })
+    )));
     if (requestId !== battleFetchRequestId) return;
 
-    const preparedApplication = prepareBattleDataApplicationState({
-      battleData: nextBattleState.battleData,
-      pendingGuilds: nextBattleState.pendingGuilds,
-      battlePoints: BATTLE_POINTS
-    });
-    state.setCurrentBattleData(nextBattleState.battleData);
-    state.setPendingGuilds(nextBattleState.pendingGuilds);
-    state.setPendingBattleApplication({
-      requestId,
-      context: selectedContext,
-      guilds: preparedApplication.guilds,
-      occupationStates: preparedApplication.occupationStates,
-      sourceType: "api"
-    });
-    state.setUsesFallbackGuilds(nextBattleState.usesFallbackGuilds);
+    pendingBattleApplicationsByBlock = new Map(blockResults.map(result => [result.block, result]));
+    if (_renderBattleBlockGuilds) {
+      _renderBattleBlockGuilds(Object.fromEntries(blockResults.map(result => [result.block, result.guilds])));
+    }
+    activatePendingBattleBlock(state.elements.block.value);
+    saveBattleSelection();
 
-    if (_renderGuildGrid) _renderGuildGrid(state.pendingGuilds);
-    setPendingState(true);
-    state.elements.applyButton.disabled = false;
-    if (_setStatus) _setStatus("最新データを取得しました。", "success");
+    const failedCount = blockResults.filter(result => result.error).length;
+    if (failedCount > 0) {
+      if (_setStatus) _setStatus(`${failedCount}ブロックの取得に失敗しました。仮名ギルドで手動反映できます。`, "error");
+    } else if (_setStatus) {
+      _setStatus("4ブロックの最新データを取得しました。", "success");
+    }
   } catch (error) {
     if (requestId !== battleFetchRequestId) return;
-
-    const fallbackBattleState = prepareBattleDataFetchFailureState(FALLBACK_GUILDS);
-    state.setCurrentBattleData(fallbackBattleState.battleData);
-    state.setPendingGuilds(fallbackBattleState.pendingGuilds);
-    state.setPendingBattleApplication({
-      requestId,
-      context: selectedContext,
-      guilds: fallbackBattleState.pendingGuilds,
-      occupationStates: fallbackBattleState.occupationStates,
-      sourceType: "fallback"
-    });
-    state.setUsesFallbackGuilds(fallbackBattleState.usesFallbackGuilds);
-    state.elements.applyButton.disabled = false;
-    setPendingState(true);
-    if (_renderGuildGrid) _renderGuildGrid(FALLBACK_GUILDS);
-    if (_setStatus) _setStatus(`エラー: ${error.message} / 仮名ギルドで手動反映できます`, "error");
-    return;
+    resetFetchedData();
+    if (_setStatus) _setStatus(`エラー: ${error.message}`, "error");
   }
 }
 

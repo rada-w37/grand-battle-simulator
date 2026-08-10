@@ -23,6 +23,14 @@ const eventsSource = readFileSync(
   fileURLToPath(new URL("../../js/events.js", import.meta.url)),
   "utf8"
 );
+const apiSource = readFileSync(
+  fileURLToPath(new URL("../../js/api.js", import.meta.url)),
+  "utf8"
+);
+const guildGridSource = readFileSync(
+  fileURLToPath(new URL("../../js/renderGuildGrid.js", import.meta.url)),
+  "utf8"
+);
 const styleSource = readFileSync(
   fileURLToPath(new URL("../../style.css", import.meta.url)),
   "utf8"
@@ -32,10 +40,15 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /<h1 class="visually-hidden">Grand Battle Simulator<\/h1>/);
   assert.match(indexHtml, /<section class="panel source-panel" aria-labelledby="source-heading">/);
   assert.match(indexHtml, /<fieldset class="source-grid">[\s\S]*<legend class="visually-hidden">/);
-  assert.match(indexHtml, /<section class="guild-display" aria-labelledby="guild-heading">/);
-  assert.match(indexHtml, /id="guild-grid" class="guild-grid" role="list"/);
-  assert.match(indexHtml, /<caption class="visually-hidden">ギルド別獲得ポイント<\/caption>/);
-  assert.equal((indexHtml.match(/scope="col"/g) || []).length, 13);
+  assert.match(indexHtml, /id="battle-class-tabs" class="battle-class-tabs" role="tablist"/);
+  assert.equal((indexHtml.match(/class="battle-block-card" data-block-value=/g) || []).length, 4);
+  assert.equal((indexHtml.match(/data-block-guild-grid=/g) || []).length, 4);
+  assert.match(indexHtml, /id="battle-selection-summary" class="battle-selection-summary"/);
+  assert.match(indexHtml, /id="guild-name-editor-controls" hidden/);
+  assert.doesNotMatch(indexHtml, /id="score-body"/);
+  assert.doesNotMatch(indexHtml, /class="panel score-panel"/);
+  assert.doesNotMatch(indexHtml, /name="highlight-guild"/);
+  assert.equal((indexHtml.match(/scope="col"/g) || []).length, 6);
   assert.match(indexHtml, /<section class="panel map-panel" aria-labelledby="map-heading">/);
   assert.match(indexHtml, /<header class="tab-row">/);
   assert.match(indexHtml, /class="map-history-controls" role="group" aria-label="MAP操作"/);
@@ -80,6 +93,17 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(mapExportSource, /sourceMapScorePanel\.cloneNode/);
   assert.match(uiSource, /export function updateMapScorePanel/);
   assert.match(uiSource, /export function toggleMapScorePanel/);
+  assert.match(uiSource, /className = "map-score-guild-button"/);
+  assert.match(uiSource, /state\.highlightedGuildName === guild\.name \? "" : guild\.name/);
+  assert.match(uiSource, /nameButton\.setAttribute\("aria-pressed"/);
+  assert.doesNotMatch(uiSource, /createScoreGuildRadioCell/);
+  assert.match(apiSource, /Promise\.all\(BATTLE_BLOCK_VALUES\.map/);
+  assert.match(apiSource, /export function selectBattleBlock/);
+  assert.match(guildGridSource, /export function renderBattleBlockGuilds/);
+  assert.match(guildGridSource, /export function syncBattleSelectionControls/);
+  assert.match(eventsSource, /document\.querySelectorAll\("\[data-class-value\]"\)/);
+  assert.match(eventsSource, /document\.querySelectorAll\("\[data-block-value\]"\)/);
+  assert.match(eventsSource, /state\.elements\.block\.value === card\.dataset\.blockValue/);
   assert.match(eventsSource, /mapScorePanelToggle\?\.addEventListener/);
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
   assert.match(styleSource, /\.map-score-castle-icon[\s\S]*?invert\(70%\)/);
