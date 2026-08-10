@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-empty-row";
-import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-empty-row";
-import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-empty-row";
-import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
+import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-self-attack";
+import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-self-attack";
+import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-self-attack";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

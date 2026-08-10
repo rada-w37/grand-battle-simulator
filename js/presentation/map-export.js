@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-empty-row";
+import { setMapImagePosition } from "../utils.js?v=20260810-self-attack";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -212,6 +212,9 @@ async function getExportStyles() {
     ".map-export-root .map-export-select.is-export-empty-defender{display:none!important;}",
     ".map-export-root .point.is-export-empty-attacker .point-sword-frame{display:none!important;}",
     ".map-export-root .point.is-export-empty-attacker .point-labels::before{display:none!important;}",
+    ".map-export-root .point.has-self-attack .point-sword-frame{display:none!important;}",
+    ".map-export-root .point.has-self-attack .point-labels::before{display:none!important;}",
+    ".map-export-root .point.has-self-attack .point-attacker-select{visibility:hidden!important;}",
     ".map-export-root .point.is-export-empty-defender .point-frame{display:none!important;}",
     ".map-export-root .point.is-export-empty-defender .point-labels::after{display:none!important;}",
     ".map-export-root[data-show-attacker=\"false\"] .point-sword-frame{display:none!important;}",

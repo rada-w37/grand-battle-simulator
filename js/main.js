@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-empty-row";
-import * as api from "./api.js?v=20260810-empty-row";
-import * as ui from "./ui.js?v=20260810-empty-row";
-import { bindEvents } from "./events.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
+import * as api from "./api.js?v=20260810-self-attack";
+import * as ui from "./ui.js?v=20260810-self-attack";
+import { bindEvents } from "./events.js?v=20260810-self-attack";
 import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 

@@ -1,8 +1,8 @@
-import * as state from "./state.js?v=20260810-empty-row";
-import { getActiveTab } from "./utils.js?v=20260810-empty-row";
-import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
+import { getActiveTab } from "./utils.js?v=20260810-self-attack";
+import { renameGuildReferences as renameDomainGuildReferences } from "./domain/guilds.js?v=20260810-self-attack";
 import { removeStorageItem, setStorageItem, STORAGE_KEYS } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260810-empty-row";
+import { saveAppliedGuilds, renderGuildGrid, updateGuildOptions, applySelectStates, updateScores, persistCurrentTabState, saveOccupationTabs } from "./ui.js?v=20260810-self-attack";
 
 function saveHighlightedGuildName(guildName) {
   if (guildName) {

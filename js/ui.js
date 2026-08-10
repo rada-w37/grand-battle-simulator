@@ -1,24 +1,24 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
-import * as state from "./state.js?v=20260810-empty-row";
-import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
+import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-self-attack";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-empty-row";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-empty-row";
-import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-empty-row";
-import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-empty-row";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-empty-row";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-self-attack";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-self-attack";
+import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-self-attack";
+import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-self-attack";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-self-attack";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
-import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-empty-row";
-import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-empty-row";
+import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-self-attack";
+import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-self-attack";
 import {
   canSharePngFile,
   captureMapPng,
   createMapExportFilename,
   downloadPngFile,
   sharePngFile
-} from "./presentation/map-export.js?v=20260810-empty-row";
+} from "./presentation/map-export.js?v=20260810-self-attack";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { getDeclarationCandidateGuildNames } from "./domain/declaration-candidates.js?v=20260810-declaration-candidates";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
@@ -30,7 +30,7 @@ export {
   selectWorld,
   renderWorldSuggestions,
   updateWorldOptions
-} from "./worldSelector.js?v=20260810-empty-row";
+} from "./worldSelector.js?v=20260810-self-attack";
 
 export {
   startGuildNameEditing,
@@ -38,12 +38,12 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260810-empty-row";
+} from "./guildNameEditor.js?v=20260810-self-attack";
 
 export {
   renderEmptyGuildGrid,
   renderGuildGrid
-} from "./renderGuildGrid.js?v=20260810-empty-row";
+} from "./renderGuildGrid.js?v=20260810-self-attack";
 
 export {
   focusEditingTabName,
@@ -58,11 +58,11 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260810-empty-row";
+} from "./occupationTabs.js?v=20260810-self-attack";
 
 export {
   refreshMapLayout
-} from "./layout/point-ui-layout.js?v=20260810-empty-row";
+} from "./layout/point-ui-layout.js?v=20260810-self-attack";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

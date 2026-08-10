@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

@@ -1,7 +1,7 @@
 import { GUILD_COLORS, GUILD_MARKER_COLORS, GUILD_AURA_COLORS, EMPTY_POINT_COLOR } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { basePxToPercent } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
-import * as state from "./state.js?v=20260810-empty-row";
+import * as state from "./state.js?v=20260810-self-attack";
 import { readJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 export {
   createOption,
