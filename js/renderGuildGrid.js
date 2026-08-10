@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260810-filtered-export";
+import * as state from "./state.js?v=20260810-empty-side";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

@@ -1,6 +1,6 @@
-import * as state from "./state.js?v=20260810-filtered-export";
-import { createOption, normalizeWorldName } from "./utils.js?v=20260810-filtered-export";
-import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-filtered-export";
+import * as state from "./state.js?v=20260810-empty-side";
+import { createOption, normalizeWorldName } from "./utils.js?v=20260810-empty-side";
+import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-empty-side";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

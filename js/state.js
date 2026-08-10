@@ -26,7 +26,7 @@ export let pendingBattleApplication = null;
 export {
   elements,
   initializeElements
-} from "./dom-elements.js?v=20260810-filtered-export";
+} from "./dom-elements.js?v=20260810-empty-side";
 
 // State Setters (for reassignment)
 export function setWorldGroupData(value) {

@@ -52,6 +52,8 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(mapExportSource, /\.point-name-label\[data-point-id='/);
   assert.match(mapExportSource, /is-export-empty-attacker/);
   assert.match(mapExportSource, /is-export-empty-defender/);
+  assert.match(mapExportSource, /point\.is-export-empty-defender \.point-frame/);
+  assert.match(mapExportSource, /point\.is-export-empty-defender \.point-labels::after/);
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
   const battleDataDialogSource = readFileSync(

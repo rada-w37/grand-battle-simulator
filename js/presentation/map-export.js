@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-filtered-export";
+import { setMapImagePosition } from "../utils.js?v=20260810-empty-side";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -120,6 +120,7 @@ function replaceSelectsWithLabels(mapInner, selectedValues = []) {
     }
     if (!selectedValue && isDefender) {
       label.classList.add("is-export-empty-defender");
+      select.closest(".point")?.classList.add("is-export-empty-defender");
     }
 
     select.replaceWith(label);
@@ -208,9 +209,11 @@ async function getExportStyles() {
     ".map-export-root .point-selects{display:grid!important;visibility:visible!important;opacity:1!important;z-index:6!important;}",
     ".map-export-root .map-export-select{position:static!important;display:block!important;visibility:visible!important;opacity:1!important;width:var(--map-point-select-width);height:var(--map-point-select-height);min-height:var(--map-point-select-min-height);padding:var(--map-point-select-padding);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:0;color:#eef4f8;font-size:calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));font-weight:700;line-height:var(--map-point-select-line-height);text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.75);background:transparent;}",
     ".map-export-root .map-export-select.is-export-empty-attacker{display:none!important;}",
-    ".map-export-root .map-export-select.is-export-empty-defender{color:transparent!important;}",
+    ".map-export-root .map-export-select.is-export-empty-defender{display:none!important;}",
     ".map-export-root .point.is-export-empty-attacker .point-sword-frame{display:none!important;}",
     ".map-export-root .point.is-export-empty-attacker .point-labels::before{display:none!important;}",
+    ".map-export-root .point.is-export-empty-defender .point-frame{display:none!important;}",
+    ".map-export-root .point.is-export-empty-defender .point-labels::after{display:none!important;}",
     ".map-export-root[data-show-attacker=\"false\"] .point-sword-frame{display:none!important;}",
     ".map-export-root[data-show-attacker=\"false\"] .point-attacker-select{visibility:hidden!important;}",
     ".map-export-root[data-show-attacker=\"false\"] .point-labels::before{display:none!important;}",

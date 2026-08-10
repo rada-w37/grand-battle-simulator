@@ -1,6 +1,6 @@
 import { MAP_STRUCTURE_PLACEMENTS, MAP_BANNER_PLACEMENTS, MAP_LABEL_LAYOUT } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { getPointLayout } from "./layout/layout-engine.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "./utils.js?v=20260810-filtered-export";
+import { setMapImagePosition } from "./utils.js?v=20260810-empty-side";
 
 function setDevLayoutMetadata(element, { targetId, layoutKey, pointId, role = "", targetType = "" }) {
   element.dataset.devLayoutId = targetId;
