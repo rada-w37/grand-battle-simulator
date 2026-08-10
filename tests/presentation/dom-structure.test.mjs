@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { formatBattleDataContext } from "../../js/presentation/battle-data-dialog.js";
 
 const indexHtml = readFileSync(
   fileURLToPath(new URL("../../index.html", import.meta.url)),
@@ -59,7 +60,7 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /id="battle-class-tabs" class="battle-class-tabs" role="tablist"/);
   assert.equal((indexHtml.match(/class="battle-block-card" data-block-value=/g) || []).length, 4);
   assert.equal((indexHtml.match(/data-block-guild-grid=/g) || []).length, 4);
-  assert.match(indexHtml, /js\/main\.js\?v=20260810-error-only-status/);
+  assert.match(indexHtml, /js\/main\.js\?v=20260810-context-labels/);
   assert.match(indexHtml, /id="battle-selection-summary" class="battle-selection-summary"/);
   assert.match(indexHtml, /id="guild-name-editor-controls" hidden/);
   assert.doesNotMatch(indexHtml, /id="score-body"/);
@@ -122,19 +123,19 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(guildGridSource, /export function syncBattleSelectionControls/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-class-value\]"\)/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-block-value\]"\)/);
-  assert.match(mainSource, /api\.js\?v=20260810-error-only-status/);
-  assert.match(mainSource, /ui\.js\?v=20260810-error-only-status/);
-  assert.match(mainSource, /events\.js\?v=20260810-error-only-status/);
-  assert.match(eventsSource, /api\.js\?v=20260810-error-only-status/);
-  assert.match(eventsSource, /ui\.js\?v=20260810-error-only-status/);
-  assert.match(worldSelectorSource, /api\.js\?v=20260810-error-only-status/);
-  assert.match(guildNameEditorSource, /ui\.js\?v=20260810-error-only-status/);
-  assert.match(occupationTabsSource, /ui\.js\?v=20260810-error-only-status/);
-  assert.match(occupationTabsSource, /battle-data-dialog\.js\?v=20260810-error-only-status/);
-  assert.match(uiSource, /worldSelector\.js\?v=20260810-error-only-status/);
-  assert.match(uiSource, /guildNameEditor\.js\?v=20260810-error-only-status/);
-  assert.match(uiSource, /occupationTabs\.js\?v=20260810-error-only-status/);
-  assert.match(uiSource, /battle-data-dialog\.js\?v=20260810-error-only-status/);
+  assert.match(mainSource, /api\.js\?v=20260810-context-labels/);
+  assert.match(mainSource, /ui\.js\?v=20260810-context-labels/);
+  assert.match(mainSource, /events\.js\?v=20260810-context-labels/);
+  assert.match(eventsSource, /api\.js\?v=20260810-context-labels/);
+  assert.match(eventsSource, /ui\.js\?v=20260810-context-labels/);
+  assert.match(worldSelectorSource, /api\.js\?v=20260810-context-labels/);
+  assert.match(guildNameEditorSource, /ui\.js\?v=20260810-context-labels/);
+  assert.match(occupationTabsSource, /ui\.js\?v=20260810-context-labels/);
+  assert.match(occupationTabsSource, /battle-data-dialog\.js\?v=20260810-context-labels/);
+  assert.match(uiSource, /worldSelector\.js\?v=20260810-context-labels/);
+  assert.match(uiSource, /guildNameEditor\.js\?v=20260810-context-labels/);
+  assert.match(uiSource, /occupationTabs\.js\?v=20260810-context-labels/);
+  assert.match(uiSource, /battle-data-dialog\.js\?v=20260810-context-labels/);
   assert.match(eventsSource, /state\.elements\.block\.value === card\.dataset\.blockValue/);
   assert.match(eventsSource, /mapScorePanelToggle\?\.addEventListener/);
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
@@ -157,10 +158,29 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
   assert.match(battleDataDialogSource, /const BATTLE_BLOCK_LABELS = \["A", "B", "C", "D"\]/);
+  assert.match(battleDataDialogSource, /3: "グランドマスター"/);
+  assert.match(battleDataDialogSource, /2: "エキスパート"/);
+  assert.match(battleDataDialogSource, /1: "エリート"/);
+  assert.doesNotMatch(battleDataDialogSource, /context\.groupId \? "グループ "/);
+  assert.doesNotMatch(battleDataDialogSource, /context\.world \? "ワールド "/);
+  assert.doesNotMatch(battleDataDialogSource, /context\.battleClass \? "クラス "/);
+  assert.match(battleDataDialogSource, /context\.world \|\| ""/);
+  assert.match(battleDataDialogSource, /battleClassLabel \|\| ""/);
   assert.match(battleDataDialogSource, /hasBlock \? "ブロック" \+ blockLabel : ""/);
   assert.match(battleDataDialogSource, /message: isReplacement[\s\S]*?別の反映元のデータです。/);
   assert.match(battleDataDialogSource, /noteText: isReplacement[\s\S]*?現在の全タブとMAP編集履歴は初期化されます。/);
   assert.match(battleDataDialogSource, /noteTone: isReplacement \? "danger" : "info"/);
   assert.match(battleDataDialogSource, /noteText = "この操作はUndoでは戻せません。"/);
   assert.match(battleDataDialogSource, /noteTone: "danger"/);
+});
+
+test("formats battle data context with user-facing labels only", () => {
+  assert.equal(formatBattleDataContext({
+    world: "W37",
+    groupId: "191",
+    battleClass: "3",
+    block: "2"
+  }), "W37 / グランドマスター / ブロックC");
+  assert.equal(formatBattleDataContext({ world: "W1", battleClass: "2", block: "0" }), "W1 / エキスパート / ブロックA");
+  assert.equal(formatBattleDataContext({ world: "W9", battleClass: "1", block: "3" }), "W9 / エリート / ブロックD");
 });

@@ -1,5 +1,10 @@
 const DIALOG_ID = "battle-data-confirmation-dialog";
 const BATTLE_BLOCK_LABELS = ["A", "B", "C", "D"];
+const BATTLE_CLASS_LABELS = {
+  3: "グランドマスター",
+  2: "エキスパート",
+  1: "エリート"
+};
 
 function getDialogElements(dialog) {
   return {
@@ -14,19 +19,19 @@ function getDialogElements(dialog) {
   };
 }
 
-function formatContext(context) {
+export function formatBattleDataContext(context) {
   if (!context) return "";
 
   const blockIndex = Number(context.block);
   const blockLabel = Number.isInteger(blockIndex) && BATTLE_BLOCK_LABELS[blockIndex]
     ? BATTLE_BLOCK_LABELS[blockIndex]
     : context.block;
+  const battleClassLabel = BATTLE_CLASS_LABELS[context.battleClass] || context.battleClass;
   const hasBlock = blockLabel !== undefined && blockLabel !== null && blockLabel !== "";
 
   return [
-    context.world ? "ワールド " + context.world : "",
-    context.groupId ? "グループ " + context.groupId : "",
-    context.battleClass ? "クラス " + context.battleClass : "",
+    context.world || "",
+    battleClassLabel || "",
     hasBlock ? "ブロック" + blockLabel : ""
   ].filter(Boolean).join(" / ");
 }
@@ -139,7 +144,7 @@ export function showBattleDataConfirmation({ mode, reason = "", context = null }
         ? "別の反映元のデータです。"
         : "ギルド構成が変わっています。"
       : "現在のタブには、データ反映後の編集があります。",
-    contextText: formatContext(context),
+    contextText: formatBattleDataContext(context),
     noteText: isReplacement
       ? "現在の全タブとMAP編集履歴は初期化されます。"
       : "上書き直後は、MAP左上のUndoで反映前に戻せます。",
