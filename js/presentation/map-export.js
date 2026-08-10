@@ -246,7 +246,13 @@ async function getExportStyles() {
     ".map-export-root .map-export-select.is-highlight-guild{color:limegreen;}",
     ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}",
     ".map-export-root .map-score-panel{z-index:18!important;}",
-    ".map-export-root .map-score-panel.is-collapsed{width:26px!important;}"
+    ".map-export-root .map-score-panel.is-collapsed{width:26px!important;}",
+    ".map-export-root.map-export-aura-pass{border:0!important;box-shadow:none!important;}",
+    ".map-export-root.map-export-aura-pass .map-inner>:not(#battle-points){display:none!important;}",
+    ".map-export-root.map-export-aura-pass .point>:not(.point-aura){display:none!important;}",
+    ".map-export-root.map-export-aura-pass .point-aura{mix-blend-mode:normal!important;}",
+    ".map-export-root.map-export-aura-pass .map-score-panel{display:none!important;}",
+    ".map-export-root.map-export-overlay-pass .point-aura{display:none!important;}"
   ].join("");
 }
 
@@ -259,12 +265,10 @@ function loadImage(sourceUrl) {
   });
 }
 
-async function renderSvgToPng(root) {
-  const exportStyles = await getExportStyles();
-  const mapImageElement = root.querySelector(".map-image");
-  const mapImageSource = mapImageElement?.getAttribute("src") || "";
-  mapImageElement?.remove();
-  const rootMarkup = new XMLSerializer().serializeToString(root);
+function createSvgDataUrl(root, exportStyles, passClass) {
+  const passRoot = root.cloneNode(true);
+  passRoot.classList.add(passClass);
+  const rootMarkup = new XMLSerializer().serializeToString(passRoot);
   const svg = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="',
     MAP_BASE_WIDTH,
@@ -297,10 +301,20 @@ async function renderSvgToPng(root) {
     throw new Error("MAP画像のSVG変換に失敗しました。");
   }
 
-  const svgUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
-  const [backgroundImage, overlayImage] = await Promise.all([
+  return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+}
+
+async function renderSvgToPng(root) {
+  const exportStyles = await getExportStyles();
+  const mapImageElement = root.querySelector(".map-image");
+  const mapImageSource = mapImageElement?.getAttribute("src") || "";
+  mapImageElement?.remove();
+  const auraSvgUrl = createSvgDataUrl(root, exportStyles, "map-export-aura-pass");
+  const overlaySvgUrl = createSvgDataUrl(root, exportStyles, "map-export-overlay-pass");
+  const [backgroundImage, auraImage, overlayImage] = await Promise.all([
     mapImageSource ? loadImage(mapImageSource) : Promise.resolve(null),
-    loadImage(svgUrl)
+    loadImage(auraSvgUrl),
+    loadImage(overlaySvgUrl)
   ]);
   const canvas = document.createElement("canvas");
   canvas.width = MAP_BASE_WIDTH;
@@ -310,6 +324,9 @@ async function renderSvgToPng(root) {
   if (backgroundImage) {
     context.drawImage(backgroundImage, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
   }
+  context.globalCompositeOperation = "soft-light";
+  context.drawImage(auraImage, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
+  context.globalCompositeOperation = "source-over";
   context.drawImage(overlayImage, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
 
   return new Promise((resolve, reject) => {
