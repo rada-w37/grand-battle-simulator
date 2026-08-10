@@ -1,7 +1,7 @@
 import * as state from "./state.js?v=20260810-map-score";
 import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-map-score";
-import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-score-highlight";
-import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-map-score";
+import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-status-copy";
+import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-status-copy";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

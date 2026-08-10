@@ -43,6 +43,7 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /id="battle-class-tabs" class="battle-class-tabs" role="tablist"/);
   assert.equal((indexHtml.match(/class="battle-block-card" data-block-value=/g) || []).length, 4);
   assert.equal((indexHtml.match(/data-block-guild-grid=/g) || []).length, 4);
+  assert.match(indexHtml, /js\/main\.js\?v=20260810-status-copy/);
   assert.match(indexHtml, /id="battle-selection-summary" class="battle-selection-summary"/);
   assert.match(indexHtml, /id="guild-name-editor-controls" hidden/);
   assert.doesNotMatch(indexHtml, /id="score-body"/);
@@ -105,6 +106,8 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(guildGridSource, /export function syncBattleSelectionControls/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-class-value\]"\)/);
   assert.match(eventsSource, /document\.querySelectorAll\("\[data-block-value\]"\)/);
+  assert.doesNotMatch(eventsSource, /api\.js\?v=20260810-score-highlight/);
+  assert.doesNotMatch(eventsSource, /ui\.js\?v=20260810-score-highlight/);
   assert.match(eventsSource, /state\.elements\.block\.value === card\.dataset\.blockValue/);
   assert.match(eventsSource, /mapScorePanelToggle\?\.addEventListener/);
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
