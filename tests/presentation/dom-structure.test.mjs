@@ -111,17 +111,22 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(styleSource, /\.map-score-castle-icon[\s\S]*?invert\(70%\)/);
   assert.match(styleSource, /\.map-score-church-icon[\s\S]*?invert\(51%\)/);
   assert.match(styleSource, /\.map-score-guild-button[\s\S]*?padding: 0 4px 0 5px/);
+  assert.match(styleSource, /\.map-score-table th:first-child[\s\S]*?padding-left: 9px/);
   assert.match(styleSource, /\.guild-grid \.guild-cell::after[\s\S]*?height: 1px/);
   assert.match(styleSource, /\.guild-grid \.guild-cell1[\s\S]*?--guild-accent: #c76565/);
   assert.match(styleSource, /\.guild-grid \.guild-cell2[\s\S]*?--guild-accent: #768be0/);
   assert.match(styleSource, /\.guild-grid \.guild-cell3[\s\S]*?--guild-accent: #7ebf88/);
   assert.match(styleSource, /\.guild-grid \.guild-cell4[\s\S]*?--guild-accent: #d4af55/);
+  assert.doesNotMatch(apiSource, /4ブロックの最新データを取得しました。/);
   assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
   assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
   const battleDataDialogSource = readFileSync(
     fileURLToPath(new URL("../../js/presentation/battle-data-dialog.js", import.meta.url)),
     "utf8"
   );
+  assert.match(battleDataDialogSource, /message: isReplacement[\s\S]*?別の反映元のデータです。/);
+  assert.match(battleDataDialogSource, /noteText: isReplacement[\s\S]*?現在の全タブとMAP編集履歴は初期化されます。/);
+  assert.match(battleDataDialogSource, /noteTone: isReplacement \? "danger" : "info"/);
   assert.match(battleDataDialogSource, /noteText = "この操作はUndoでは戻せません。"/);
   assert.match(battleDataDialogSource, /noteTone: "danger"/);
 });

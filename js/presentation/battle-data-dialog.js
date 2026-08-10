@@ -129,11 +129,14 @@ export function showBattleDataConfirmation({ mode, reason = "", context = null }
       : "編集したMAPへデータを反映しますか？",
     message: isReplacement
       ? reason === "context"
-        ? "別の反映元のデータです。現在の全タブとMAP編集履歴を初期化して反映します。"
-        : "ギルド構成が変わっています。現在の全タブとMAP編集履歴を初期化して反映します。"
+        ? "別の反映元のデータです。"
+        : "ギルド構成が変わっています。"
       : "現在のタブには、データ反映後の編集があります。",
     contextText: formatContext(context),
-    noteText: isReplacement ? "" : "上書き直後は、MAP左上のUndoで反映前に戻せます。",
+    noteText: isReplacement
+      ? "現在の全タブとMAP編集履歴は初期化されます。"
+      : "上書き直後は、MAP左上のUndoで反映前に戻せます。",
+    noteTone: isReplacement ? "danger" : "info",
     mode,
     confirmLabel: isReplacement ? "データを反映" : "上書き",
     confirmClass: isReplacement ? "dialog-danger-button" : "dialog-primary-button",

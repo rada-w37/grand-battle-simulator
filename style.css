@@ -1110,6 +1110,10 @@ button:focus-visible {
   text-overflow: ellipsis;
 }
 
+.map-score-table th:first-child {
+  padding-left: 9px;
+}
+
 .map-score-table td {
   color: #e8d9b2;
   font-variant-numeric: tabular-nums;

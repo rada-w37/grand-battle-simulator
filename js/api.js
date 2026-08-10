@@ -267,8 +267,6 @@ export async function fetchBattleDataIfReady() {
     const failedCount = blockResults.filter(result => result.error).length;
     if (failedCount > 0) {
       if (_setStatus) _setStatus(`${failedCount}ブロックの取得に失敗しました。仮名ギルドで手動反映できます。`, "error");
-    } else if (_setStatus) {
-      _setStatus("4ブロックの最新データを取得しました。", "success");
     }
   } catch (error) {
     if (requestId !== battleFetchRequestId) return;
