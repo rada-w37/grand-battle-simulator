@@ -339,8 +339,10 @@ button:focus-visible {
 }
 
 .guild-grid .guild-cell {
+  position: relative;
   display: block;
-  --guild-ink-rgb: 120, 108, 72;
+  --guild-ink-rgb: 72, 76, 88;
+  --guild-accent: #aa8b52;
   min-width: 0;
   min-height: 30px;
   padding: 5px 7px;
@@ -361,6 +363,18 @@ button:focus-visible {
     inset 0 -12px 20px rgba(4, 8, 14, 0.12);
 }
 
+.guild-grid .guild-cell::after {
+  content: "";
+  position: absolute;
+  right: 10%;
+  bottom: 0;
+  left: 10%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--guild-accent) 22%, var(--guild-accent) 78%, transparent);
+  opacity: 0.82;
+}
+
 .guild-cell1 {
   --guild-ink-rgb: var(--guild-1-ink);
 }
@@ -378,23 +392,19 @@ button:focus-visible {
 }
 
 .guild-grid .guild-cell1 {
-  --guild-ink-rgb: 151, 53, 57;
-  border-color: rgba(224, 94, 101, 0.58);
+  --guild-accent: #c76565;
 }
 
 .guild-grid .guild-cell2 {
-  --guild-ink-rgb: 54, 82, 143;
-  border-color: rgba(112, 139, 225, 0.58);
+  --guild-accent: #768be0;
 }
 
 .guild-grid .guild-cell3 {
-  --guild-ink-rgb: 57, 112, 71;
-  border-color: rgba(100, 185, 116, 0.58);
+  --guild-accent: #7ebf88;
 }
 
 .guild-grid .guild-cell4 {
-  --guild-ink-rgb: 139, 108, 37;
-  border-color: rgba(226, 190, 75, 0.6);
+  --guild-accent: #d4af55;
 }
 
 .apply-data-button {
