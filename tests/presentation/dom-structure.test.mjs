@@ -47,6 +47,7 @@ test("provides semantic structure for the static application shell", () => {
   assert.match(indexHtml, /resource\/map-score-temple\.png/);
   assert.match(indexHtml, /resource\/map-score-castle\.png/);
   assert.match(indexHtml, /resource\/map-score-church\.png/);
+  assert.match(indexHtml, /<path d="M18 21V8m0 0-3 3m3-3 3 3" \/>/);
   assert.match(indexHtml, /id="mobile-point-picker" class="mobile-point-picker" role="dialog" aria-modal="true" aria-labelledby="mobile-point-picker-title"/);
 });
 
