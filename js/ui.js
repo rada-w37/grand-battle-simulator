@@ -1,24 +1,24 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
-import * as state from "./state.js?v=20260810-self-attack";
-import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-self-attack";
+import * as state from "./state.js?v=20260810-map-score";
+import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-map-score";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-self-attack";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-self-attack";
-import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-self-attack";
-import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-self-attack";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-self-attack";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-map-score";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-map-score";
+import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-map-score";
+import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-map-score";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-map-score";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
-import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-self-attack";
-import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-self-attack";
+import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-map-score";
+import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-map-score";
 import {
   canSharePngFile,
   captureMapPng,
   createMapExportFilename,
   downloadPngFile,
   sharePngFile
-} from "./presentation/map-export.js?v=20260810-self-attack";
+} from "./presentation/map-export.js?v=20260810-map-score";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { getDeclarationCandidateGuildNames } from "./domain/declaration-candidates.js?v=20260810-declaration-candidates";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
@@ -30,7 +30,7 @@ export {
   selectWorld,
   renderWorldSuggestions,
   updateWorldOptions
-} from "./worldSelector.js?v=20260810-self-attack";
+} from "./worldSelector.js?v=20260810-map-score";
 
 export {
   startGuildNameEditing,
@@ -38,12 +38,12 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260810-self-attack";
+} from "./guildNameEditor.js?v=20260810-map-score";
 
 export {
   renderEmptyGuildGrid,
   renderGuildGrid
-} from "./renderGuildGrid.js?v=20260810-self-attack";
+} from "./renderGuildGrid.js?v=20260810-map-score";
 
 export {
   focusEditingTabName,
@@ -58,11 +58,11 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260810-self-attack";
+} from "./occupationTabs.js?v=20260810-map-score";
 
 export {
   refreshMapLayout
-} from "./layout/point-ui-layout.js?v=20260810-self-attack";
+} from "./layout/point-ui-layout.js?v=20260810-map-score";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -419,6 +419,50 @@ export function updateCumulativeScope() {
   state.elements.cumulativeScope.textContent = `累計対象: ${targetTabs.join(" / ")}`;
 }
 
+export function updateMapScorePanel(guilds, activeScores, cumulativeScores) {
+  const scoreBody = getRequiredElement("mapScoreBody", "map-score-body");
+  if (!scoreBody) return;
+
+  const rows = Array.from({ length: 4 }, (_, index) => {
+    const guild = guilds[index] || { name: "" };
+    const score = activeScores[guild.name] || { total: 0, temple: 0, castle: 0, church: 0 };
+    const cumulativeScore = cumulativeScores[guild.name]?.total || 0;
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.className = `map-score-guild-cell guild-cell${index + 1}`;
+    nameCell.textContent = guild.name;
+    row.append(
+      nameCell,
+      createScoreCell(cumulativeScore, "map-score-cumulative-cell"),
+      createScoreCell(score.total, "map-score-total-cell"),
+      createScoreCell(score.temple, "map-score-count-cell"),
+      createScoreCell(score.castle, "map-score-count-cell"),
+      createScoreCell(score.church, "map-score-count-cell")
+    );
+    return row;
+  });
+
+  scoreBody.replaceChildren(...rows);
+}
+
+export function setMapScorePanelCollapsed(isCollapsed) {
+  const panel = state.elements.mapScorePanel || document.getElementById("map-score-panel");
+  const toggleButton = state.elements.mapScorePanelToggle || document.getElementById("map-score-panel-toggle");
+  if (!panel || !toggleButton) return;
+
+  panel.classList.toggle("is-collapsed", isCollapsed);
+  toggleButton.setAttribute("aria-expanded", String(!isCollapsed));
+  const label = isCollapsed ? "ギルドスコアを展開" : "ギルドスコアを折り畳む";
+  toggleButton.setAttribute("aria-label", label);
+  toggleButton.title = label;
+}
+
+export function toggleMapScorePanel() {
+  const panel = state.elements.mapScorePanel || document.getElementById("map-score-panel");
+  if (!panel) return;
+  setMapScorePanelCollapsed(!panel.classList.contains("is-collapsed"));
+}
+
 export function updateScores() {
   updateCumulativeScope();
   const guilds = getGuildEntries();
@@ -475,6 +519,8 @@ export function updateScores() {
 
     return row;
   });
+
+  updateMapScorePanel(guilds, activeScores, cumulativeScores);
 
   const scoreBody = getRequiredElement("scoreBody", "score-body");
   if (!scoreBody) return;

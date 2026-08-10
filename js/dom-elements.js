@@ -22,6 +22,9 @@ export function initializeElements() {
   elements.mapUndoButton = document.getElementById("map-undo-button");
   elements.mapRedoButton = document.getElementById("map-redo-button");
   elements.mapScreenshotButton = document.getElementById("map-screenshot-button");
+  elements.mapScorePanel = document.getElementById("map-score-panel");
+  elements.mapScorePanelToggle = document.getElementById("map-score-panel-toggle");
+  elements.mapScoreBody = document.getElementById("map-score-body");
   elements.mapExportStatus = document.getElementById("map-export-status");
   elements.mapExportStatusMessage = document.getElementById("map-export-status-message");
   elements.mapExportSaveButton = document.getElementById("map-export-save-button");

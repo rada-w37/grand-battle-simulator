@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grand Battle Simulator</title>
-  <link rel="stylesheet" href="style.css?v=20260810-self-attack">
+  <link rel="stylesheet" href="style.css?v=20260810-map-score">
 </head>
 <body>
   <main class="app-shell">
@@ -164,6 +164,49 @@
         </div>
       </div>
       <div id="map-visibility-controls" class="map-visibility-controls" role="group" aria-label="MAP要素表示切替"></div>
+      <aside id="map-score-panel" class="map-score-panel" aria-labelledby="map-score-panel-title">
+        <div class="map-score-panel-header">
+          <h3 id="map-score-panel-title" class="visually-hidden">ギルドスコア</h3>
+          <button type="button" id="map-score-panel-toggle" class="map-score-panel-toggle" aria-expanded="true" aria-controls="map-score-panel-body" aria-label="ギルドスコアを折り畳む" title="ギルドスコアを折り畳む">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m7 10 5 5 5-5" />
+            </svg>
+          </button>
+        </div>
+        <div id="map-score-panel-body" class="map-score-panel-body">
+          <table id="map-score-table" class="map-score-table">
+            <caption class="visually-hidden">ギルド別スコア</caption>
+            <thead>
+              <tr>
+                <th scope="col">Guild</th>
+                <th scope="col" aria-label="累計" title="累計">
+                  <span class="map-score-symbol map-score-cumulative-symbol" role="img" aria-label="累計" title="累計">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m5 7 7-4 7 4-7 4-7-4Z" />
+                      <path d="m5 12 7 4 7-4" />
+                      <path d="m5 17 7 4 7-4" />
+                      <path d="M12 9V3m0 0-2 2m2-2 2 2" />
+                    </svg>
+                  </span>
+                </th>
+                <th scope="col" aria-label="合計" title="合計">
+                  <span class="map-score-symbol map-score-total-symbol" role="img" aria-label="合計" title="合計">Σ</span>
+                </th>
+                <th scope="col" aria-label="神殿" title="神殿">
+                  <img src="resource/map-score-temple.png" alt="神殿">
+                </th>
+                <th scope="col" aria-label="城" title="城">
+                  <img src="resource/map-score-castle.png" alt="城">
+                </th>
+                <th scope="col" aria-label="教会" title="教会">
+                  <img src="resource/map-score-church.png" alt="教会">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="map-score-body"></tbody>
+          </table>
+        </div>
+      </aside>
     </section>
     </section>
 
@@ -197,6 +240,6 @@
     (c)BANK OF INNOVATION 該当画像の転載・配布等は禁止しております。
   </footer>
 
-  <script type="module" src="js/main.js?v=20260810-self-attack"></script>
+  <script type="module" src="js/main.js?v=20260810-map-score"></script>
 </body>
 </html>

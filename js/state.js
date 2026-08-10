@@ -26,7 +26,7 @@ export let pendingBattleApplication = null;
 export {
   elements,
   initializeElements
-} from "./dom-elements.js?v=20260810-self-attack";
+} from "./dom-elements.js?v=20260810-map-score";
 
 // State Setters (for reassignment)
 export function setWorldGroupData(value) {

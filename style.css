@@ -859,6 +859,149 @@ button:focus-visible {
   cursor: default;
 }
 
+.map-score-panel {
+  position: absolute;
+  z-index: 18;
+  right: 12px;
+  bottom: 12px;
+  width: min(360px, calc(100% - 24px));
+  overflow: hidden;
+  border-radius: 8px;
+  color: #e8d9b2;
+  background: rgba(7, 9, 15, 0.8);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  pointer-events: auto;
+}
+
+.map-score-panel.is-collapsed {
+  width: 32px;
+}
+
+.map-score-panel-header {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 26px;
+}
+
+.map-score-panel-toggle {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  color: #e2c47e;
+  background: transparent;
+  box-shadow: none;
+}
+
+.map-score-panel-toggle:hover,
+.map-score-panel-toggle:focus-visible {
+  border: 0;
+  color: #f1d994;
+  background: rgba(199, 166, 96, 0.14);
+  box-shadow: none;
+}
+
+.map-score-panel-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.16s ease;
+}
+
+.map-score-panel.is-collapsed .map-score-panel-toggle svg {
+  transform: rotate(180deg);
+}
+
+.map-score-panel-body {
+  padding: 0 8px 8px;
+}
+
+.map-score-panel.is-collapsed .map-score-panel-body {
+  display: none;
+}
+
+.map-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #e8d9b2;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.map-score-table thead {
+  border-bottom: 1px solid rgba(226, 196, 126, 0.66);
+}
+
+.map-score-table th,
+.map-score-table td {
+  height: 25px;
+  padding: 3px 4px;
+  border: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.map-score-table th {
+  color: #f0dfb6;
+  font-weight: 700;
+}
+
+.map-score-table th:first-child,
+.map-score-table td:first-child {
+  width: 37%;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.map-score-table td {
+  color: #e8d9b2;
+  font-variant-numeric: tabular-nums;
+}
+
+.map-score-table img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.map-score-symbol {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #e2c47e;
+}
+
+.map-score-cumulative-symbol svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map-score-total-symbol {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 .map-screenshot-button svg {
   width: 18px;
   height: 18px;
@@ -1691,6 +1834,41 @@ button:focus-visible {
   .map-history-button {
     width: 24px;
     height: 24px;
+  }
+
+  .map-score-panel {
+    right: 6px;
+    bottom: 6px;
+    width: min(340px, calc(100% - 12px));
+  }
+
+  .map-score-panel.is-collapsed {
+    width: 30px;
+  }
+
+  .map-score-panel-body {
+    padding: 0 5px 5px;
+  }
+
+  .map-score-table {
+    font-size: 0.64rem;
+  }
+
+  .map-score-table th,
+  .map-score-table td {
+    height: 22px;
+    padding: 2px;
+  }
+
+  .map-score-table img,
+  .map-score-symbol {
+    width: 19px;
+    height: 19px;
+  }
+
+  .map-score-cumulative-symbol svg {
+    width: 19px;
+    height: 19px;
   }
 
   .map-zoom-controls {

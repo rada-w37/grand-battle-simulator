@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-self-attack";
+import { setMapImagePosition } from "../utils.js?v=20260810-map-score";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -167,6 +167,7 @@ async function inlineImageSources(mapInner) {
 
 async function createExportRoot(mapContainer) {
   const sourceMapInner = mapContainer.querySelector("#map-inner");
+  const sourceMapScorePanel = mapContainer.querySelector("#map-score-panel");
   if (!sourceMapInner) throw new Error("MAP本体が見つかりません。");
 
   const root = document.createElement("div");
@@ -195,9 +196,20 @@ async function createExportRoot(mapContainer) {
   replaceSelectsWithLabels(mapInner, selectedValues);
   applyDesktopLayoutToClone(mapInner);
 
-  await inlineImageSources(mapInner);
-
   root.appendChild(mapInner);
+
+  if (sourceMapScorePanel) {
+    const mapScorePanel = sourceMapScorePanel.cloneNode(true);
+    mapScorePanel.id = "map-score-panel-export";
+    mapScorePanel.style.position = "absolute";
+    mapScorePanel.style.right = "12px";
+    mapScorePanel.style.bottom = "12px";
+    mapScorePanel.style.width = "360px";
+    root.appendChild(mapScorePanel);
+  }
+
+  await inlineImageSources(root);
+
   return root;
 }
 
@@ -225,7 +237,9 @@ async function getExportStyles() {
     ".map-export-root[data-show-defender=\"false\"] .point-labels::after{display:none!important;}",
     ".map-export-root .point-name-label{z-index:7!important;}",
     ".map-export-root .map-export-select.is-highlight-guild{color:limegreen;}",
-    ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}"
+    ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}",
+    ".map-export-root .map-score-panel{z-index:18!important;}",
+    ".map-export-root .map-score-panel.is-collapsed{width:32px!important;}"
   ].join("");
 }
 

@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-self-attack";
-import * as api from "./api.js?v=20260810-self-attack";
-import * as ui from "./ui.js?v=20260810-self-attack";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-self-attack";
+import * as state from "./state.js?v=20260810-map-score";
+import * as api from "./api.js?v=20260810-map-score";
+import * as ui from "./ui.js?v=20260810-map-score";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-map-score";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
 const MAP_MIN_SCALE = 1;
@@ -576,6 +576,9 @@ export function bindEvents() {
   });
   state.elements.mapScreenshotButton.addEventListener("click", () => {
     ui.exportCurrentMapPng();
+  });
+  state.elements.mapScorePanelToggle?.addEventListener("click", () => {
+    ui.toggleMapScorePanel();
   });
   state.elements.mapExportSaveButton.addEventListener("click", () => {
     ui.savePendingMapExport();

@@ -1,6 +1,6 @@
-import * as state from "./state.js?v=20260810-self-attack";
-import { createOption, normalizeWorldName } from "./utils.js?v=20260810-self-attack";
-import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-self-attack";
+import * as state from "./state.js?v=20260810-map-score";
+import { createOption, normalizeWorldName } from "./utils.js?v=20260810-map-score";
+import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-map-score";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

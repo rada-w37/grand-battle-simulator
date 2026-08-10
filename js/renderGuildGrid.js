@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260810-self-attack";
+import * as state from "./state.js?v=20260810-map-score";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
