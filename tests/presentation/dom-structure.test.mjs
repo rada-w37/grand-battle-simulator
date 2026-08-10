@@ -110,6 +110,7 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(styleSource, /\.map-score-temple-icon[\s\S]*?invert\(72%\)/);
   assert.match(styleSource, /\.map-score-castle-icon[\s\S]*?invert\(70%\)/);
   assert.match(styleSource, /\.map-score-church-icon[\s\S]*?invert\(51%\)/);
+  assert.match(styleSource, /\.map-score-guild-button[\s\S]*?padding: 0 4px 0 5px/);
   assert.match(styleSource, /\.guild-grid \.guild-cell1[\s\S]*?151, 53, 57/);
   assert.match(styleSource, /\.guild-grid \.guild-cell2[\s\S]*?54, 82, 143/);
   assert.match(styleSource, /\.guild-grid \.guild-cell3[\s\S]*?57, 112, 71/);
