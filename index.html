@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grand Battle Simulator</title>
-  <link rel="stylesheet" href="style.css?v=20260524-visibility-toggles">
+  <link rel="stylesheet" href="style.css?v=20260810-data-apply">
 </head>
 <body>
   <main class="app-shell">
@@ -129,13 +129,23 @@
         <img src="resource/map.png" alt="グランドバトル拠点マップ" class="map-image">
         <div id="battle-points"></div>
       </div>
-      <div class="map-history-controls" role="group" aria-label="MAP編集履歴操作">
+      <div class="map-history-controls" role="group" aria-label="MAP操作">
         <button type="button" id="map-undo-button" class="map-history-button" aria-label="MAP編集を元に戻す" title="MAP編集を元に戻す" disabled>
           <span class="map-history-icon" aria-hidden="true"></span>
         </button>
         <button type="button" id="map-redo-button" class="map-history-button" aria-label="MAP編集をやり直す" title="MAP編集をやり直す" disabled>
           <span class="map-history-icon is-redo" aria-hidden="true"></span>
         </button>
+        <button type="button" id="map-screenshot-button" class="map-history-button map-screenshot-button" aria-label="現在のMAPをPNG保存" title="現在のMAPをPNG保存">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h3l1.5-2h5L16 7h3v11H5z" />
+            <circle cx="12" cy="12.5" r="3.2" />
+          </svg>
+        </button>
+      </div>
+      <div id="map-export-status" class="map-export-status" role="status" aria-live="polite" hidden>
+        <span id="map-export-status-message"></span>
+        <button type="button" id="map-export-save-button" class="map-export-save-button" hidden>保存</button>
       </div>
       <div class="map-zoom-controls" role="group" aria-label="MAP表示操作">
         <div class="map-zoom-actions">
@@ -166,12 +176,27 @@
         <div id="mobile-point-picker-options" class="mobile-point-picker-options"></div>
       </div>
     </div>
+
+    <dialog id="battle-data-confirmation-dialog" class="battle-data-dialog" aria-labelledby="battle-data-dialog-title" aria-describedby="battle-data-dialog-message">
+      <form method="dialog" class="battle-data-dialog-panel">
+        <h2 id="battle-data-dialog-title" data-dialog-title></h2>
+        <p data-dialog-message></p>
+        <p class="battle-data-dialog-context" data-dialog-context hidden></p>
+        <p class="battle-data-dialog-note" data-dialog-note hidden></p>
+        <div class="battle-data-dialog-actions" role="group" aria-label="反映方法を選択">
+          <button type="button" class="dialog-secondary-button" data-dialog-action="cancel">キャンセル</button>
+          <button type="button" class="dialog-secondary-button" data-dialog-action="new-tab" hidden>新しいタブ</button>
+          <button type="button" class="dialog-primary-button" data-dialog-action="overwrite" hidden>上書き</button>
+          <button type="button" class="dialog-danger-button" data-dialog-action="replace" hidden>データを反映</button>
+        </div>
+      </form>
+    </dialog>
   </main>
 
   <footer>
     (c)BANK OF INNOVATION 該当画像の転載・配布等は禁止しております。
   </footer>
 
-  <script type="module" src="js/main.js?v=20260810-declaration-candidates"></script>
+  <script type="module" src="js/main.js?v=20260810-data-apply"></script>
 </body>
 </html>

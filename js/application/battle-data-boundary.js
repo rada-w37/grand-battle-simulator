@@ -26,8 +26,84 @@ export function prepareBattleDataFetchFailureState(fallbackGuilds = []) {
   return {
     battleData: null,
     pendingGuilds: fallbackGuilds,
-    usesFallbackGuilds: true
+    usesFallbackGuilds: true,
+    occupationStates: null
   };
+}
+
+export function createBattleDataContext({
+  server = "",
+  world = "",
+  groupId = "",
+  battleClass = "",
+  block = ""
+} = {}) {
+  return {
+    server: String(server),
+    world: String(world),
+    groupId: String(groupId),
+    battleClass: String(battleClass),
+    block: String(block)
+  };
+}
+
+export function areBattleDataContextsDifferent(currentContext, nextContext) {
+  if (!currentContext || !nextContext) return false;
+
+  return ["server", "groupId", "battleClass", "block"].some(key => (
+    String(currentContext[key] ?? "") !== String(nextContext[key] ?? "")
+  ));
+}
+
+export function areOccupationStatesEqual(currentStates = [], nextStates = []) {
+  if (!Array.isArray(currentStates) || !Array.isArray(nextStates)) return false;
+  if (currentStates.length !== nextStates.length) return false;
+
+  return currentStates.every((state, index) => {
+    const nextState = nextStates[index] || {};
+    return (state?.defender || "") === (nextState.defender || "") &&
+      (state?.attacker || "") === (nextState.attacker || "");
+  });
+}
+
+export function hasOccupationStateValues(selectStates = []) {
+  return Array.isArray(selectStates) && selectStates.some(pointState => (
+    Boolean(pointState?.defender || pointState?.attacker)
+  ));
+}
+
+export function decideBattleDataApplication({
+  currentContext = null,
+  pendingContext = null,
+  currentGuilds = [],
+  nextGuilds = [],
+  currentStates = [],
+  baselineStates = null,
+  pendingStates = [],
+  tabCount = 1,
+  usesFallbackGuilds = false
+} = {}) {
+  const hasExistingWorkspace = Boolean(currentContext) ||
+    currentGuilds.some(Boolean) ||
+    hasOccupationStateValues(currentStates) ||
+    tabCount > 1;
+  const guildsDifferent = areGuildNameListsDifferent(currentGuilds, nextGuilds);
+  const contextDifferent = areBattleDataContextsDifferent(currentContext, pendingContext);
+
+  if (hasExistingWorkspace && (contextDifferent || guildsDifferent || usesFallbackGuilds)) {
+    return { mode: "replace", reason: contextDifferent ? "context" : "guilds" };
+  }
+
+  const isDirty = baselineStates === null
+    ? hasOccupationStateValues(currentStates)
+    : !areOccupationStatesEqual(currentStates, baselineStates);
+
+  if (isDirty) return { mode: "confirm", reason: "dirty" };
+  if (areOccupationStatesEqual(currentStates, pendingStates)) {
+    return { mode: "immediate", reason: "already-applied" };
+  }
+
+  return { mode: "immediate", reason: "clean" };
 }
 
 export function prepareBattleDataApplicationState({

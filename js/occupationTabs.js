@@ -1,6 +1,6 @@
-import * as state from "./state.js?v=20260524-visibility-toggles";
-import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260524-visibility-toggles";
-import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-declaration-candidates";
+import * as state from "./state.js?v=20260810-data-apply";
+import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-data-apply";
+import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-data-apply";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -156,8 +156,13 @@ export function addOccupationTab() {
   persistCurrentTabState();
 
   const nextIndex = getNextTabDayNumber();
-  const sourceStates = getActiveTab()?.selectStates || createEmptyOccupationStates();
-  const newTab = createOccupationTab(nextIndex, cloneOccupationStates(sourceStates));
+  const activeTab = getActiveTab();
+  const sourceStates = activeTab?.selectStates || createEmptyOccupationStates();
+  const newTab = createOccupationTab(
+    nextIndex,
+    cloneOccupationStates(sourceStates),
+    activeTab?.appliedSnapshotStates || null
+  );
   state.occupationTabs.push(newTab);
   state.setActiveTabId(newTab.id);
   saveOccupationTabs();
@@ -192,8 +197,10 @@ export function deleteActiveOccupationTab() {
   updateOccupationHistoryControls();
 }
 
-export function resetOccupationTabs() {
-  state.setOccupationTabs([createOccupationTab(1)]);
+export function resetOccupationTabs({ selectStates, appliedSnapshotStates = null } = {}) {
+  state.setOccupationTabs([
+    createOccupationTab(1, selectStates || createEmptyOccupationStates(), appliedSnapshotStates)
+  ]);
   state.setActiveTabId(state.occupationTabs[0].id);
   state.setEditingTabId("");
   state.setPendingSelectStates(state.occupationTabs[0].selectStates);

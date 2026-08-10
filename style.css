@@ -859,6 +859,134 @@ button:focus-visible {
   cursor: default;
 }
 
+.map-screenshot-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map-export-status {
+  position: absolute;
+  z-index: 24;
+  top: 50px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(360px, calc(100% - 20px));
+  padding: 7px 9px;
+  border: 1px solid rgba(199, 166, 96, 0.46);
+  border-radius: 6px;
+  color: #f1e3bf;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  background: rgba(7, 9, 15, 0.86);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.map-export-status[data-type="error"] {
+  border-color: rgba(208, 108, 116, 0.68);
+  color: #ffdadd;
+}
+
+.map-export-status[hidden] {
+  display: none;
+}
+
+.map-export-save-button {
+  pointer-events: auto;
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 3px 10px;
+  border: 1px solid rgba(226, 196, 126, 0.6);
+  border-radius: 4px;
+  color: #f4e6bf;
+  background: rgba(199, 166, 96, 0.14);
+}
+
+.battle-data-dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  border: 1px solid rgba(199, 166, 96, 0.6);
+  border-radius: 12px;
+  color: #f2ead9;
+  background: rgba(15, 17, 24, 0.98);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
+}
+
+.battle-data-dialog::backdrop {
+  background: rgba(3, 5, 10, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.battle-data-dialog-panel {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.battle-data-dialog-panel h2 {
+  margin: 0;
+  color: #f7e4b6;
+  font-size: 1.1rem;
+}
+
+.battle-data-dialog-panel p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.battle-data-dialog-context {
+  padding: 8px 10px;
+  border-left: 3px solid rgba(199, 166, 96, 0.72);
+  color: #d9c99e;
+  font-size: 0.84rem;
+  background: rgba(199, 166, 96, 0.08);
+}
+
+.battle-data-dialog-note {
+  color: #b9c2b5;
+  font-size: 0.8rem;
+}
+
+.battle-data-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.battle-data-dialog-actions button {
+  min-width: 96px;
+  min-height: 40px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.dialog-secondary-button {
+  border: 1px solid rgba(199, 166, 96, 0.4);
+  color: #e8d9b2;
+  background: rgba(199, 166, 96, 0.08);
+}
+
+.dialog-primary-button {
+  border: 1px solid rgba(226, 196, 126, 0.76);
+  color: #1d1a12;
+  background: #e2c47e;
+}
+
+.dialog-danger-button {
+  border: 1px solid rgba(208, 108, 116, 0.82);
+  color: #fff0f0;
+  background: rgba(125, 44, 52, 0.82);
+}
+
 .map-zoom-controls {
   position: absolute;
   z-index: 20;
@@ -1765,6 +1893,43 @@ button:focus-visible {
 
   .point select:focus {
     outline: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .map-history-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .map-history-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .map-screenshot-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .map-export-status {
+    top: 42px;
+    left: 3px;
+    max-width: calc(100% - 6px);
+    padding: 6px 7px;
+    font-size: 0.72rem;
+  }
+
+  .battle-data-dialog-panel {
+    padding: 18px;
+  }
+
+  .battle-data-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .battle-data-dialog-actions button {
     width: 100%;
   }
 }

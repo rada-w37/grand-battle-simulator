@@ -20,11 +20,13 @@ export let isEditingGuildNames = false;
 export let guildNameDrafts = [];
 export let usesFallbackGuilds = false;
 export let occupationHistoryByTabId = {};
+export let appliedBattleContext = null;
+export let pendingBattleApplication = null;
 
 export {
   elements,
   initializeElements
-} from "./dom-elements.js";
+} from "./dom-elements.js?v=20260810-data-apply";
 
 // State Setters (for reassignment)
 export function setWorldGroupData(value) {
@@ -130,4 +132,14 @@ export function setUsesFallbackGuilds(value) {
 export function setOccupationHistoryByTabId(value) {
   occupationHistoryByTabId = value;
   return occupationHistoryByTabId;
+}
+
+export function setAppliedBattleContext(value) {
+  appliedBattleContext = value;
+  return appliedBattleContext;
+}
+
+export function setPendingBattleApplication(value) {
+  pendingBattleApplication = value;
+  return pendingBattleApplication;
 }

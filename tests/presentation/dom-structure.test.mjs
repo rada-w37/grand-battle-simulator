@@ -18,7 +18,12 @@ test("provides semantic structure for the static application shell", () => {
   assert.equal((indexHtml.match(/scope="col"/g) || []).length, 7);
   assert.match(indexHtml, /<section class="panel map-panel" aria-labelledby="map-heading">/);
   assert.match(indexHtml, /<header class="tab-row">/);
-  assert.match(indexHtml, /class="map-history-controls" role="group"/);
+  assert.match(indexHtml, /class="map-history-controls" role="group" aria-label="MAP操作"/);
+  assert.match(indexHtml, /id="map-screenshot-button" class="map-history-button map-screenshot-button"/);
+  assert.match(indexHtml, /<dialog id="battle-data-confirmation-dialog"/);
+  assert.match(indexHtml, /data-dialog-action="overwrite"/);
+  assert.match(indexHtml, /data-dialog-action="new-tab"/);
+  assert.match(indexHtml, /data-dialog-action="cancel"/);
   assert.match(indexHtml, /class="map-zoom-controls" role="group"/);
   assert.match(indexHtml, /id="mobile-point-picker" class="mobile-point-picker" role="dialog" aria-modal="true" aria-labelledby="mobile-point-picker-title"/);
 });

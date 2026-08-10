@@ -1,16 +1,24 @@
 import { GUILD_COLORS, GUILD_MARKER_ICONS, GUILD_MARKER_COLORS, SWORD_MARKER_ICON } from "./constants.js?v=20260524-visibility-toggles";
 import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js?v=20260524-visibility-toggles";
-import * as state from "./state.js?v=20260524-visibility-toggles";
-import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260810-data-apply";
+import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-data-apply";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260524-visibility-toggles";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-declaration-candidates";
-import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260524-visibility-toggles";
-import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260524-visibility-toggles";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-declaration-candidates";
+import { updateWorldOptions } from "./worldSelector.js?v=20260810-data-apply";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-data-apply";
+import { renderEmptyGuildGrid, renderGuildGrid } from "./renderGuildGrid.js?v=20260810-data-apply";
+import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-data-apply";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-data-apply";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
-import { prepareBattleDataApplicationState, resolveFallbackGuildNames, shouldResetBattleDataApplication } from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-data-apply";
+import { showBattleDataConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-data-apply";
+import {
+  canSharePngFile,
+  captureMapPng,
+  createMapExportFilename,
+  downloadPngFile,
+  sharePngFile
+} from "./presentation/map-export.js?v=20260810-data-apply";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { getDeclarationCandidateGuildNames } from "./domain/declaration-candidates.js?v=20260810-declaration-candidates";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";
@@ -22,7 +30,7 @@ export {
   selectWorld,
   renderWorldSuggestions,
   updateWorldOptions
-} from "./worldSelector.js?v=20260524-visibility-toggles";
+} from "./worldSelector.js?v=20260810-data-apply";
 
 export {
   startGuildNameEditing,
@@ -30,12 +38,12 @@ export {
   confirmGuildNameEditing,
   getEditableGuildNames,
   updateGuildNameEditControls
-} from "./guildNameEditor.js?v=20260810-declaration-candidates";
+} from "./guildNameEditor.js?v=20260810-data-apply";
 
 export {
   renderEmptyGuildGrid,
   renderGuildGrid
-} from "./renderGuildGrid.js?v=20260524-visibility-toggles";
+} from "./renderGuildGrid.js?v=20260810-data-apply";
 
 export {
   focusEditingTabName,
@@ -50,11 +58,11 @@ export {
   deleteActiveOccupationTab,
   resetOccupationTabs,
   updateTabScrollState
-} from "./occupationTabs.js?v=20260810-declaration-candidates";
+} from "./occupationTabs.js?v=20260810-data-apply";
 
 export {
   refreshMapLayout
-} from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
+} from "./layout/point-ui-layout.js?v=20260810-data-apply";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -559,7 +567,7 @@ export function deleteOccupationHistory(tabId) {
   delete state.occupationHistoryByTabId[tabId];
 }
 
-function clearOccupationHistory() {
+export function clearOccupationHistory() {
   state.setOccupationHistoryByTabId({});
   updateOccupationHistoryControls();
 }
@@ -595,11 +603,14 @@ export function restoreSelectStates() {
 }
 
 // Tab Management
-export function createOccupationTab(index, selectStates = createEmptyOccupationStates()) {
+export function createOccupationTab(index, selectStates = createEmptyOccupationStates(), appliedSnapshotStates = null) {
   return {
     id: `tab-${Date.now()}-${index}`,
     name: `Day ${index}`,
-    selectStates: cloneOccupationStates(selectStates)
+    selectStates: cloneOccupationStates(selectStates),
+    appliedSnapshotStates: Array.isArray(appliedSnapshotStates)
+      ? cloneOccupationStates(appliedSnapshotStates)
+      : null
   };
 }
 
@@ -614,6 +625,7 @@ export function persistCurrentTabState() {
 export function saveOccupationTabs() {
   writeJsonStorage(STORAGE_KEYS.occupationTabs, {
     activeTabId: state.activeTabId,
+    appliedContext: state.appliedBattleContext,
     tabs: state.occupationTabs
   });
 }
@@ -626,8 +638,12 @@ export function loadOccupationTabs() {
     state.setOccupationTabs(saved.tabs.map((tab, index) => ({
       id: tab.id || `tab-${index + 1}`,
       name: tab.name || String(index + 1),
-      selectStates: Array.isArray(tab.selectStates) ? cloneOccupationStates(tab.selectStates) : createEmptyOccupationStates()
+      selectStates: Array.isArray(tab.selectStates) ? cloneOccupationStates(tab.selectStates) : createEmptyOccupationStates(),
+      appliedSnapshotStates: Array.isArray(tab.appliedSnapshotStates)
+        ? cloneOccupationStates(tab.appliedSnapshotStates)
+        : null
     })));
+    state.setAppliedBattleContext(saved.appliedContext || null);
     state.setActiveTabId(saved.activeTabId || state.occupationTabs[0].id);
     return;
   }
@@ -635,6 +651,7 @@ export function loadOccupationTabs() {
   state.setOccupationTabs([
     createOccupationTab(1, Array.isArray(legacySelectStates) ? legacySelectStates : createEmptyOccupationStates())
   ]);
+  state.setAppliedBattleContext(null);
   state.setActiveTabId(state.occupationTabs[0].id);
   saveOccupationTabs();
 }
@@ -738,69 +755,260 @@ export function _setSetPendingStateFn(fn) {
 }
 
 // Apply Battle Data
-export function applyBattleData() {
-  const beforeSelectStates = getCurrentSelectStates();
+let isBattleDataApplyInProgress = false;
+let pendingMapExport = null;
+let mapExportStatusTimer = 0;
+
+function getPendingBattleApplication() {
+  if (state.pendingBattleApplication) return state.pendingBattleApplication;
+
+  if (state.currentBattleData && Array.isArray(state.currentBattleData.castles)) {
+    const prepared = prepareBattleDataApplicationState({
+      battleData: state.currentBattleData,
+      pendingGuilds: state.pendingGuilds,
+      battlePoints: BATTLE_POINTS
+    });
+    return {
+      context: null,
+      guilds: prepared.guilds,
+      occupationStates: prepared.occupationStates,
+      sourceType: "legacy"
+    };
+  }
 
   if (state.usesFallbackGuilds) {
-    const nextGuilds = resolveFallbackGuildNames({
-      pendingGuilds: state.pendingGuilds,
-      editableGuildNames: getEditableGuildNames()
-    });
-    state.setCurrentGuilds(nextGuilds);
-    saveAppliedGuilds();
-    renderGuildGrid(state.currentGuilds);
-    resetOccupationTabs();
-    updateGuildOptions();
-    applySelectStates(state.occupationTabs[0].selectStates);
-    pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
-    updateScores();
-    state.setUsesFallbackGuilds(false);
-    if (_setPendingStateFn) {
-      _setPendingStateFn(false);
-    }
-    updateOccupationHistoryControls();
-    setStatus("仮名ギルドを反映しました。", "success");
-    return;
+    return {
+      context: null,
+      guilds: resolveFallbackGuildNames({
+        pendingGuilds: state.pendingGuilds,
+        editableGuildNames: getEditableGuildNames()
+      }),
+      occupationStates: createEmptyOccupationStates(),
+      sourceType: "fallback"
+    };
   }
 
-  if (!state.currentBattleData || !Array.isArray(state.currentBattleData.castles)) return;
+  return null;
+}
 
-  const preparedBattleData = prepareBattleDataApplicationState({
-    battleData: state.currentBattleData,
-    pendingGuilds: state.pendingGuilds,
-    battlePoints: BATTLE_POINTS
-  });
-  const nextGuilds = preparedBattleData.guilds;
-  if (shouldResetBattleDataApplication({
-    currentGuilds: state.currentGuilds,
-    nextGuilds
-  })) {
-    const confirmed = window.confirm(
-      "最新の拠点情報から取得したギルド名が、現在の拠点情報のギルドと異なります。\n" +
-      "各拠点情報およびタブをすべて初期化してから反映します。よろしいですか？"
-    );
+function setAppliedSnapshot(activeTab, snapshotStates) {
+  if (!activeTab) return;
 
-    if (!confirmed) return;
-    resetOccupationTabs();
+  const currentStates = getCurrentSelectStates();
+  activeTab.selectStates = cloneOccupationStates(currentStates);
+  activeTab.appliedSnapshotStates = cloneOccupationStates(snapshotStates);
+}
+
+function finishBattleDataApply(pending) {
+  state.setPendingBattleApplication(null);
+  state.setUsesFallbackGuilds(false);
+  if (_setPendingStateFn) {
+    _setPendingStateFn(false);
   }
+  state.setAppliedBattleContext(pending.context || null);
+  saveOccupationTabs();
+  updateScores();
+  updateOccupationHistoryControls();
+}
+
+function applyBattleDataToCurrentTab({ pending, beforeSelectStates, recordHistory }) {
+  const nextGuilds = pending.guilds;
+  const snapshotStates = pending.occupationStates || createEmptyOccupationStates();
+  const activeTab = getActiveTab();
 
   state.setCurrentGuilds(nextGuilds);
   saveAppliedGuilds();
   renderGuildGrid(state.currentGuilds);
   updateGuildOptions();
-
-  const snapshotStates = preparedBattleData.occupationStates;
-
   applySelectStates(snapshotStates);
 
-  pushOccupationHistory(createOccupationHistoryEntry(beforeSelectStates, getCurrentSelectStates(), BATTLE_POINTS));
-  saveSelectStates();
-  updateScores();
-  if (_setPendingStateFn) {
-    _setPendingStateFn(false);
+  const afterSelectStates = getCurrentSelectStates();
+  if (recordHistory && activeTab) {
+    pushOccupationHistory(
+      createOccupationHistoryEntry(beforeSelectStates, afterSelectStates, BATTLE_POINTS),
+      activeTab.id
+    );
   }
-  updateOccupationHistoryControls();
+
+  setAppliedSnapshot(activeTab, snapshotStates);
+  saveSelectStates();
+  saveOccupationTabs();
+  finishBattleDataApply(pending);
+}
+
+function replaceBattleDataWorkspace(pending) {
+  const snapshotStates = pending.occupationStates || createEmptyOccupationStates();
+
+  clearOccupationHistory();
+  state.setAppliedBattleContext(pending.context || null);
+  state.setCurrentGuilds(pending.guilds);
+  saveAppliedGuilds();
+  renderGuildGrid(state.currentGuilds);
+  resetOccupationTabs({
+    selectStates: snapshotStates,
+    appliedSnapshotStates: snapshotStates
+  });
+  updateGuildOptions();
+  applySelectStates(snapshotStates);
+  setAppliedSnapshot(getActiveTab(), snapshotStates);
+  saveOccupationTabs();
+  finishBattleDataApply(pending);
+}
+
+function createBattleDataTab(pending) {
+  const snapshotStates = pending.occupationStates || createEmptyOccupationStates();
+  const nextIndex = getNextTabDayNumber();
+
+  persistCurrentTabState();
+  state.setAppliedBattleContext(pending.context || null);
+  const newTab = createOccupationTab(nextIndex, snapshotStates, snapshotStates);
+  state.occupationTabs.push(newTab);
+  state.setActiveTabId(newTab.id);
+  saveOccupationTabs();
+  renderOccupationTabs();
+  updateGuildOptions();
+  applySelectStates(snapshotStates);
+  saveOccupationTabs();
+  finishBattleDataApply(pending);
+}
+
+export async function applyBattleData() {
+  if (isBattleDataApplyInProgress) return;
+
+  const pending = getPendingBattleApplication();
+  const activeTab = getActiveTab();
+  if (!pending || !activeTab) return;
+
+  const beforeSelectStates = getCurrentSelectStates();
+  const decision = decideBattleDataApplication({
+    currentContext: state.appliedBattleContext,
+    pendingContext: pending.context,
+    currentGuilds: state.currentGuilds,
+    nextGuilds: pending.guilds,
+    currentStates: beforeSelectStates,
+    baselineStates: activeTab.appliedSnapshotStates ?? null,
+    pendingStates: pending.occupationStates || createEmptyOccupationStates(),
+    tabCount: state.occupationTabs.length,
+    usesFallbackGuilds: pending.sourceType === "fallback"
+  });
+
+  let action = "immediate";
+  if (decision.mode !== "immediate") {
+    isBattleDataApplyInProgress = true;
+    try {
+      action = await showBattleDataConfirmation({
+        mode: decision.mode,
+        reason: decision.reason,
+        context: pending.context
+      });
+    } finally {
+      isBattleDataApplyInProgress = false;
+    }
+
+    if (state.pendingBattleApplication && state.pendingBattleApplication !== pending) return;
+    if (action === "cancel") return;
+  }
+
+  if (decision.mode === "replace" || action === "replace") {
+    replaceBattleDataWorkspace(pending);
+  } else if (action === "new-tab") {
+    createBattleDataTab(pending);
+  } else {
+    applyBattleDataToCurrentTab({
+      pending,
+      beforeSelectStates,
+      recordHistory: decision.reason !== "already-applied"
+    });
+  }
+
   setStatus("拠点情報を反映しました。", "success");
+}
+
+function setMapExportStatus(message, { showSaveButton = false, type = "" } = {}) {
+  const status = state.elements.mapExportStatus;
+  const messageElement = state.elements.mapExportStatusMessage;
+  const saveButton = state.elements.mapExportSaveButton;
+  if (!status || !messageElement || !saveButton) return;
+
+  window.clearTimeout(mapExportStatusTimer);
+  messageElement.textContent = message;
+  status.dataset.type = type;
+  status.hidden = !message;
+  saveButton.hidden = !showSaveButton;
+  saveButton.disabled = false;
+
+  if (message && !showSaveButton) {
+    mapExportStatusTimer = window.setTimeout(() => {
+      status.hidden = true;
+      messageElement.textContent = "";
+      status.dataset.type = "";
+    }, 5000);
+  }
+}
+
+export async function exportCurrentMapPng() {
+  const button = state.elements.mapScreenshotButton;
+  if (!button || button.disabled) return;
+
+  const activeTab = getActiveTab();
+  const tabName = activeTab?.name || "Day";
+  const filename = createMapExportFilename(tabName);
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  setMapExportStatus("MAP画像を作成しています。");
+
+  try {
+    const blob = await captureMapPng(document.querySelector(".map-container"));
+    const file = new File([blob], filename, { type: "image/png" });
+
+    if (canSharePngFile(file)) {
+      pendingMapExport = { file, filename };
+      setMapExportStatus("画像を作成しました。保存ボタンを押してください。", {
+        showSaveButton: true,
+        type: "success"
+      });
+    } else {
+      downloadPngFile(blob, filename);
+      setMapExportStatus("MAP画像を保存しました。", { type: "success" });
+    }
+  } catch (error) {
+    setMapExportStatus(error.message || "MAP画像の保存に失敗しました。", { type: "error" });
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+  }
+}
+
+export async function savePendingMapExport() {
+  if (!pendingMapExport) return;
+
+  const { file, filename } = pendingMapExport;
+  const saveButton = state.elements.mapExportSaveButton;
+  if (saveButton) saveButton.disabled = true;
+
+  try {
+    if (canSharePngFile(file)) {
+      await sharePngFile(file);
+      setMapExportStatus("保存先を選択しました。", { type: "success" });
+      pendingMapExport = null;
+      return;
+    }
+
+    downloadPngFile(file, filename);
+    setMapExportStatus("MAP画像を保存しました。", { type: "success" });
+    pendingMapExport = null;
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      setMapExportStatus("保存をキャンセルしました。");
+      return;
+    }
+
+    downloadPngFile(file, filename);
+    setMapExportStatus("MAP画像をダウンロードしました。", { type: "success" });
+    pendingMapExport = null;
+  } finally {
+    if (saveButton) saveButton.disabled = false;
+  }
 }
 
 // Reset Data
@@ -814,11 +1022,13 @@ export function resetAllData() {
   state.setCurrentBattleData(null);
   state.setCurrentGuilds([]);
   state.setPendingGuilds([]);
+  state.setPendingBattleApplication(null);
   state.setPendingSelectStates([]);
   state.setHighlightedGuildName("");
   state.setIsEditingGuildNames(false);
   state.setGuildNameDrafts([]);
   state.setUsesFallbackGuilds(false);
+  state.setAppliedBattleContext(null);
   state.setOccupationTabs([createOccupationTab(1)]);
   state.setActiveTabId(state.occupationTabs[0].id);
   state.setEditingTabId("");

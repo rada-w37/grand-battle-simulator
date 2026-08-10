@@ -1,6 +1,6 @@
-import * as state from "./state.js?v=20260524-visibility-toggles";
-import { createOption, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
-import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260810-data-apply";
+import { createOption, normalizeWorldName } from "./utils.js?v=20260810-data-apply";
+import { getGroupedWorldOptions, getFilteredWorldOptions } from "./api.js?v=20260810-data-apply";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

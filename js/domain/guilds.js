@@ -42,7 +42,10 @@ export function renamePointStateGuildReferences(pointState, renameMap) {
 export function renameOccupationTabsGuildReferences(occupationTabs, renameMap) {
   return occupationTabs.map(tab => ({
     ...tab,
-    selectStates: tab.selectStates.map(pointState => renamePointStateGuildReferences(pointState, renameMap))
+    selectStates: tab.selectStates.map(pointState => renamePointStateGuildReferences(pointState, renameMap)),
+    appliedSnapshotStates: Array.isArray(tab.appliedSnapshotStates)
+      ? tab.appliedSnapshotStates.map(pointState => renamePointStateGuildReferences(pointState, renameMap))
+      : tab.appliedSnapshotStates
   }));
 }
 

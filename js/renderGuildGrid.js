@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260810-data-apply";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260524-visibility-toggles";
-import * as api from "./api.js?v=20260524-visibility-toggles";
-import * as ui from "./ui.js?v=20260810-declaration-candidates";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260810-data-apply";
+import * as api from "./api.js?v=20260810-data-apply";
+import * as ui from "./ui.js?v=20260810-data-apply";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-data-apply";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
 const MAP_MIN_SCALE = 1;
@@ -573,6 +573,12 @@ export function bindEvents() {
   });
   state.elements.mapRedoButton.addEventListener("click", () => {
     ui.redoOccupationChange();
+  });
+  state.elements.mapScreenshotButton.addEventListener("click", () => {
+    ui.exportCurrentMapPng();
+  });
+  state.elements.mapExportSaveButton.addEventListener("click", () => {
+    ui.savePendingMapExport();
   });
 
   getAllPointSelects().forEach(select => {

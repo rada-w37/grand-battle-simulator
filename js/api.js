@@ -1,5 +1,5 @@
-import * as state from "./state.js?v=20260524-visibility-toggles";
-import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260524-visibility-toggles";
+import * as state from "./state.js?v=20260810-data-apply";
+import { normalizeWorldName, getGuildEntries } from "./utils.js?v=20260810-data-apply";
 import { readJsonStorage, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
 import {
   fetchLatestBattleData,
@@ -7,9 +7,12 @@ import {
 } from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 import {
   areGuildNameListsDifferent,
+  createBattleDataContext,
   prepareBattleDataFetchFailureState,
+  prepareBattleDataApplicationState,
   prepareFetchedBattleDataState
-} from "./application/battle-data-boundary.js?v=20260524-visibility-toggles";
+} from "./application/battle-data-boundary.js?v=20260810-data-apply";
+import { BATTLE_POINTS } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import {
   getGroupedWorldOptions as groupWorldOptions,
   getWorldOptionsForServer as createWorldOptionsForServer,
@@ -25,6 +28,8 @@ export {
 } from "./infrastructure/mentemori-api.js?v=20260524-visibility-toggles";
 
 const FALLBACK_GUILDS = ["ギルド1", "ギルド2", "ギルド3", "ギルド4"];
+
+let battleFetchRequestId = 0;
 
 // UI Function References (set by main.js)
 let _setStatus = null;
@@ -119,8 +124,10 @@ export function restoreBattleSelection() {
 
 // Fetch Battle Data
 export function resetFetchedData() {
+  battleFetchRequestId += 1;
   state.setCurrentBattleData(null);
   state.setPendingGuilds([]);
+  state.setPendingBattleApplication(null);
   state.setUsesFallbackGuilds(false);
   state.elements.applyButton.disabled = true;
   setPendingState(false);
@@ -136,6 +143,11 @@ export async function fetchBattleDataIfReady() {
     return;
   }
 
+  const requestId = ++battleFetchRequestId;
+  state.setPendingBattleApplication(null);
+  setPendingState(false);
+
+  let selectedContext = null;
   try {
     if (_setStatus) _setStatus("最新データを読み込み中...");
     state.elements.applyButton.disabled = true;
@@ -146,14 +158,35 @@ export async function fetchBattleDataIfReady() {
     state.elements.world.value = selectedWorld.id;
     const worldNumeric = selectedWorld.numeric;
     const groupId = getSelectedGroupId(worldNumeric);
+    selectedContext = createBattleDataContext({
+      server: state.elements.server.value,
+      world: selectedWorld.id,
+      groupId,
+      battleClass: state.elements.battleClass.value,
+      block: state.elements.block.value
+    });
 
     const nextBattleState = prepareFetchedBattleDataState(await fetchLatestBattleData({
       groupId,
       battleClass: state.elements.battleClass.value,
       block: state.elements.block.value
     }));
+    if (requestId !== battleFetchRequestId) return;
+
+    const preparedApplication = prepareBattleDataApplicationState({
+      battleData: nextBattleState.battleData,
+      pendingGuilds: nextBattleState.pendingGuilds,
+      battlePoints: BATTLE_POINTS
+    });
     state.setCurrentBattleData(nextBattleState.battleData);
     state.setPendingGuilds(nextBattleState.pendingGuilds);
+    state.setPendingBattleApplication({
+      requestId,
+      context: selectedContext,
+      guilds: preparedApplication.guilds,
+      occupationStates: preparedApplication.occupationStates,
+      sourceType: "api"
+    });
     state.setUsesFallbackGuilds(nextBattleState.usesFallbackGuilds);
 
     if (_renderGuildGrid) _renderGuildGrid(state.pendingGuilds);
@@ -161,9 +194,18 @@ export async function fetchBattleDataIfReady() {
     state.elements.applyButton.disabled = false;
     if (_setStatus) _setStatus("最新データを取得しました。", "success");
   } catch (error) {
+    if (requestId !== battleFetchRequestId) return;
+
     const fallbackBattleState = prepareBattleDataFetchFailureState(FALLBACK_GUILDS);
     state.setCurrentBattleData(fallbackBattleState.battleData);
     state.setPendingGuilds(fallbackBattleState.pendingGuilds);
+    state.setPendingBattleApplication({
+      requestId,
+      context: selectedContext,
+      guilds: fallbackBattleState.pendingGuilds,
+      occupationStates: fallbackBattleState.occupationStates,
+      sourceType: "fallback"
+    });
     state.setUsesFallbackGuilds(fallbackBattleState.usesFallbackGuilds);
     state.elements.applyButton.disabled = false;
     setPendingState(true);
