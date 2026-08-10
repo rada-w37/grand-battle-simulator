@@ -51,6 +51,7 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(mapExportSource, /\.point-selects\{display:grid!important/);
   assert.match(mapExportSource, /\.point-name-label\[data-point-id='/);
   assert.match(mapExportSource, /is-export-empty-attacker/);
+  assert.match(mapExportSource, /map-export-select\.is-export-empty-attacker\{visibility:hidden!important;/);
   assert.match(mapExportSource, /is-export-empty-defender/);
   assert.match(mapExportSource, /point\.is-export-empty-defender \.point-frame/);
   assert.match(mapExportSource, /point\.is-export-empty-defender \.point-labels::after/);
