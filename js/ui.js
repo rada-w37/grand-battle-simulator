@@ -3,22 +3,22 @@ import { BATTLE_POINTS, POINT_AURA_COORDINATES } from "./layout/layout-config.js
 import * as state from "./state.js?v=20260810-map-score";
 import { cloneOccupationStates, normalizePointState, createEmptyOccupationStates, getGuildEntries, getGuildIndex, getColorForGuildName, getAuraColorForGuildName, setMapImagePosition, createScoreCell, getTabDayNumber, getNextTabDayNumber, getActiveTab, createOption } from "./utils.js?v=20260810-map-score";
 import { getStorageItem, readJsonStorage, removeStorageItem, removeStorageKeys, setStorageItem, STORAGE_KEYS, writeJsonStorage } from "./infrastructure/storage.js?v=20260524-visibility-toggles";
-import { updateWorldOptions } from "./worldSelector.js?v=20260810-context-labels";
-import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260810-context-labels";
+import { updateWorldOptions } from "./worldSelector.js?v=20260811-ios-map-export";
+import { getEditableGuildNames, updateGuildNameEditControls } from "./guildNameEditor.js?v=20260811-ios-map-export";
 import { renderBattleBlockGuilds, renderEmptyGuildGrid, renderGuildGrid, syncBattleSelectionControls } from "./renderGuildGrid.js?v=20260810-score-highlight";
 import { renderStructurePlacements, renderBannerPlacements } from "./renderMapDecorations.js?v=20260810-map-score";
-import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260810-context-labels";
+import { renderOccupationTabs, resetOccupationTabs } from "./occupationTabs.js?v=20260811-ios-map-export";
 import { applyPointUiOffsets } from "./layout/point-ui-layout.js?v=20260524-visibility-toggles";
 import { setDevLayoutMetadata } from "./presentation/dom-helpers.js?v=20260524-visibility-toggles";
 import { decideBattleDataApplication, prepareBattleDataApplicationState, resolveFallbackGuildNames } from "./application/battle-data-boundary.js?v=20260810-map-score";
-import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-context-labels";
+import { showBattleDataConfirmation, showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260811-ios-map-export";
 import {
   canSharePngFile,
   captureMapPng,
   createMapExportFilename,
   downloadPngFile,
   sharePngFile
-} from "./presentation/map-export.js?v=20260810-map-score";
+} from "./presentation/map-export.js?v=20260811-ios-map-export";
 import { applyOccupationHistoryEntryToStates, createOccupationHistoryEntry } from "./domain/occupation-history.js?v=20260524-visibility-toggles";
 import { getDeclarationCandidateGuildNames } from "./domain/declaration-candidates.js?v=20260810-declaration-candidates";
 import { addPointScore, calculateCumulativeScores, calculateScoresFromStates as calculateDomainScoresFromStates, createEmptyScores } from "./domain/scoring.js?v=20260524-visibility-toggles";

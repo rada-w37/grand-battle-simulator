@@ -989,7 +989,8 @@ button:focus-visible {
 }
 
 .map-score-panel.is-collapsed {
-  width: 32px;
+  width: 26px;
+  border-radius: 5px;
 }
 
 .map-score-panel-header {
@@ -2128,7 +2129,7 @@ button:focus-visible {
   }
 
   .map-score-panel.is-collapsed {
-    width: 30px;
+    width: 26px;
   }
 
   .map-score-panel-body {

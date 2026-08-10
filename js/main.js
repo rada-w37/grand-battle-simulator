@@ -1,7 +1,7 @@
 import * as state from "./state.js?v=20260810-map-score";
-import * as api from "./api.js?v=20260810-context-labels";
-import * as ui from "./ui.js?v=20260810-context-labels";
-import { bindEvents } from "./events.js?v=20260810-context-labels";
+import * as api from "./api.js?v=20260811-ios-map-export";
+import * as ui from "./ui.js?v=20260811-ios-map-export";
+import { bindEvents } from "./events.js?v=20260811-ios-map-export";
 import { applyMapLayoutCssVars } from "./layout/layout-config.js?v=20260524-visibility-toggles";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 

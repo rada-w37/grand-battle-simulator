@@ -1,4 +1,4 @@
-import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-visibility-toggles";
+import { MAP_BANNER_PLACEMENTS, getMapLayoutCssVars } from "../layout/layout-config.js?v=20260524-visibility-toggles";
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
@@ -139,6 +139,12 @@ function copyMapCssVariables(sourceElement, targetElement) {
   }
 }
 
+function applyDesktopMapCssVariables(targetElement) {
+  Object.entries(getMapLayoutCssVars(MAP_BASE_WIDTH)).forEach(([propertyName, propertyValue]) => {
+    targetElement.style.setProperty(propertyName, propertyValue);
+  });
+}
+
 function applyDesktopLayoutToClone(mapInner) {
   mapInner.querySelectorAll(".point").forEach(point => {
     clearPointUiOffsets(point);
@@ -179,6 +185,7 @@ async function createExportRoot(mapContainer) {
   root.style.margin = "0";
   root.style.overflow = "visible";
   copyMapCssVariables(document.documentElement, root);
+  applyDesktopMapCssVariables(root);
 
   const selectedValues = [...sourceMapInner.querySelectorAll("select")].map(select => select.value);
   const mapInner = sourceMapInner.cloneNode(true);
@@ -239,12 +246,24 @@ async function getExportStyles() {
     ".map-export-root .map-export-select.is-highlight-guild{color:limegreen;}",
     ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}",
     ".map-export-root .map-score-panel{z-index:18!important;}",
-    ".map-export-root .map-score-panel.is-collapsed{width:32px!important;}"
+    ".map-export-root .map-score-panel.is-collapsed{width:26px!important;}"
   ].join("");
+}
+
+function loadImage(sourceUrl) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("MAP画像の描画に失敗しました。"));
+    image.src = sourceUrl;
+  });
 }
 
 async function renderSvgToPng(root) {
   const exportStyles = await getExportStyles();
+  const mapImageElement = root.querySelector(".map-image");
+  const mapImageSource = mapImageElement?.getAttribute("src") || "";
+  mapImageElement?.remove();
   const rootMarkup = new XMLSerializer().serializeToString(root);
   const svg = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="',
@@ -273,36 +292,34 @@ async function renderSvgToPng(root) {
     "</div></foreignObject></svg>"
   ].join("");
 
-  const svgUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
   const parsedSvg = new DOMParser().parseFromString(svg, "image/svg+xml");
   if (parsedSvg.querySelector("parsererror")) {
     throw new Error("MAP画像のSVG変換に失敗しました。");
   }
 
+  const svgUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+  const [backgroundImage, overlayImage] = await Promise.all([
+    mapImageSource ? loadImage(mapImageSource) : Promise.resolve(null),
+    loadImage(svgUrl)
+  ]);
+  const canvas = document.createElement("canvas");
+  canvas.width = MAP_BASE_WIDTH;
+  canvas.height = MAP_BASE_HEIGHT;
+  const context = canvas.getContext("2d");
+
+  if (backgroundImage) {
+    context.drawImage(backgroundImage, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
+  }
+  context.drawImage(overlayImage, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
+
   return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = MAP_BASE_WIDTH;
-        canvas.height = MAP_BASE_HEIGHT;
-        const context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0, MAP_BASE_WIDTH, MAP_BASE_HEIGHT);
-        canvas.toBlob(blob => {
-          if (!blob) {
-            reject(new Error("PNG画像を生成できませんでした。"));
-            return;
-          }
-          resolve(blob);
-        }, "image/png");
-      } catch (error) {
-        reject(error);
+    canvas.toBlob(blob => {
+      if (!blob) {
+        reject(new Error("PNG画像を生成できませんでした。"));
+        return;
       }
-    };
-    image.onerror = () => {
-      reject(new Error("MAP画像の描画に失敗しました。"));
-    };
-    image.src = svgUrl;
+      resolve(blob);
+    }, "image/png");
   });
 }
 
