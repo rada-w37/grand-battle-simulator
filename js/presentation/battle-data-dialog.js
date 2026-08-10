@@ -141,10 +141,11 @@ export function showBattleDataConfirmation({ mode, reason = "", context = null }
   });
 }
 
-export function showDestructiveConfirmation({ title, message, confirmLabel } = {}) {
+export function showDestructiveConfirmation({ title, message, noteText = "この操作はUndoでは戻せません。", confirmLabel } = {}) {
   return showConfirmationDialog({
     title,
     message,
+    noteText,
     confirmLabel,
     mode: "destructive",
     confirmClass: "dialog-danger-button",

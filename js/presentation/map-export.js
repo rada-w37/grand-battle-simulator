@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-ui-followup";
+import { setMapImagePosition } from "../utils.js?v=20260810-png-values";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -104,14 +104,26 @@ function getStylesheetText() {
   return absolutizeCssUrls(rules.join("\n"));
 }
 
-function replaceSelectsWithLabels(mapInner) {
-  mapInner.querySelectorAll("select").forEach(select => {
+function replaceSelectsWithLabels(mapInner, selectedValues = []) {
+  mapInner.querySelectorAll("select").forEach((select, index) => {
     const label = document.createElement("span");
     label.className = Array.from(select.classList).concat("map-export-select").join(" ");
-    label.textContent = select.value || "選択";
+    label.textContent = selectedValues[index] || select.value || "選択";
     label.setAttribute("aria-hidden", "true");
     select.replaceWith(label);
   });
+}
+
+function copyMapCssVariables(sourceElement, targetElement) {
+  const computedStyle = getComputedStyle(sourceElement);
+
+  for (let index = 0; index < computedStyle.length; index += 1) {
+    const propertyName = computedStyle.item(index);
+    if (!propertyName.startsWith("--map-")) continue;
+
+    const propertyValue = computedStyle.getPropertyValue(propertyName).trim();
+    if (propertyValue) targetElement.style.setProperty(propertyName, propertyValue);
+  }
 }
 
 function applyDesktopLayoutToClone(mapInner) {
@@ -152,7 +164,9 @@ async function createExportRoot(mapContainer) {
   root.style.height = MAP_BASE_HEIGHT + "px";
   root.style.margin = "0";
   root.style.overflow = "visible";
+  copyMapCssVariables(document.documentElement, root);
 
+  const selectedValues = [...sourceMapInner.querySelectorAll("select")].map(select => select.value);
   const mapInner = sourceMapInner.cloneNode(true);
   mapInner.style.width = MAP_BASE_WIDTH + "px";
   mapInner.style.height = MAP_BASE_HEIGHT + "px";
@@ -165,7 +179,7 @@ async function createExportRoot(mapContainer) {
     mapImage.style.height = MAP_BASE_HEIGHT + "px";
   }
 
-  replaceSelectsWithLabels(mapInner);
+  replaceSelectsWithLabels(mapInner, selectedValues);
   applyDesktopLayoutToClone(mapInner);
 
   await inlineImageSources(mapInner);

@@ -47,6 +47,10 @@ test("uses modal confirmation for destructive actions and keeps map export label
   assert.match(occupationTabsSource, /showDestructiveConfirmation/);
   assert.match(mapExportSource, /root\.dataset\.showAttacker = "true"/);
   assert.match(mapExportSource, /root\.dataset\.showDefender = "true"/);
+  assert.match(mapExportSource, /copyMapCssVariables\(document\.documentElement, root\)/);
   assert.match(mapExportSource, /\.point-selects\{display:grid!important/);
   assert.match(mapExportSource, /\.point-name-label\[data-point-id='/);
+  assert.match(uiSource, /message: "全ての占拠データ、タブ、履歴を初期化します。"/);
+  assert.match(occupationTabsSource, /message: "選択中のタブと、そのタブの履歴を削除します。"/);
+  assert.match(readFileSync(fileURLToPath(new URL("../../js/presentation/battle-data-dialog.js", import.meta.url)), "utf8"), /noteText = "この操作はUndoでは戻せません。"/);
 });

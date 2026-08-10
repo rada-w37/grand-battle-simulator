@@ -26,7 +26,7 @@ export let pendingBattleApplication = null;
 export {
   elements,
   initializeElements
-} from "./dom-elements.js?v=20260810-ui-followup";
+} from "./dom-elements.js?v=20260810-png-values";
 
 // State Setters (for reassignment)
 export function setWorldGroupData(value) {

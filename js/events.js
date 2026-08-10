@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-ui-followup";
-import * as api from "./api.js?v=20260810-ui-followup";
-import * as ui from "./ui.js?v=20260810-ui-followup";
-import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-ui-followup";
+import * as state from "./state.js?v=20260810-png-values";
+import * as api from "./api.js?v=20260810-png-values";
+import * as ui from "./ui.js?v=20260810-png-values";
+import { getAllPointSelects, normalizeWorldName } from "./utils.js?v=20260810-png-values";
 import { getLayoutViewport } from "./layout/layout-coordinate.js?v=20260524-visibility-toggles";
 
 const MAP_MIN_SCALE = 1;

@@ -1,4 +1,4 @@
-import * as state from "./state.js?v=20260810-ui-followup";
+import * as state from "./state.js?v=20260810-png-values";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);

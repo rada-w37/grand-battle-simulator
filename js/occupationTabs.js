@@ -1,7 +1,7 @@
-import * as state from "./state.js?v=20260810-ui-followup";
-import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-ui-followup";
-import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-ui-followup";
-import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-ui-followup";
+import * as state from "./state.js?v=20260810-png-values";
+import { cloneOccupationStates, createEmptyOccupationStates, getActiveTab, getNextTabDayNumber } from "./utils.js?v=20260810-png-values";
+import { applySelectStates, createOccupationTab, deleteOccupationHistory, persistCurrentTabState, saveOccupationTabs, updateGuildOptions, updateOccupationHistoryControls } from "./ui.js?v=20260810-png-values";
+import { showDestructiveConfirmation } from "./presentation/battle-data-dialog.js?v=20260810-png-values";
 
 function getRequiredElement(elementKey, id) {
   const element = state.elements[elementKey] || document.getElementById(id);
@@ -183,7 +183,7 @@ export async function deleteActiveOccupationTab() {
 
   const confirmed = await showDestructiveConfirmation({
     title: "選択中のタブを削除しますか？",
-    message: "選択中のタブと、そのタブの履歴を削除します。この操作はUndoでは戻せません。",
+    message: "選択中のタブと、そのタブの履歴を削除します。",
     confirmLabel: "削除"
   });
   if (!confirmed) return;
