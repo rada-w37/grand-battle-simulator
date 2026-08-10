@@ -982,39 +982,39 @@ button:focus-visible {
   filter:
     brightness(0)
     saturate(100%)
-    invert(81%)
-    sepia(31%)
-    saturate(693%)
+    invert(69%)
+    sepia(18%)
+    saturate(421%)
     hue-rotate(357deg)
-    brightness(91%)
-    contrast(91%)
-    drop-shadow(0 0 2px rgba(226, 196, 126, 0.28));
+    brightness(84%)
+    contrast(82%)
+    drop-shadow(0 0 2px rgba(190, 163, 106, 0.16));
 }
 
 .map-score-castle-icon {
   filter:
     brightness(0)
     saturate(100%)
-    invert(81%)
-    sepia(7%)
-    saturate(295%)
+    invert(70%)
+    sepia(5%)
+    saturate(210%)
     hue-rotate(175deg)
-    brightness(94%)
-    contrast(88%)
-    drop-shadow(0 0 2px rgba(200, 208, 215, 0.18));
+    brightness(85%)
+    contrast(83%)
+    drop-shadow(0 0 2px rgba(177, 186, 193, 0.1));
 }
 
 .map-score-church-icon {
   filter:
     brightness(0)
     saturate(100%)
-    invert(55%)
-    sepia(20%)
-    saturate(759%)
+    invert(46%)
+    sepia(12%)
+    saturate(420%)
     hue-rotate(345deg)
-    brightness(93%)
-    contrast(89%)
-    drop-shadow(0 0 2px rgba(177, 119, 78, 0.18));
+    brightness(79%)
+    contrast(83%)
+    drop-shadow(0 0 2px rgba(143, 113, 91, 0.1));
 }
 
 .map-score-symbol {
