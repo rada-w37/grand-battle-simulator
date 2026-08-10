@@ -982,13 +982,13 @@ button:focus-visible {
   filter:
     brightness(0)
     saturate(100%)
-    invert(69%)
-    sepia(18%)
-    saturate(421%)
+    invert(72%)
+    sepia(24%)
+    saturate(500%)
     hue-rotate(357deg)
-    brightness(84%)
-    contrast(82%)
-    drop-shadow(0 0 2px rgba(190, 163, 106, 0.16));
+    brightness(90%)
+    contrast(86%)
+    drop-shadow(0 0 2px rgba(190, 163, 106, 0.22));
 }
 
 .map-score-castle-icon {
@@ -1008,13 +1008,13 @@ button:focus-visible {
   filter:
     brightness(0)
     saturate(100%)
-    invert(46%)
-    sepia(12%)
-    saturate(420%)
+    invert(51%)
+    sepia(18%)
+    saturate(520%)
     hue-rotate(345deg)
-    brightness(79%)
-    contrast(83%)
-    drop-shadow(0 0 2px rgba(143, 113, 91, 0.1));
+    brightness(86%)
+    contrast(87%)
+    drop-shadow(0 0 2px rgba(143, 113, 91, 0.16));
 }
 
 .map-score-symbol {
