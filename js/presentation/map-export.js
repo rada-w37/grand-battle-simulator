@@ -2,7 +2,7 @@ import { MAP_BANNER_PLACEMENTS } from "../layout/layout-config.js?v=20260524-vis
 import { getPointLayout } from "../layout/layout-engine.js?v=20260524-visibility-toggles";
 import { MAP_BASE_HEIGHT, MAP_BASE_WIDTH } from "../layout/layout-coordinate.js?v=20260524-visibility-toggles";
 import { applyPointUiOffsets, clearPointUiOffsets } from "../layout/point-ui-layout.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-png-values";
+import { setMapImagePosition } from "../utils.js?v=20260810-filtered-export";
 
 function collectCssRules(ruleList, output) {
   Array.from(ruleList || []).forEach(rule => {
@@ -106,10 +106,22 @@ function getStylesheetText() {
 
 function replaceSelectsWithLabels(mapInner, selectedValues = []) {
   mapInner.querySelectorAll("select").forEach((select, index) => {
+    const selectedValue = selectedValues[index] || select.value || "";
+    const isAttacker = select.classList.contains("point-attacker-select");
+    const isDefender = select.classList.contains("point-defender-select");
     const label = document.createElement("span");
     label.className = Array.from(select.classList).concat("map-export-select").join(" ");
-    label.textContent = selectedValues[index] || select.value || "選択";
+    label.textContent = selectedValue || "";
     label.setAttribute("aria-hidden", "true");
+
+    if (!selectedValue && isAttacker) {
+      label.classList.add("is-export-empty-attacker");
+      select.closest(".point")?.classList.add("is-export-empty-attacker");
+    }
+    if (!selectedValue && isDefender) {
+      label.classList.add("is-export-empty-defender");
+    }
+
     select.replaceWith(label);
   });
 }
@@ -158,8 +170,8 @@ async function createExportRoot(mapContainer) {
 
   const root = document.createElement("div");
   root.className = "map-container map-export-root";
-  root.dataset.showAttacker = "true";
-  root.dataset.showDefender = "true";
+  root.dataset.showAttacker = mapContainer.dataset.showAttacker || "true";
+  root.dataset.showDefender = mapContainer.dataset.showDefender || "true";
   root.style.width = MAP_BASE_WIDTH + "px";
   root.style.height = MAP_BASE_HEIGHT + "px";
   root.style.margin = "0";
@@ -195,6 +207,16 @@ async function getExportStyles() {
     ".map-export-root .map-inner{position:relative!important;}",
     ".map-export-root .point-selects{display:grid!important;visibility:visible!important;opacity:1!important;z-index:6!important;}",
     ".map-export-root .map-export-select{position:static!important;display:block!important;visibility:visible!important;opacity:1!important;width:var(--map-point-select-width);height:var(--map-point-select-height);min-height:var(--map-point-select-min-height);padding:var(--map-point-select-padding);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:0;color:#eef4f8;font-size:calc(var(--map-point-select-font-size) * var(--map-select-font-scale, var(--map-label-font-scale, 1)));font-weight:700;line-height:var(--map-point-select-line-height);text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.75);background:transparent;}",
+    ".map-export-root .map-export-select.is-export-empty-attacker{display:none!important;}",
+    ".map-export-root .map-export-select.is-export-empty-defender{color:transparent!important;}",
+    ".map-export-root .point.is-export-empty-attacker .point-sword-frame{display:none!important;}",
+    ".map-export-root .point.is-export-empty-attacker .point-labels::before{display:none!important;}",
+    ".map-export-root[data-show-attacker=\"false\"] .point-sword-frame{display:none!important;}",
+    ".map-export-root[data-show-attacker=\"false\"] .point-attacker-select{visibility:hidden!important;}",
+    ".map-export-root[data-show-attacker=\"false\"] .point-labels::before{display:none!important;}",
+    ".map-export-root[data-show-defender=\"false\"] .point-frame{display:none!important;}",
+    ".map-export-root[data-show-defender=\"false\"] .point-defender-select{visibility:hidden!important;}",
+    ".map-export-root[data-show-defender=\"false\"] .point-labels::after{display:none!important;}",
     ".map-export-root .point-name-label{z-index:7!important;}",
     ".map-export-root .map-export-select.is-highlight-guild{color:limegreen;}",
     ".map-export-root .map-export-select.is-self-attack{color:#9ca3a7;}"

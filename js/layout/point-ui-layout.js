@@ -5,7 +5,7 @@ import {
   MAP_BANNER_PLACEMENTS
 } from "./decorations.js?v=20260524-visibility-toggles";
 import { getPointLayout } from "./layout-engine.js?v=20260524-visibility-toggles";
-import { setMapImagePosition } from "../utils.js?v=20260810-png-values";
+import { setMapImagePosition } from "../utils.js?v=20260810-filtered-export";
 
 export const POINT_UI_OFFSET_VARS = {
   pointLabels: {

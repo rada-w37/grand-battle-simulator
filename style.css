@@ -950,8 +950,15 @@ button:focus-visible {
 }
 
 .battle-data-dialog-note {
-  color: #b9c2b5;
   font-size: 0.8rem;
+}
+
+.battle-data-dialog-note[data-tone="info"] {
+  color: #a9c7ad;
+}
+
+.battle-data-dialog-note[data-tone="danger"] {
+  color: #e3a0a7;
 }
 
 .battle-data-dialog-actions {

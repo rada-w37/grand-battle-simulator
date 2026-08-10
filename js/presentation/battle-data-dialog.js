@@ -31,6 +31,7 @@ function showConfirmationDialog({
   message,
   contextText = "",
   noteText = "",
+  noteTone = "info",
   mode = "",
   confirmLabel = "上書き",
   confirmClass = "dialog-primary-button",
@@ -53,6 +54,7 @@ function showConfirmationDialog({
   elements.context.hidden = !contextText;
   elements.note.textContent = noteText;
   elements.note.hidden = !noteText;
+  elements.note.dataset.tone = noteTone;
 
   elements.cancel.hidden = false;
   elements.newTab.hidden = !showNewTab;
@@ -146,6 +148,7 @@ export function showDestructiveConfirmation({ title, message, noteText = "この
     title,
     message,
     noteText,
+    noteTone: "danger",
     confirmLabel,
     mode: "destructive",
     confirmClass: "dialog-danger-button",
